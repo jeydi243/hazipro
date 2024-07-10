@@ -4,6 +4,15 @@ const appConfig = useAppConfig()
 const { isHelpSlideoverOpen } = useDashboard()
 
 const links = [{
+  id: 'note_frais',
+  label: 'Note de frais',
+  icon: 'i-heroicons-user-group',
+  to: '/nf',
+  tooltip: {
+    text: 'Note de frais',
+    shortcuts: ['G', 'U']
+  }
+}, {
   id: 'home',
   label: 'Home',
   icon: 'i-heroicons-home',
@@ -21,15 +30,6 @@ const links = [{
   tooltip: {
     text: 'Inbox',
     shortcuts: ['G', 'I']
-  }
-}, {
-  id: 'users',
-  label: 'Users',
-  icon: 'i-heroicons-user-group',
-  to: '/users',
-  tooltip: {
-    text: 'Users',
-    shortcuts: ['G', 'U']
   }
 }, {
   id: 'settings',
@@ -86,15 +86,8 @@ const colors = computed(() => defaultColors.value.map(color => ({ ...color, acti
 
 <template>
   <UDashboardLayout>
-    <UDashboardPanel
-      :width="250"
-      :resizable="{ min: 200, max: 300 }"
-      collapsible
-    >
-      <UDashboardNavbar
-        class="!border-transparent"
-        :ui="{ left: 'flex-1' }"
-      >
+    <UDashboardPanel :width="250" :resizable="{ min: 200, max: 300 }" collapsible>
+      <UDashboardNavbar class="!border-transparent" :ui="{ left: 'flex-1' }">
         <template #left>
           <TeamsDropdown />
         </template>
@@ -109,10 +102,8 @@ const colors = computed(() => defaultColors.value.map(color => ({ ...color, acti
 
         <UDivider />
 
-        <UDashboardSidebarLinks
-          :links="[{ label: 'Colors', draggable: true, children: colors }]"
-          @update:links="colors => defaultColors = colors"
-        />
+        <UDashboardSidebarLinks :links="[{ label: 'Colors', draggable: true, children: colors }]"
+          @update:links="colors => defaultColors = colors" />
 
         <div class="flex-1" />
 
