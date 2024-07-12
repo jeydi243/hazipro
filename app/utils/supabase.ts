@@ -1,6 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
+import { useRuntimeConfig } from '#app';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const env = useRuntimeConfig()
+
+const supabaseUrl: string = env.public.SUPABASE_URL;
+const supabaseKey: string = env.public.SUPABASE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
