@@ -16,6 +16,7 @@ export default withNuxt({
     "@stylistic/keyword-spacing": "off",
     "prefer-const": "off",
     "vue/html-quotes": "off",
-    "vue/block-tag-newline": "off"
-  }
+    "@stylistic/comma-dangle": "off",
+    "vue/block-tag-newline": "off",
+  },
 });

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { User } from '~/types'
+import { supabase } from '~/utils/supabase';
 
 const defaultColumns = [{
   key: 'id',
@@ -19,7 +20,11 @@ const defaultColumns = [{
   key: 'status',
   label: 'Status'
 }]
-
+const nf_headers = ref([])
+async function getCountries() {
+  const { data } = await supabase.from('nf_headers').select()
+  nf_headers.value = data
+}
 const q = ref('')
 const sort = ref({ column: 'id', direction: 'asc' as const })
 const input = ref<{ input: HTMLInputElement }>()

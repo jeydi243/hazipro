@@ -1,32 +1,34 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   extends: [process.env.NUXT_UI_PRO_PATH || "@nuxt/ui-pro"],
-  modules: [
-    "@nuxt/eslint",
-    "@nuxt/ui",
-    "@nuxt/fonts",
-    "@vueuse/nuxt",
-    "shadcn-nuxt",
-  ],
+
+  modules: ["@nuxt/eslint", "@nuxt/ui", "@nuxt/fonts", "@vueuse/nuxt"],
+
   ui: {
     icons: ["heroicons", "simple-icons"],
     safelistColors: ["primary", "red", "orange", "green"],
   },
+
   colorMode: {
     disableTransition: true,
   },
+
   routeRules: {
     "/": { prerender: true },
   },
+
   devtools: {
     enabled: true,
   },
+
   typescript: {
     strict: false,
   },
+
   future: {
     compatibilityVersion: 4,
   },
+
   eslint: {
     config: {
       stylistic: {
@@ -34,5 +36,8 @@ export default defineNuxtConfig({
         braceStyle: "1tbs",
       },
     },
-  }
+  },
+
+  devServer: { port: 5000 },
+  compatibilityDate: "2024-07-11",
 });
