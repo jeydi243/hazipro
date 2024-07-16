@@ -219,7 +219,7 @@ function onSelectBeneficiaire(option) {
             Note de frais - Entete
           </template>
 
-          <UForm ref="form" :schema="header_schema" :state="state" class="space-y-4 h-full" @submit="onSubmit">
+          <UForm ref="form" :schema="header_schema" :state="state" class="space-y-1 h-full overflow-y-auto" @submit="onSubmit">
             <UCard>
               <UFormGroup label="Direction demandeur" name="crg_demandeur">
                 <UInput v-model="state.crg_demandeur" />
