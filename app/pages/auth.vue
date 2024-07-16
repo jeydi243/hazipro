@@ -39,9 +39,11 @@ async function onSubmit(payload: any) {
     if (!error) {
         const current_user = await supabase.auth.getUser();
         console.log({ current_user });
-        router.push('/')
+        toast.add({ icon: 'i-solar-shield-warning-linear', title: 'Login successfully', color: 'green', description: 'Bienvenue cher membre !' });
+        router.push('/nf')
+    } else {
+        toast.add({ icon: 'i-heroicons-check-circle', title: 'Login unseccessful', color: 'red', description: error.message });
     }
-    toast.add({ icon: 'i-heroicons-check-circle', title: 'Login unseccessful', color: 'red' });
 }
 </script>
 

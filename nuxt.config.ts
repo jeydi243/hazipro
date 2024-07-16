@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   modules: ["@nuxt/eslint", "@nuxt/ui", "@nuxt/fonts", "@vueuse/nuxt"],
 
   ui: {
-    icons: ["heroicons", "simple-icons"],
+    icons: ["heroicons", "simple-icons", "solar"],
     safelistColors: ["primary", "red", "orange", "green"],
   },
 
