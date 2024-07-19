@@ -2,28 +2,28 @@
 const links = [[{
   label: 'General',
   icon: 'i-heroicons-user-circle',
-  to: '/settings',
+  to: '/parametres',
   exact: true
 }, {
   label: 'Lookups',
   icon: 'i-heroicons-user-group',
-  to: '/parametreslookups'
+  to: '/parametres/lookups'
 }, {
   label: 'SSO',
   icon: 'i-heroicons-bell',
-  to: '/parametressso'
+  to: '/parametres/sso'
 }, {
   label: 'Frais',
   icon: 'i-heroicons-bell',
-  to: '/parametresfrais'
+  to: '/parametres/frais'
 }, {
   label: 'Beneficiaires',
   icon: 'i-heroicons-bell',
-  to: '/parametresfrais'
+  to: '/parametres/frais'
 }, {
   label: 'Matrices',
   icon: 'i-heroicons-bell',
-  to: '/parametresmatrice_approbation'
+  to: '/parametres/matrice_approbation'
 }], [{
   label: 'Frais',
   icon: 'i-heroicons-book-open',
