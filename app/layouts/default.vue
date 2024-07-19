@@ -4,15 +4,6 @@ const appConfig = useAppConfig()
 const { isHelpSlideoverOpen } = useDashboard()
 
 const links = [{
-  id: 'note_frais',
-  label: 'Note de frais',
-  icon: 'i-heroicons-user-group',
-  to: '/nf',
-  tooltip: {
-    text: 'Note de frais',
-    shortcuts: ['G', 'U']
-  }
-}, {
   id: 'home',
   label: 'Home',
   icon: 'i-heroicons-home',
@@ -22,14 +13,33 @@ const links = [{
     shortcuts: ['G', 'H']
   }
 }, {
-  id: 'inbox',
-  label: 'Inbox',
-  icon: 'i-heroicons-inbox',
-  to: '/inbox',
-  badge: '4',
+  id: 'note_frais',
+  label: 'Note de frais',
+  icon: 'i-heroicons-user-group',
+  to: '/nf',
   tooltip: {
-    text: 'Inbox',
-    shortcuts: ['G', 'I']
+    text: 'Note de frais',
+    shortcuts: ['G', 'U']
+  }
+}, {
+  id: 'tresorerie',
+  label: 'Tresorerie',
+  to: '/tresorerie',
+  icon: 'i-heroicons-cog-8-tooth',
+  children: [{
+    label: 'Caisse Transaction',
+    to: '/tresorerie/caisse_transaction',
+    exact: true
+  }, {
+    label: 'Banque transaction',
+    to: '/tresorerie/banque_transaction'
+  }, {
+    label: 'Transfert de fond',
+    to: '/tresorerie/transfert_fond'
+  }],
+  tooltip: {
+    text: 'Tresorerie',
+    shortcuts: ['G', 'T']
   }
 }, {
   id: 'settings',
@@ -51,7 +61,19 @@ const links = [{
     text: 'Settings',
     shortcuts: ['G', 'S']
   }
-}]
+},
+{
+  id: 'inbox',
+  label: 'Inbox',
+  icon: 'i-heroicons-inbox',
+  to: '/inbox',
+  badge: '4',
+  tooltip: {
+    text: 'Inbox',
+    shortcuts: ['G', 'I']
+  }
+}
+]
 
 const footerLinks = [{
   label: 'Invite people',

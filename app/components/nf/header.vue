@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { z } from 'zod'
 import type { FormError, FormSubmitEvent } from '#ui/types'
 
 const state = reactive({
@@ -13,7 +14,18 @@ const state = reactive({
     nature_op: undefined,
     taux: undefined
 })
-
+const header_schema = z.object({
+    crg_demandeur: z.string().email('Invalid email'),
+    org_id: z.string().min(8, 'Must be at least 8 characters'),
+    beneficiaire_id: z.number().min(100, 'Must be at least 0'),
+    type_budget: z.number().min(100, 'Must be at least 0'),
+    categorie: z.string().min(8, 'Must be at least 8 characters'),
+    description: z.string().min(8, 'Must be at least 8 characters'),
+    date_creation: z.date({ required_error: 'Date is required' }),
+    devise: z.string().max(3, 'Must be 3 characters'),
+    nature_op: z.number().min(100, 'Must be at least 0'),
+    taux: z.number().min(100, 'Must be at least 0')
+})
 const form = ref()
 
 async function onSubmit(event: FormSubmitEvent<any>) {
@@ -34,7 +46,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 </script>
 
 <template>
-    <UForm ref="form" :state="state" class="flex flex-col" @submit="onSubmit">
+    <UForm ref="form" :state="state" :schema="header_schema" class="flex flex-col" @submit="onSubmit">
         <UCard class="flex flex-row  mb-2">
             <UFormGroup label="Direction demandeur" name="email" class="mb-2  block">
                 <UInput v-model="state.crg_demandeur" />

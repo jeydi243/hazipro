@@ -214,6 +214,7 @@ function onSelectBeneficiaire(option) {
                       <NfHeader v-if="item.key === 'header'" />
                       <NfLines v-else-if="item.key === 'lines'" />
                       <NfResume v-else-if="item.key === 'resume'" />
+                      <NfApercu v-else-if="item.key === 'apercu'" />
                     </UCard>
                   </template>
                 </UTabs>
