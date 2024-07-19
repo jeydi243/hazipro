@@ -42,20 +42,20 @@ const links = [{
     shortcuts: ['G', 'T']
   }
 }, {
-  id: 'settings',
-  label: 'Settings',
-  to: '/settings',
+  id: 'parametres',
+  label: 'Parametres',
+  to: '/parametres',
   icon: 'i-heroicons-cog-8-tooth',
   children: [{
     label: 'General',
-    to: '/settings',
+    to: '/parametres',
     exact: true
   }, {
     label: 'Members',
-    to: '/settings/members'
+    to: '/parametres/members'
   }, {
     label: 'Notifications',
-    to: '/settings/notifications'
+    to: '/parametres/notifications'
   }],
   tooltip: {
     text: 'Settings',
@@ -78,7 +78,7 @@ const links = [{
 const footerLinks = [{
   label: 'Invite people',
   icon: 'i-heroicons-plus',
-  to: '/settings/members'
+  to: '/parametres/members'
 }, {
   label: 'Help & Support',
   icon: 'i-heroicons-question-mark-circle',

@@ -5,15 +5,27 @@ const links = [[{
   to: '/settings',
   exact: true
 }, {
-  label: 'Members',
+  label: 'Lookups',
   icon: 'i-heroicons-user-group',
-  to: '/settings/members'
+  to: '/parametreslookups'
 }, {
-  label: 'Notifications',
+  label: 'SSO',
   icon: 'i-heroicons-bell',
-  to: '/settings/notifications'
+  to: '/parametressso'
+}, {
+  label: 'Frais',
+  icon: 'i-heroicons-bell',
+  to: '/parametresfrais'
+}, {
+  label: 'Beneficiaires',
+  icon: 'i-heroicons-bell',
+  to: '/parametresfrais'
+}, {
+  label: 'Matrices',
+  icon: 'i-heroicons-bell',
+  to: '/parametresmatrice_approbation'
 }], [{
-  label: 'Documentation',
+  label: 'Frais',
   icon: 'i-heroicons-book-open',
   to: 'https://ui.nuxt.com/pro',
   target: '_blank'

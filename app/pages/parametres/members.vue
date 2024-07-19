@@ -42,7 +42,7 @@ const filteredMembers = computed(() => {
           />
         </template>
 
-        <!-- ~/components/settings/MembersList.vue -->
+        <!-- ~/components/parametres/MembersList.vue -->
         <SettingsMembersList :members="filteredMembers" />
       </UCard>
     </UDashboardSection>
@@ -53,7 +53,7 @@ const filteredMembers = computed(() => {
       description="Invite new members by email address"
       :ui="{ width: 'sm:max-w-md' }"
     >
-      <!-- ~/components/settings/MembersForm.vue -->
+      <!-- ~/components/parametres/MembersForm.vue -->
       <SettingsMembersForm @close="isInviteModalOpen = false" />
     </UDashboardModal>
   </UDashboardPanelContent>
