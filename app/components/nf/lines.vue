@@ -36,6 +36,10 @@ async function onSubmit(event: FormSubmitEvent<any>) {
             <UInput v-model="state.numero_piece" />
         </UFormGroup>
 
+        <UFormGroup label="Montant total" name="montant_total">
+            <UInput v-model="state.montant_total" />
+        </UFormGroup>
+
         <UButton type="submit">
             Submit
         </UButton>

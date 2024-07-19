@@ -2,8 +2,16 @@
 import type { FormError, FormSubmitEvent } from '#ui/types'
 
 const state = reactive({
-    email: undefined,
-    password: undefined
+    crg_demandeur: undefined,
+    org_id: undefined,
+    beneficiaire_id: undefined,
+    type_budget: undefined,
+    categorie: undefined,
+    description: undefined,
+    date_creation: undefined,
+    devise: undefined,
+    nature_op: undefined,
+    taux: undefined
 })
 
 const form = ref()
@@ -26,14 +34,25 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 </script>
 
 <template>
-    <UForm ref="form" :state="state" @submit="onSubmit">
-        <UFormGroup label="Email" name="email">
-            <UInput v-model="state.email" />
-        </UFormGroup>
+    <UForm ref="form" :state="state" class="flex flex-col" @submit="onSubmit">
+        <UCard class="flex flex-row  mb-2">
+            <UFormGroup label="Direction demandeur" name="email" class="mb-2  block">
+                <UInput v-model="state.crg_demandeur" />
+            </UFormGroup>
 
-        <UFormGroup label="Password" name="password">
-            <UInput v-model="state.password" type="password" />
-        </UFormGroup>
+            <UFormGroup label="Organisation" name="password" class=" mb-2">
+                <UInput v-model="state.org_id" />
+            </UFormGroup>
+        </UCard>
+        <UCard class="flex flex-row">
+            <UFormGroup label="Categorie" name="categorie" class="mb-2  block">
+                <UInput v-model="state.categorie" />
+            </UFormGroup>
+
+            <UFormGroup label="Nature NF" name="nature_op" class=" mb-2">
+                <UInput v-model="state.nature_op" />
+            </UFormGroup>
+        </UCard>
 
         <UButton type="submit">
             Submit
