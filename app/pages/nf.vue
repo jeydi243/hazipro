@@ -1,7 +1,23 @@
 <script lang="ts" setup>
 import { z } from 'zod'
+import {
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+  DialogTrigger,
+} from 'radix-vue'
 import type { User } from '~/types'
-import type { FormSubmitEvent } from '#ui/types'
+
+// import type { FormSubmitEvent } from '#ui/types'
+
+
+
+
+// import { Icon } from '@iconify/vue'
 
 const supabase = useSupabase()
 const countries = [{
@@ -52,7 +68,7 @@ onMounted(() => {
 const q = ref('')
 const sort = ref({ column: 'id', direction: 'asc' as const })
 const input = ref<{ input: HTMLInputElement }>()
-const selected = ref<User[]>([])
+const selectedUser = ref<User[]>([])
 const selectedColumns = ref(defaultColumns)
 const selectedStatuses = ref([])
 const selectedLocations = ref([])
@@ -95,11 +111,11 @@ const defaultStatuses = users.value.reduce((acc, user) => {
 }, [] as string[])
 
 function onSelect(row: User) {
-  const index = selected.value.findIndex(item => item.id === row.id)
+  const index = selectedUser.value.findIndex(item => item.id === row.id)
   if (index === -1) {
-    selected.value.push(row)
+    selectedUser.value.push(row)
   } else {
-    selected.value.splice(index, 1)
+    selectedUser.value.splice(index, 1)
   }
 }
 
@@ -130,17 +146,21 @@ defineShortcuts({
 const items = [{
   key: 'header',
   label: 'Header',
+  icon: 'i-heroicons-information-circle',
   description: 'Make changes to your account here. Click save when you\'re done.'
 }, {
   key: 'lines',
   label: 'Lines',
+  icon: 'i-heroicons-information-circle',
   description: 'Change your password here. After saving, you\'ll be logged out.'
 }, {
   key: 'resume',
   label: 'Resume',
+  icon: 'i-heroicons-information-circle',
   description: 'Change your password here. After saving, you\'ll be logged out.'
 }, {
   key: 'apercu',
+  icon: 'i-heroicons-information-circle',
   label: 'Apercu',
   description: 'Change your password here. After saving, you\'ll be logged out.'
 }]
@@ -172,6 +192,55 @@ function onSelectBeneficiaire(option) {
 
           <UButton label="Note de frais" leading-icon="i-heroicons-plus" color="gray"
             @click="isNewUserModalOpen = true" />
+          <DialogRoot>
+            <DialogTrigger class="">
+              <UButton label="Test" leading-icon="i-heroicons-plus" color="gray" />
+            </DialogTrigger>
+            <DialogPortal>
+              <DialogOverlay
+                class=" backdrop-blur-sm bg-white/20 data-[state=open]:animate-overlayShow fixed inset-0 z-30" />
+              <DialogContent
+                class="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] min-h-[90%] w-[90vw] max-w-[90%] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-gray-900 p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none z-[100]">
+                <DialogTitle class="text-teal-200 m-0 text-[17px] font-semibold">
+                  Edit profile
+                </DialogTitle>
+                <DialogDescription class="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
+                  Make changes to your profile here. Click save when you're done.
+                </DialogDescription>
+                <UTabs :items="items" class="w-full">
+                  <template #default="{ item, index, selected }">
+                    <div class="flex items-center gap-2 relative truncate">
+                      <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
+
+                      <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
+
+                      <span v-if="selected"
+                        class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
+                    </div>
+                  </template>
+                  <template #item="{ item }">
+                    {{ item }}
+                    <NfHeader v-if="item.key === 'header'" />
+                    <NfLines v-if="item.key === 'lines'" />
+                  </template>
+                </UTabs>
+
+                <div class="mt-[25px] flex justify-end">
+                  <DialogClose as-child>
+                    <button
+                      class="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
+                      Save changes
+                    </button>
+                  </DialogClose>
+                </div>
+                <DialogClose
+                  class="text-grass11 hover:bg-white focus:shadow-green7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
+                  aria-label="Close">
+                  <UIcon name="solar-close-circle-line-duotone:x" />
+                </DialogClose>
+              </DialogContent>
+            </DialogPortal>
+          </DialogRoot>
         </template>
       </UDashboardNavbar>
 
@@ -193,7 +262,8 @@ function onSelectBeneficiaire(option) {
         </template>
       </UDashboardToolbar>
       There is {{ employes.length }} employes
-      <UTable v-model="selected" v-model:sort="sort" :rows="users" :columns="columns" :loading="pending"
+
+      <UTable v-model="selectedUser" v-model:sort="sort" :rows="users" :columns="columns" :loading="pending"
         sort-mode="manual" class="w-full" :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }" @select="onSelect">
         <template #name-data="{ row }">
           <div class="flex items-center gap-3">
@@ -211,7 +281,7 @@ function onSelectBeneficiaire(option) {
       </UTable>
       <USlideover v-model="isNewUserModalOpen" :ui="{ width: 'w-[700px]' }" size="md" prevent-close>
         <UCard class="flex flex-col flex-1"
-          :ui="{ body: { base: 'flex-1' }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+          :ui="{ body: { base: 'flex-1', padding: 'px-1 py-1 sm:px-3' }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
           <template #header>
             <UButton color="gray" variant="ghost" size="sm" icon="i-heroicons-x-mark-20-solid"
               class="flex absolute end-5 top-5 z-10" square padded @click="isNewUserModalOpen = false" />
@@ -219,8 +289,14 @@ function onSelectBeneficiaire(option) {
             Note de frais - Entete
           </template>
 
-          <UForm ref="form" :schema="header_schema" :state="state" class="space-y-1 h-full overflow-y-auto" @submit="onSubmit">
-            <UCard>
+          <UForm ref="form" :schema="header_schema" :state="state" class="space-y-2 h-full " @submit="onSubmit">
+            <UCard :ui="{
+              body: {
+                base: '',
+                background: '',
+                padding: 'px-1 py-1 sm:px-3'
+              }
+            }">
               <UFormGroup label="Direction demandeur" name="crg_demandeur">
                 <UInput v-model="state.crg_demandeur" />
               </UFormGroup>
@@ -235,9 +311,27 @@ function onSelectBeneficiaire(option) {
                 <UInput v-model="state.categorie" type="text" />
               </UFormGroup>
             </UCard>
-            <UCard>
+            <UCard :ui="{
+              body: {
+                base: '',
+                background: '',
+                padding: 'px-1 py-1 sm:px-3'
+              }
+            }">
               <UFormGroup label="Date" name="date_creation">
                 <input id="date_creation" v-model="state.date_creation" name="date_creation" type="date">
+                <div class="relative max-w-sm">
+                  <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                    </svg>
+                  </div>
+                  <input id="default-datepicker" datepicker type="text"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Select date">
+                </div>
               </UFormGroup>
               <UFormGroup label="Devise" name="devise">
                 <USelect v-model="state.devise" :options="defaultDevise" />
@@ -246,7 +340,13 @@ function onSelectBeneficiaire(option) {
                 <UInput v-model="state.taux" type="text" />
               </UFormGroup>
             </UCard>
-            <UCard>
+            <UCard :ui="{
+              body: {
+                base: '',
+                background: '',
+                padding: 'px-1 py-1 sm:px-3'
+              }
+            }">
               <UFormGroup label="Bénéficiaire" name="beneficiaire_id">
                 <UModal v-model="beneficiaireModalOpen" title="Select beneficiaire">
                   <UCommandPalette v-model="state.beneficiaire_id" :autoselect="false"
@@ -257,7 +357,13 @@ function onSelectBeneficiaire(option) {
                 <USelect v-model="state.beneficiaire_id" :options="people" @click="beneficiaireModalOpen = true" />
               </UFormGroup>
             </UCard>
-            <UCard>
+            <UCard :ui="{
+              body: {
+                base: '',
+                background: '',
+                padding: 'px-1 py-1 sm:px-3'
+              }
+            }">
               <UFormGroup label="Description" name="description">
                 <!-- <UInput v-model="state.beneficiaire_id" type="number" /> -->
                 <UTextarea v-model="state.description" color="primary" />

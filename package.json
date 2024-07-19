@@ -23,6 +23,8 @@
     "@vueuse/nuxt": "^10.11.0",
     "date-fns": "^3.6.0",
     "nuxt": "^3.12.2",
+    "preline": "^2.3.0",
+    "radix-vue": "^1.9.1",
     "shadcn-nuxt": "^0.10.4",
     "v-calendar": "^3.1.2",
     "yup": "^1.4.0",

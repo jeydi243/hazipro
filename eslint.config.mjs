@@ -18,5 +18,9 @@ export default withNuxt({
     "vue/html-quotes": "off",
     "@stylistic/comma-dangle": "off",
     "vue/block-tag-newline": "off",
+    "@stylistic/eol-last": "off",
+    "@stylistic/no-multiple-empty-lines": "off",
+    "vue/padding-line-between-blocks": "off",
+    "@stylistic/arrow-parens": "off",
   },
 });

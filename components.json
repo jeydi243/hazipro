@@ -1,17 +1,17 @@
 {
   "$schema": "https://shadcn-vue.com/schema.json",
   "style": "default",
-  "typescript": false,
-  "tsConfigPath": "./tsconfig.json",
+  "typescript": true,
+  "tsConfigPath": "tsconfig.json",
   "tailwind": {
-    "config": "./tailwind.config.ts",
-    "css": "./app/assets/index.css",
+    "config": "tailwind.config.js",
+    "css": "~/assets/index.css",
     "baseColor": "gray",
     "cssVariables": false
   },
   "framework": "nuxt",
   "aliases": {
-    "components": "@/components",
-    "utils": "./app/utils"
+    "components": "~/components",
+    "utils": "~/utils"
   }
 }
