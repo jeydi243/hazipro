@@ -19,9 +19,9 @@ const links = [[{
 }, {
   label: 'Beneficiaires',
   icon: 'i-heroicons-bell',
-  to: '/parametres/frais'
+  to: '/parametres/beneficiaires'
 }, {
-  label: 'Matrices',
+  label: "Matrice d'approbation",
   icon: 'i-heroicons-bell',
   to: '/parametres/matrice_approbation'
 }], [{
@@ -40,7 +40,7 @@ const links = [[{
 <template>
   <UDashboardPage>
     <UDashboardPanel grow>
-      <UDashboardNavbar title="Settings" />
+      <UDashboardNavbar title="Parametres" />
 
       <UDashboardToolbar class="py-0 px-1.5 overflow-x-auto">
         <UHorizontalNavigation :links="links" />

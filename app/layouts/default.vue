@@ -51,11 +51,25 @@ const links = [{
     to: '/parametres',
     exact: true
   }, {
-    label: 'Members',
-    to: '/parametres/members'
-  }, {
-    label: 'Notifications',
-    to: '/parametres/notifications'
+    label: 'Lookups',
+    to: '/parametres/lookups'
+  },
+  {
+    label: 'SSO',
+    to: '/parametres/sso'
+  },
+  {
+    label: 'Frais',
+    to: '/parametres/frais'
+  },
+  {
+    label: 'Béneficiaires',
+    to: '/parametres/beneficiaires'
+  },
+
+  {
+    label: "Matrice d'approbation",
+    to: '/parametres/matrice_approbation'
   }],
   tooltip: {
     text: 'Settings',
