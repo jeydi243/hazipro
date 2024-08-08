@@ -27,21 +27,23 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 </script>
 
 <template>
-    <UForm ref="form" :state="state" @submit="onSubmit">
-        <UFormGroup label="Date piece" name="date_piece">
-            <UInput v-model="state.date_piece" />
-        </UFormGroup>
+    <UCard :ui="{ base: 'w-[75%]' }">
+        <UForm ref="form" :state="state" @submit="onSubmit">
+            <UFormGroup label="Date piece" name="date_piece">
+                <UInput v-model="state.date_piece" />
+            </UFormGroup>
 
-        <UFormGroup label="Numero pièce" name="numero_piece">
-            <UInput v-model="state.numero_piece" />
-        </UFormGroup>
+            <UFormGroup label="Numero pièce" name="numero_piece">
+                <UInput v-model="state.numero_piece" />
+            </UFormGroup>
 
-        <UFormGroup label="Montant total" name="montant_total">
-            <UInput v-model="state.montant_total" />
-        </UFormGroup>
+            <UFormGroup label="Montant total" name="montant_total">
+                <UInput v-model="state.montant_total" />
+            </UFormGroup>
 
-        <UButton type="submit">
-            Submit
-        </UButton>
-    </UForm>
+            <UButton type="submit">
+                Submit
+            </UButton>
+        </UForm>
+    </UCard>
 </template>

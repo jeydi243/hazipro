@@ -1,13 +1,11 @@
 <template>
-    <div>
-Resumes
-    </div>
+    <UCard :ui="{ base: 'w-[75%]' }">
+        Resumes
+    </UCard>
 </template>
 
 <script setup lang="ts">
 
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

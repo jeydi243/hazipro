@@ -154,7 +154,21 @@ const items = [{
   label: 'Apercu',
   description: 'Change your password here. After saving, you\'ll be logged out.'
 }]
-
+const isOpen = ref(false)
+const isOpen2 = ref(false)
+const _employes = [
+  { id: 1, label: 'Wade Cooper', click: () => { isOpen.value = false } },
+  { id: 2, label: 'Arlene Mccoy', click: () => { isOpen.value = false } },
+  { id: 3, label: 'Devon Webb', click: () => { isOpen.value = false } },
+  { id: 4, label: 'Tom Cook', click: () => { isOpen.value = false } },
+  { id: 5, label: 'Tanya Fox', click: () => { isOpen.value = false } },
+  { id: 6, label: 'Hellen Schmidt', click: () => { isOpen.value = false } },
+  { id: 7, label: 'Caroline Schultz', click: () => { isOpen.value = false } },
+  { id: 8, label: 'Mason Heaney', click: () => { isOpen.value = false } },
+  { id: 9, label: 'Claudie Smitham', click: () => { isOpen.value = false } },
+  { id: 10, label: 'Emil Schaefer', click: () => { isOpen.value = false } }
+]
+const selectedEmp = ref([_employes[3]])
 const accountForm = reactive({ name: 'Benjamin', username: 'benjamincanac' })
 const passwordForm = reactive({ currentPassword: '', newPassword: '' })
 
@@ -165,6 +179,15 @@ function onSubmit(form) {
 function onSelectBeneficiaire(option) {
   state.beneficiaire_id = option.id
   beneficiaireModalOpen.value = false
+}
+function onSelect2(option) {
+  option.click()
+  // if (option.click) {
+  // } else if (option.to) {
+  //   router.push(option.to)
+  // } else if (option.href) {
+  //   window.open(option.href, '_blank')
+  // }
 }
 </script>
 
@@ -179,23 +202,73 @@ function onSelectBeneficiaire(option) {
               <UKbd value="/" />
             </template>
           </UInput>
+          <UButton label="Open" @click="isOpen = true" />
+          <UModal v-model="isOpen" prevent-close>
+            <UCommandPalette v-model="selectedEmp" :autoselect="false"
+              :fuse="{ resultLimit: 6, fuseOptions: { threshold: 0.1 } }" @update:model-value="onSelect2"
+              :groups="[{ key: 'people', commands: _employes }]" />
+          </UModal>
+          <UButton label="Note de frais 2" leading-icon="i-heroicons-plus" color="gray" @click="isOpen2 = true" />
+          <UModal v-model="isOpen2" fullscreen>
+            <UCard :ui="{
+              base: 'h-full flex flex-col',
+              rounded: '',
+              divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+              body: {
+                base: 'grow'
+              }
+            }">
+              <template #header>
+                <div class="flex items-center justify-between sticky">
+                  <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                    Modal
+                  </h3>
+                  <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                    @click="isOpen2 = false" />
+                </div>
+              </template>
 
-          <UButton label="Note de frais" leading-icon="i-heroicons-plus" color="gray"
-            @click="isNewUserModalOpen = true" />
+              <UTabs :items="items" class="w-full">
+                <template #default="{ item, index, selected }">
+                  <div class="flex items-center gap-2 relative truncate sticky">
+                    <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
+
+                    <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
+
+                    <span v-if="selected"
+                      class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
+                  </div>
+                </template>
+                <template #item="{ item }">
+                  <!-- {{ item }} -->
+                  <div class="flex flex-row space-x-4 p-0">
+                    <NfHeader v-if="item.key === 'header'" />
+                    <NfLines v-else-if="item.key === 'lines'" />
+                    <NfResume v-else-if="item.key === 'resume'" />
+                    <NfApercu v-else-if="item.key === 'apercu'" />
+
+                    <UCard :ui="{ base: 'w-[25%]' }">
+                      test
+                    </UCard>
+                  </div>
+                </template>
+              </UTabs>
+            </UCard>
+          </UModal>
           <DialogRoot>
             <DialogTrigger class="">
-              <UButton label="Test" leading-icon="i-heroicons-plus" color="gray" />
+              <UButton label="Note de frais" leading-icon="i-heroicons-plus" color="gray" />
             </DialogTrigger>
             <DialogPortal>
               <DialogOverlay
                 class=" backdrop-blur-sm bg-white/20 data-[state=open]:animate-overlayShow fixed inset-0 z-30" />
               <DialogContent
-                class="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] min-h-[90%] w-[90vw] max-w-[90%] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-gray-900 p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none z-[100]">
+                class="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] h-[90%] w-[90vw] max-w-[90%] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-gray-900 p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none z-[100] overflow-auto">
                 <DialogTitle class="text-teal-200 m-0 text-[17px] font-semibold">
-                  Edit profile
+                  Note de frais
                 </DialogTitle>
                 <DialogDescription class="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
-                  Make changes to your profile here. Click save when you're done.
+                  Create new employe expense
                 </DialogDescription>
                 <UTabs :items="items" class="w-full">
                   <template #default="{ item, index, selected }">
@@ -210,12 +283,16 @@ function onSelectBeneficiaire(option) {
                   </template>
                   <template #item="{ item }">
                     <!-- {{ item }} -->
-                    <UCard>
+                    <div class="flex flex-row space-x-4 p-0">
                       <NfHeader v-if="item.key === 'header'" />
                       <NfLines v-else-if="item.key === 'lines'" />
                       <NfResume v-else-if="item.key === 'resume'" />
                       <NfApercu v-else-if="item.key === 'apercu'" />
-                    </UCard>
+
+                      <UCard :ui="{ base: 'w-[25%]' }">
+                        test
+                      </UCard>
+                    </div>
                   </template>
                 </UTabs>
 
@@ -228,9 +305,9 @@ function onSelectBeneficiaire(option) {
                   </DialogClose>
                 </div>
                 <DialogClose
-                  class="text-grass11 hover:bg-white focus:shadow-green7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
+                  class="text-white  hover:bg-white focus:shadow-green7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
                   aria-label="Close">
-                  <UIcon name="solar-close-circle-line-duotone:x" />
+                  <UIcon name="solar-close-circle-line-duotone:x" class="text-white" />
                 </DialogClose>
               </DialogContent>
             </DialogPortal>
@@ -245,7 +322,7 @@ function onSelectBeneficiaire(option) {
           <USelectMenu v-model="selectedLocations" icon="i-heroicons-map-pin" placeholder="Location"
             :options="defaultLocations" multiple />
         </template>
-
+        {{ selectedEmp }}
         <template #right>
           <USelectMenu v-model="selectedColumns" icon="i-heroicons-adjustments-horizontal-solid"
             :options="defaultColumns" multiple class="hidden lg:block">

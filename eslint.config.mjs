@@ -22,5 +22,6 @@ export default withNuxt({
     "@stylistic/no-multiple-empty-lines": "off",
     "vue/padding-line-between-blocks": "off",
     "@stylistic/arrow-parens": "off",
+    "@stylistic/no-trailing-spaces": "off",
   },
 });
