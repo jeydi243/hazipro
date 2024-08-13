@@ -1,3 +1,5 @@
+import path from "path";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   extends: [process.env.NUXT_UI_PRO_PATH || "@nuxt/ui-pro"],
@@ -10,7 +12,6 @@ export default defineNuxtConfig({
     "shadcn-nuxt",
     "radix-vue/nuxt",
   ],
-
   ui: {
     icons: ["heroicons", "simple-icons", "solar"],
     safelistColors: ["primary", "red", "orange", "green"],
@@ -65,4 +66,7 @@ export default defineNuxtConfig({
   },
   devServer: { port: 5000 },
   compatibilityDate: "2024-07-11",
+  alias: {
+    "~/lib": "./lib",
+  },
 });

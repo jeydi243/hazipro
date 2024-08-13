@@ -10,6 +10,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'radix-vue'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
+
 import type { User } from '~/types'
 
 // import type { FormSubmitEvent } from '#ui/types'
@@ -189,6 +200,7 @@ function onSelect2(option) {
   //   window.open(option.href, '_blank')
   // }
 }
+
 </script>
 
 <template>
@@ -202,6 +214,51 @@ function onSelect2(option) {
               <UKbd value="/" />
             </template>
           </UInput>
+          <Drawer>
+            <DrawerTrigger>
+              <UButton label="Open drawer" />
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+                <DrawerDescription>This action cannot be undone.</DrawerDescription>
+              </DrawerHeader>
+              <UTabs :items="items" class="w-full">
+                <template #default="{ item, index, selected }">
+                  <div class="flex items-center gap-2 relative truncate sticky">
+                    <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
+
+                    <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
+
+                    <span v-if="selected"
+                      class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
+                  </div>
+                </template>
+                <template #item="{ item }">
+                  <!-- {{ item }} -->
+                  <div class="flex flex-row space-x-4 p-0">
+                    <NfHeader v-if="item.key === 'header'" />
+                    <NfLines v-else-if="item.key === 'lines'" />
+                    <NfResume v-else-if="item.key === 'resume'" />
+                    <NfApercu v-else-if="item.key === 'apercu'" />
+
+                    <UCard :ui="{ base: 'w-[25%]' }">
+                      test
+                    </UCard>
+                  </div>
+                </template>
+              </UTabs>
+              <DrawerFooter>
+                <Button>Submit</Button>
+                <DrawerClose>
+                  <Button variant="outline">
+                    Cancel
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+
           <UButton label="Open" @click="isOpen = true" />
           <UModal v-model="isOpen" prevent-close>
             <UCommandPalette v-model="selectedEmp" :autoselect="false"
