@@ -23,5 +23,6 @@ export default withNuxt({
     "vue/padding-line-between-blocks": "off",
     "@stylistic/arrow-parens": "off",
     "@stylistic/no-trailing-spaces": "off",
+    "vue/operator-linebreak": "off",
   },
 });

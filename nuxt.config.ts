@@ -4,6 +4,9 @@ import path from "path";
 export default defineNuxtConfig({
   extends: [process.env.NUXT_UI_PRO_PATH || "@nuxt/ui-pro"],
 
+  devtools: {
+    enabled: true,
+  },
   modules: [
     "@nuxt/eslint",
     "@nuxt/ui",
@@ -31,10 +34,6 @@ export default defineNuxtConfig({
   },
   routeRules: {
     "/": { prerender: true },
-  },
-
-  devtools: {
-    enabled: true,
   },
 
   typescript: {

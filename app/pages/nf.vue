@@ -76,21 +76,23 @@ const selectedLocations = ref([])
 const isNewUserModalOpen = ref(false)
 const beneficiaireModalOpen = ref(false)
 const submitingHeader = ref(false)
+const isCommOpen = ref(false)
+const _loadingForm = ref(false)
 const form = ref()
 const columns = computed(() => defaultColumns.filter(column => selectedColumns.value.includes(column)))
 const query = computed(() => ({ q: q.value, statuses: selectedStatuses.value, locations: selectedLocations.value, sort: sort.value.column, order: sort.value.direction }))
-const { data: users, pending } = await useFetch<User[]>('/api/users', { query, default: () => [] })
+const { data: users } = await useFetch<User[]>('/api/users', { query, default: () => [] })
 const people = [
-  { id: 1, label: 'Wade Cooper' },
-  { id: 2, label: 'Arlene Mccoy' },
-  { id: 3, label: 'Devon Webb' },
-  { id: 4, label: 'Tom Cook' },
-  { id: 5, label: 'Tanya Fox' },
-  { id: 6, label: 'Hellen Schmidt' },
-  { id: 7, label: 'Caroline Schultz' },
-  { id: 8, label: 'Mason Heaney' },
-  { id: 9, label: 'Claudie Smitham' },
-  { id: 10, label: 'Emil Schaefer' }
+  { id: 1, label: 'Wade Cooper', click: () => { isCommOpen.value = false } },
+  { id: 2, label: 'Arlene Mccoy', click: () => { isCommOpen.value = false } },
+  { id: 3, label: 'Devon Webb', click: () => { isCommOpen.value = false } },
+  { id: 4, label: 'Tom Cook', click: () => { isCommOpen.value = false } },
+  { id: 5, label: 'Tanya Fox', click: () => { isCommOpen.value = false } },
+  { id: 6, label: 'Hellen Schmidt', click: () => { isCommOpen.value = false } },
+  { id: 7, label: 'Caroline Schultz', click: () => { isCommOpen.value = false } },
+  { id: 8, label: 'Mason Heaney', click: () => { isCommOpen.value = false } },
+  { id: 9, label: 'Claudie Smitham', click: () => { isCommOpen.value = false } },
+  { id: 10, label: 'Emil Schaefer', click: () => { isCommOpen.value = false } }
 ]
 const defaultDevise = [
   { id: 1, label: 'USD' },
@@ -167,6 +169,7 @@ const items = [{
 }]
 const isOpen = ref(false)
 const isOpen2 = ref(false)
+const isOpen3 = ref(false)
 const _employes = [
   { id: 1, label: 'Wade Cooper', click: () => { isOpen.value = false } },
   { id: 2, label: 'Arlene Mccoy', click: () => { isOpen.value = false } },
@@ -208,63 +211,56 @@ function onSelect2(option) {
     <UDashboardPanel grow>
       <UDashboardNavbar title="Note de frais" :badge="users.length">
         <template #right>
-          <UInput ref="input" v-model="q" icon="i-heroicons-funnel" autocomplete="off"
-            placeholder="Filter note de frais..." class="hidden lg:block" @keydown.esc="$event.target.blur()">
-            <template #trailing>
-              <UKbd value="/" />
-            </template>
-          </UInput>
-          <Drawer>
-            <DrawerTrigger>
-              <UButton label="Open drawer" />
-            </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader>
-                <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-                <DrawerDescription>This action cannot be undone.</DrawerDescription>
-              </DrawerHeader>
-              <UTabs :items="items" class="w-full">
-                <template #default="{ item, index, selected }">
-                  <div class="flex items-center gap-2 relative truncate sticky">
-                    <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
+          <UButton label="Note de frais 3" leading-icon="i-heroicons-plus" color="gray" @click="isOpen3 = true" />
+          <USlideover v-model="isOpen3" :ui="{ width: 'min-w-[90%]' }" prevent-close>
+            <UCard class="flex flex-col flex-1 overflow-y-auto"
+              :ui="{ body: { base: 'flex-1' }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+              <template #header>
+                <div class="flex items-center justify-between">
+                  <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                    Slideover
+                  </h3>
+                  <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                    @click="isOpen3 = false" />
+                </div>
+              </template>
+              <div class="scrollbar">
+                <UTabs :items="items" class="w-full">
+                  <template #default="{ item, index, selected }">
+                    <div class="flex items-center gap-2 relative truncate">
+                      <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
 
-                    <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
+                      <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
 
-                    <span v-if="selected"
-                      class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
-                  </div>
-                </template>
-                <template #item="{ item }">
-                  <!-- {{ item }} -->
-                  <div class="flex flex-row space-x-4 p-0">
-                    <NfHeader v-if="item.key === 'header'" />
-                    <NfLines v-else-if="item.key === 'lines'" />
-                    <NfResume v-else-if="item.key === 'resume'" />
-                    <NfApercu v-else-if="item.key === 'apercu'" />
+                      <span v-if="selected"
+                        class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
+                    </div>
+                  </template>
+                  <template #item="{ item }">
+                    <!-- {{ item }} -->
+                    <div class="flex flex-row space-x-4 p-0">
+                      <NfHeader v-if="item.key === 'header'" />
+                      <NfLines v-else-if="item.key === 'lines'" />
+                      <NfResume v-else-if="item.key === 'resume'" />
+                      <NfApercu v-else-if="item.key === 'apercu'" />
 
-                    <UCard :ui="{ base: 'w-[25%]' }">
-                      test
-                    </UCard>
-                  </div>
-                </template>
-              </UTabs>
-              <DrawerFooter>
-                <Button>Submit</Button>
-                <DrawerClose>
-                  <Button variant="outline">
-                    Cancel
-                  </Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
+                      <UCard :ui="{ base: 'w-[25%]' }">
+                        test
+                      </UCard>
+                    </div>
+                  </template>
+                </UTabs>
+              </div>
 
-          <UButton label="Open" @click="isOpen = true" />
-          <UModal v-model="isOpen" prevent-close>
-            <UCommandPalette v-model="selectedEmp" :autoselect="false"
-              :fuse="{ resultLimit: 6, fuseOptions: { threshold: 0.1 } }" @update:model-value="onSelect2"
-              :groups="[{ key: 'people', commands: _employes }]" />
-          </UModal>
+              <template #footer>
+                <div class="flex flex-row-reverse">
+                    <UButton type="submit" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false" :loading="_loadingForm">
+                        Suivant
+                    </UButton>
+                </div>
+              </template>
+            </UCard>
+          </USlideover>
           <UButton label="Note de frais 2" leading-icon="i-heroicons-plus" color="gray" @click="isOpen2 = true" />
           <UModal v-model="isOpen2" fullscreen>
             <UCard :ui="{
@@ -391,8 +387,8 @@ function onSelect2(option) {
       </UDashboardToolbar>
       There is {{ employes.length }} employes
 
-      <UTable v-model="selectedUser" v-model:sort="sort" :rows="users" :columns="columns" :loading="pending"
-        sort-mode="manual" class="w-full" :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }" @select="onSelect">
+      <UTable v-model="selectedUser" v-model:sort="sort" :rows="users" :columns="columns" sort-mode="manual"
+        class="w-full" :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }" @select="onSelect">
         <template #name-data="{ row }">
           <div class="flex items-center gap-3">
             <UAvatar v-bind="row.avatar" :alt="row.name" size="xs" />
