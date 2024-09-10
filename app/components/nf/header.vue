@@ -16,25 +16,27 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover'
+
 import type { FormError, FormSubmitEvent } from '#ui/types'
 
 
 
-const df = new DateFormatter('en-US', {
+const df = new DateFormatter('fr-FR', {
     dateStyle: 'long',
 })
-
+const { signIn } = useAuth()
 const value = ref<DateValue>()
 const form = ref()
 const toast = useToast()
 const _orgs = [{ name: 'APR', value: 14 }]
 const _categories = [{ name: 'Employé', value: 13 }]
-const _devises = [{ name: 'USD', value: 1 }, { name: 'CDF', value: 2 }, { name: 'ZAR', value: 3 }]
+const _devises = [{ name: 'USD', value: 'USD' }, { name: 'CDF', value: 'CDF' }, { name: 'ZAR', value: 'ZAR' }]
+const _payment_group = [{ name: 'PGF', value: 1 }, { name: 'TRO', value: 2 }, { name: 'TRC', value: 3 }]
 const isCommOpen = ref(false)
 const _natureOP = [{ name: 'Mission', value: 12 }]
 const _cr = [{ name: 'SUE', value: 18 }]
 const state = reactive({
-    crg_demandeur: undefined,
+    crg_id: undefined,
     org_id: undefined,
     cr_id: undefined,
     beneficiaire_id: undefined,
@@ -42,10 +44,11 @@ const state = reactive({
     categorie: undefined,
     description: undefined,
     date_creation: undefined,
-    devise: undefined,
+    devise: 'CDF',
     nature_op: undefined,
     taux: undefined,
-    payment_group_id: undefined
+    payment_group_id: undefined,
+    a_justifier: false
 })
 const header_schema = z.object({
     crg_demandeur: z.number().min(1, 'Le crg demandeur doit etre un ID'),
@@ -58,6 +61,7 @@ const header_schema = z.object({
     devise: z.string().max(3, 'Must be 3 characters'),
     nature_op: z.number().min(1, 'Must be at least 1'),
     taux: z.number().min(1, 'Must be at least 1'),
+    a_justifier: z.boolean().default(false),
     date_creation: z.custom<DateValue>(() => true),
 })
 
@@ -100,6 +104,15 @@ function onSelectBeneficiaire(option) {
     state.beneficiaire_id = option.id
     option.click()
 }
+
+function submitHeader() {
+    form.value?.submit();
+}
+
+defineExpose({
+    submitHeader
+});
+
 </script>
 
 <template>
@@ -110,24 +123,24 @@ function onSelectBeneficiaire(option) {
                 <UCard class="flex flex-row w-full grow">
                     <div class="flex flex-row space-x-3 w-full grow">
                         <UFormGroup label="CRG" name="direction_demandeur" class="grow flex-auto min-w-[200px]">
-                            <USelect option-attribute="name" class="min-w[50%]" color="gray" variant="outline"
-                                :options="_orgs" :model-value="state.crg_demandeur" />
+                            <USelect v-model="state.crg_id" option-attribute="name" class="w-[200px]" color="gray"
+                                variant="outline" :options="_orgs" />
                         </UFormGroup>
                         <UFormGroup label="CR" name="cr" class=" w-[200px]">
-                            <USelect option-attribute="cr" color="gray" variant="outline" :options="_cr"
-                                :model-value="state.cr_id" />
+                            <USelect v-model="state.cr_id" option-attribute="name" name="cr" color="gray"
+                                variant="outline" :options="_cr" />
                         </UFormGroup>
                         <UFormGroup label="1er Approbateur" name="org_id" class="w-[200px]">
-                            <USelect option-attribute="name" color="gray" variant="outline" :options="_orgs"
-                                :model-value="state.org_id" />
+                            <USelect v-model="state.org_id" option-attribute="name" name="org_id" color="gray"
+                                variant="outline" :options="_orgs" />
                         </UFormGroup>
-                        <UFormGroup label="Categorie" name="categorie" class="mb-2 w-[200px]">
-                            <USelect option-attribute="name" color="gray" variant="outline" :options="_categories"
-                                :model-value="state.categorie" />
+                        <UFormGroup label="Catégorie" name="categorie" class="mb-2 w-[200px]">
+                            <USelect v-model="state.categorie" option-attribute="name" name="categorie" color="gray"
+                                variant="outline" :options="_categories" />
                         </UFormGroup>
-                        <UFormGroup label="Nature NF" name="nature" class=" w-[200px]">
-                            <USelect option-attribute="name" color="gray" variant="outline" :options="_natureOP"
-                                :model-value="state.nature_op" />
+                        <UFormGroup label="A justifier" name="a_justifier" class="mb-2 w-[200px]">
+                            <UToggle v-model="state.a_justifier" on-icon="i-heroicons-check-20-solid"
+                                off-icon="i-heroicons-x-mark-20-solid" />
                         </UFormGroup>
                     </div>
                 </UCard>
@@ -145,11 +158,19 @@ function onSelectBeneficiaire(option) {
                 <UCard class="w-full">
                     <div class="flex flex-row space-x-3 w-full grow">
                         <UFormGroup label="Devise" name="devise" class=" w-[200px]">
-                            <USelect option-attribute="name" color="gray" variant="outline" :options="_devises"
-                                :model-value="state.devise" />
+                            <USelect v-model="state.devise" option-attribute="name" color="gray" variant="outline"
+                                :options="_devises" />
                         </UFormGroup>
                         <UFormGroup label="Taux de change" name="taux_change" class="w-[200px] z-0">
-                            <UInput placeholder="2875" icon="i-heroicons-currency-dollar-solid" />
+                            <UInput placeholder="2875" icon="i-heroicons-currency-dollar-solid" variant="outline" />
+                        </UFormGroup>
+                        <UFormGroup label="Nature NF" name="nature" class=" w-[200px]">
+                            <USelect v-model="state.nature_op" option-attribute="name" color="gray" variant="outline"
+                                :options="_natureOP" />
+                        </UFormGroup>
+                        <UFormGroup label="Groupe de paiement" name="payment_group" class=" w-[200px]">
+                            <USelect option-attribute="name" color="gray" variant="outline" :options="_payment_group"
+                                :model-value="state.devise" />
                         </UFormGroup>
                         <UFormGroup label="Date de création" name="date_creation" class="w-[200px]">
                             <Popover>
@@ -172,9 +193,9 @@ function onSelectBeneficiaire(option) {
                     </div>
                 </UCard>
                 <UCard class="flex flex-row min-w-full">
-                    <div class="min-w-full">
-                        <UFormGroup size="lg" label="Description" name="description" class="mb-2 min-w-full ">
-                            <UTextarea v-model="state.description" class="w-full" />
+                    <div class="flex-grow block w-full">
+                        <UFormGroup size="lg" label="Description" name="description" class="mb-2 w-full ">
+                            <UTextarea v-model="state.description" class="w-[100%]" variant="outline" />
                         </UFormGroup>
                     </div>
                 </UCard>

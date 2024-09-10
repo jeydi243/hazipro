@@ -10,25 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'radix-vue'
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer'
 
 import type { User } from '~/types'
-
-// import type { FormSubmitEvent } from '#ui/types'
-
-
-
-
-// import { Icon } from '@iconify/vue'
 
 const supabase = useSupabase()
 
@@ -185,6 +168,8 @@ const _employes = [
 const selectedEmp = ref([_employes[3]])
 const accountForm = reactive({ name: 'Benjamin', username: 'benjamincanac' })
 const passwordForm = reactive({ currentPassword: '', newPassword: '' })
+const childHeader = ref(null)
+const selectedTab = ref(0);
 
 function onSubmit(form) {
   console.log('Submitted form:', form)
@@ -204,6 +189,24 @@ function onSelect2(option) {
   // }
 }
 
+function submitCurrentForm() {
+  _loadingForm.value = true
+  setTimeout(() => {
+    _loadingForm.value = false
+  }, 2000)
+  if (selectedTab.value === 0) {
+    console.log("The selected tab is: " + items[selectedTab.value].key);
+    childHeader.value?.submitHeader();
+  } else {
+    console.log("The tab is: " + selectedTab.value);
+    alert('Selected Tab is null')
+  }
+}
+function onChange(index) {
+  selectedTab.value = index
+  alert(`${items[index].label} was clicked!`)
+}
+
 </script>
 
 <template>
@@ -218,14 +221,14 @@ function onSelect2(option) {
               <template #header>
                 <div class="flex items-center justify-between">
                   <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                    Slideover
+                    Note de frais
                   </h3>
                   <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                     @click="isOpen3 = false" />
                 </div>
               </template>
               <div class="scrollbar">
-                <UTabs :items="items" class="w-full">
+                <UTabs v-model="selectedTab" :items="items" class="w-full" @change="onChange">
                   <template #default="{ item, index, selected }">
                     <div class="flex items-center gap-2 relative truncate">
                       <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
@@ -239,13 +242,13 @@ function onSelect2(option) {
                   <template #item="{ item }">
                     <!-- {{ item }} -->
                     <div class="flex flex-row space-x-4 p-0">
-                      <NfHeader v-if="item.key === 'header'" />
+                      <NfHeader v-if="item.key === 'header'" ref="childHeader" />
                       <NfLines v-else-if="item.key === 'lines'" />
                       <NfResume v-else-if="item.key === 'resume'" />
                       <NfApercu v-else-if="item.key === 'apercu'" />
 
                       <UCard :ui="{ base: 'w-[25%]' }">
-                        test
+                        Informations
                       </UCard>
                     </div>
                   </template>
@@ -254,9 +257,10 @@ function onSelect2(option) {
 
               <template #footer>
                 <div class="flex flex-row-reverse">
-                    <UButton type="submit" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false" :loading="_loadingForm">
-                        Suivant
-                    </UButton>
+                  <UButton color="primary" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false"
+                    :loading="_loadingForm" @click="submitCurrentForm">
+                    Suivant
+                  </UButton>
                 </div>
               </template>
             </UCard>

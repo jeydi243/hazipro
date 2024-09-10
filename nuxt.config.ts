@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "shadcn-nuxt",
     "radix-vue/nuxt",
+    "@pinia/nuxt",
   ],
   ui: {
     icons: ["heroicons", "simple-icons", "solar"],
@@ -30,6 +31,7 @@ export default defineNuxtConfig({
     public: {
       SUPABASE_URL: process.env.SUPABASE_URL,
       SUPABASE_KEY: process.env.SUPABASE_KEY,
+      SUPABASE_ROLE_KEY: process.env.SUPABASE_ROLE_KEY,
     },
   },
   routeRules: {

@@ -43,6 +43,7 @@ async function onSubmit(payload: any) {
         router.push('/nf')
     } else {
         toast.add({ icon: 'i-heroicons-check-circle', title: 'Login unseccessful', color: 'red', description: error.message });
+        router.push('/')
     }
 }
 </script>

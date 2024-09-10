@@ -1,3 +1,4 @@
 {
-  "eslint.experimental.useFlatConfig": true
+  "eslint.experimental.useFlatConfig": true,
+  "editor.fontFamily": "'Cascadia Code', 'Courier New', monospace"
 }

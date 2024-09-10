@@ -24,5 +24,8 @@ export default withNuxt({
     "@stylistic/arrow-parens": "off",
     "@stylistic/no-trailing-spaces": "off",
     "vue/operator-linebreak": "off",
+    "vue/html-self-closing": "off",
+    "vue/html-closing-bracket-spacing": "off",
+    '@stylistic/space-before-blocks': "off"
   },
 });
