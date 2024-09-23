@@ -8,11 +8,13 @@ const links = [[{
   label: 'Lookups',
   icon: 'i-heroicons-user-group',
   to: '/parametres/lookups'
-}, {
-  label: 'SSO',
-  icon: 'i-heroicons-bell',
-  to: '/parametres/sso'
-}, {
+},
+{
+  label: 'Users',
+  icon: 'i-heroicons-users',
+  to: '/parametres/users'
+},
+{
   label: 'Frais',
   icon: 'i-heroicons-bell',
   to: '/parametres/frais'

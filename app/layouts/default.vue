@@ -41,7 +41,26 @@ const links = [{
     text: 'Tresorerie',
     shortcuts: ['G', 'T']
   }
-}, {
+}, 
+{
+  id: 'planification_paiements',
+  label: 'Planification des paiements',
+  to: '/planification_paiements',
+  icon: 'i-heroicons-cog-8-tooth',
+  children: [{
+    label: 'Plan de decaissement',
+    to: '/planification_paiements/plan_decaissement',
+    exact: true
+  }, {
+    label: 'Programmation de paiement',
+    to: '/planification_paiements/programmation_paiement'
+  }],
+  tooltip: {
+    text: 'Planification des paiements',
+    shortcuts: ['H', 'T']
+  }
+},
+{
   id: 'parametres',
   label: 'Parametres',
   to: '/parametres',
@@ -55,8 +74,8 @@ const links = [{
     to: '/parametres/lookups'
   },
   {
-    label: 'SSO',
-    to: '/parametres/sso'
+    label: 'Users',
+    to: '/parametres/users'
   },
   {
     label: 'Frais',
@@ -92,7 +111,7 @@ const links = [{
 const footerLinks = [{
   label: 'Invite people',
   icon: 'i-heroicons-plus',
-  to: '/parametres/members'
+  to: '/parametres/users'
 }, {
   label: 'Help & Support',
   icon: 'i-heroicons-question-mark-circle',

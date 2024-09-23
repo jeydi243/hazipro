@@ -166,8 +166,6 @@ const _employes = [
   { id: 10, label: 'Emil Schaefer', click: () => { isOpen.value = false } }
 ]
 const selectedEmp = ref([_employes[3]])
-const accountForm = reactive({ name: 'Benjamin', username: 'benjamincanac' })
-const passwordForm = reactive({ currentPassword: '', newPassword: '' })
 const childHeader = ref(null)
 const selectedTab = ref(0);
 
@@ -391,7 +389,7 @@ function onChange(index) {
       </UDashboardToolbar>
       There is {{ employes.length }} employes
 
-      <UTable v-model="selectedUser" v-model:sort="sort" :rows="users" :columns="columns" sort-mode="manual"
+      <UTable v-model="selectedUser" v-model:sort="sort" :rows="employes" :columns="columns" sort-mode="manual"
         class="w-full" :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }" @select="onSelect">
         <template #name-data="{ row }">
           <div class="flex items-center gap-3">

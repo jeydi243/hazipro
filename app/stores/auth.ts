@@ -3,6 +3,7 @@ import type { User } from "@supabase/supabase-js";
 interface storeAuth {
   user: User;
   description: string;
+  baseUrl: string;
   users: User[];
 }
 
@@ -10,6 +11,7 @@ export const useAuth = defineStore("auth", {
   state: (): storeAuth => ({
     user: null,
     users: [],
+    baseUrl: "http://127.0.0.1:4000/v1",
     description: "",
   }),
   actions: {
@@ -31,14 +33,31 @@ export const useAuth = defineStore("auth", {
             )
         `);
     },
+    async createUser(user) {
+      const data = await $fetch<User[] | any>(this.baseUrl + "/users", {
+        // default: () => [],
+        method: "POST",
+        body: user,
+      });
+      console.log({ data });
+      return data;
 
+      // if (!data?.error) {
+      //   return "L'utilisateur a été crée avec succes";
+      // } else {
+      //   return "L'utilisateur n'a pas été crée";
+      // }
+    },
     async getAllUsers() {
       const {
-        data: { users },
+        data: users,
+        refresh,
         error,
-      } = await supabaseAdmin.auth.admin.listUsers();
+      } = await useFetch<User[]>(this.baseUrl + "/users", {
+        default: () => [],
+      });
       if (!error) {
-        this.users = users;
+        this.users = users.value;
         console.log("La fonction est appelé correctement %o ", users);
       } else {
         console.log("La fonction ne marche pas %o ", error);
