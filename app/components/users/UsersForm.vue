@@ -40,10 +40,10 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     const result = await store.createUser(event.data)
     if (!result.error) {
       toast.add({ title: "Creation d'un utilisateur ", description: "Utilisateur creé avec succes", timeout: 5000 })
+      emit('close')
     } else {
       toast.add({ title: "Creation d'un utilisateur ", description: "Utilisateur n'as pas pu etre enregistré " + result.error.message, timeout: 5000, color: 'red' })
     }
-    // emit('close')
   } catch (error) {
     toast.add({ title: "Creation d'un utilisateur ", description: "Utilisateur n'as pas pu etre enregistré " + error.message, timeout: 5000, color: 'red' })
   }

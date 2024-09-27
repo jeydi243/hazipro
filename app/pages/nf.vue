@@ -177,15 +177,6 @@ function onSelectBeneficiaire(option) {
   state.beneficiaire_id = option.id
   beneficiaireModalOpen.value = false
 }
-function onSelect2(option) {
-  option.click()
-  // if (option.click) {
-  // } else if (option.to) {
-  //   router.push(option.to)
-  // } else if (option.href) {
-  //   window.open(option.href, '_blank')
-  // }
-}
 
 function submitCurrentForm() {
   _loadingForm.value = true
