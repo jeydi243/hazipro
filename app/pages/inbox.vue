@@ -52,6 +52,9 @@ watch(filteredMails, () => {
     selectedMail.value = null
   }
 })
+definePageMeta({
+  middleware: ["auth"]
+})
 </script>
 
 <template>

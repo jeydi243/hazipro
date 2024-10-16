@@ -48,14 +48,15 @@ const validate = (state: any): FormError[] => {
   if (!state.email) errors.push({ path: 'email', message: 'Please enter an email.' })
   return errors
 }
-const store = useAuth()
+// const store = useAuth()
 const storeOrg = useOrg()
 
 async function onSubmit(event: FormSubmitEvent<any>) {
   // Do something with data
   try {
+    const result = null;
     console.log(event.data)
-    const result = await storeOrg.assign_to_org(event.data)
+    // const result = await storeOrg.assign_to_org(event.data)
     if (!result.error) {
       toast.add({ title: "Affectation organisation ", description: "Utilisateur affecté à l'organisation", timeout: 5000 })
       emit('close')

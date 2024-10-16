@@ -13,7 +13,7 @@ import {
 
 import type { User } from '~/types'
 
-const supabase = useSupabase()
+const supabase = null
 
 const defaultColumns = [{
   key: 'id',
@@ -44,11 +44,15 @@ async function getEmployes() {
   const { data } = await supabase.from('employes').select()
   employes.value = data
 }
+onBeforeMount(() => {
+  supabase = useSupabase()
+})
 onMounted(() => {
   getEmployes()
   getNf()
 })
-
+const supabase_user = useSupabaseUser()
+const supabase_auth_client = useSupabaseAuthClient()
 const q = ref('')
 const sort = ref({ column: 'id', direction: 'asc' as const })
 const input = ref<{ input: HTMLInputElement }>()
@@ -184,8 +188,8 @@ function submitCurrentForm() {
     _loadingForm.value = false
   }, 2000)
   if (selectedTab.value === 0) {
-    console.log("The selected tab is: " + items[selectedTab.value].key);
     childHeader.value?.submitHeader();
+    console.log("The selected tab is: " + items[selectedTab.value].key);
   } else {
     console.log("The tab is: " + selectedTab.value);
     alert('Selected Tab is null')
@@ -379,7 +383,7 @@ function onChange(index) {
         </template>
       </UDashboardToolbar>
       There is {{ employes.length }} employes
-
+      {{ supabase_auth_client }}{{ supabase_user }}
       <UTable v-model="selectedUser" v-model:sort="sort" :rows="employes" :columns="columns" sort-mode="manual"
         class="w-full" :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }" @select="onSelect">
         <template #name-data="{ row }">

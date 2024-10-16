@@ -2,16 +2,16 @@
 const { isHelpSlideoverOpen } = useDashboard()
 const { isDashboardSearchModalOpen } = useUIState()
 const { metaSymbol } = useShortcuts()
-
+const supabase = useSupabase()
 const items = computed(() => [
   [{
     slot: 'account',
     label: '',
     disabled: true
   }], [{
-    label: 'Settings',
+    label: 'Parametres',
     icon: 'i-heroicons-cog-8-tooth',
-    to: '/settings'
+    to: '/parametres'
   }, {
     label: 'Command menu',
     icon: 'i-heroicons-command-line',
@@ -25,23 +25,9 @@ const items = computed(() => [
     shortcuts: ['?'],
     click: () => isHelpSlideoverOpen.value = true
   }], [{
-    label: 'Documentation',
-    icon: 'i-heroicons-book-open',
-    to: 'https://ui.nuxt.com/pro/getting-started',
-    target: '_blank'
-  }, {
-    label: 'GitHub repository',
-    icon: 'i-simple-icons-github',
-    to: 'https://github.com/nuxt-ui-pro/dashboard',
-    target: '_blank'
-  }, {
-    label: 'Buy Nuxt UI Pro',
-    icon: 'i-heroicons-credit-card',
-    to: 'https://ui.nuxt.com/pro/purchase',
-    target: '_blank'
-  }], [{
-    label: 'Sign out',
-    icon: 'i-heroicons-arrow-left-on-rectangle'
+    label: 'Deconnexion',
+    icon: 'i-heroicons-arrow-left-on-rectangle',
+    click: () => supabase.auth.signOut()
   }]
 ])
 </script>

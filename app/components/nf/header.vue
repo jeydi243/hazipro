@@ -23,45 +23,48 @@ import type { FormError, FormSubmitEvent } from '#ui/types'
 const df = new DateFormatter('fr-FR', {
     dateStyle: 'long',
 })
+let supabase = null
 const { signIn } = useAuth()
 const value = ref<DateValue>()
 const form = ref()
 const toast = useToast()
 const _orgs = [{ name: 'APR', value: 14 }]
+const _cr = [{ name: 'SUE', value: 18 }]
 const _categories = [{ name: 'Employé', value: 13 }]
+const _type_budget = [{ name: "BA - Budget d'activité", value: 1 }, { name: "TR - Budget Trésorerie", value: 1 }]
 const _devises = [{ name: 'USD', value: 'USD' }, { name: 'CDF', value: 'CDF' }, { name: 'ZAR', value: 'ZAR' }]
 const _payment_group = [{ name: 'PGF', value: 1 }, { name: 'TRO', value: 2 }, { name: 'TRC', value: 3 }]
 const isCommOpen = ref(false)
 const _natureOP = [{ name: 'Mission', value: 12 }]
-const _cr = [{ name: 'SUE', value: 18 }]
 const state = reactive({
     crg_id: undefined,
     org_id: undefined,
     cr_id: undefined,
     beneficiaire_id: undefined,
     type_budget: undefined,
-    categorie: undefined,
+    categorie_id: undefined,
     description: undefined,
     date_creation: undefined,
     devise: 'CDF',
-    nature_op: undefined,
-    taux: undefined,
-    payment_group_id: undefined,
+    nature_id: undefined,
+    taux_echange: undefined,
+    payment_group_id: 1,
     a_justifier: false
 })
 const header_schema = z.object({
-    crg_demandeur: z.number().min(1, 'Le crg demandeur doit etre un ID'),
-    org_id: z.number().min(1, 'Must be at least a number'),
-    beneficiaire_id: z.number().min(100, 'Must be at least 1'),
-    type_budget: z.number().min(1, 'Must be at least 1'),
-    categorie: z.number().min(8, 'Must be at least 8 characters'),
-    description: z.string().min(2, 'Must be at least 8 characters'),
-    // date_creation: z.date({ required_error: 'Date is  required' }),
-    devise: z.string().max(3, 'Must be 3 characters'),
-    nature_op: z.number().min(1, 'Must be at least 1'),
-    taux: z.number().min(1, 'Must be at least 1'),
+    crg_id: z.string().transform(v => Number(v)), // .min(1, 'Le crg demandeur doit etre un ID'),
+    cr_id: z.string().transform(v => Number(v)), // .min(1, 'Le CR doit etre un ID'),
+    org_id: z.string().transform(v => Number(v)), // .min(1, 'Vous devez indiquer le 1er approvateur'),
+    beneficiaire_id: z.number().min(1, 'Vous devez indiquer un bénéficiaire'),
+    type_budget: z.string().min(1, 'Vous devez indiquer le type de budget'),
+    categorie_id: z.string().min(1, 'Vous devez indiquer la catégorie de note de frais'),
+    description: z.string().min(2, 'Vous devez indiquer une description'),
+    devise: z.string().max(3, 'Vous devez indiquer une devise'),
+    nature_id: z.string().min(1, 'Vous devez indiquer une nature de note de frais'),
+    taux_echange: z.number().min(1, 'Must be at least 1'),
     a_justifier: z.boolean().default(false),
     date_creation: z.custom<DateValue>(() => true),
+    payment_group_id: z.number()
 })
 
 
@@ -79,17 +82,22 @@ const _employes = [
 ]
 const selectedEmp = ref(_employes[3])
 async function onSubmit(event: FormSubmitEvent<any>) {
-    form.value.clear()
-    console.log({ fff: form.value });
-    console.log({ ooo: event.data });
-    toast.add({ icon: 'i-heroicons-check-circle', title: event.data, color: 'red' })
+    // form.value.clear()
+    console.log({ data: event.data });
+    console.log('Current user on submit ', supabase.auth);
     try {
-        // const { data, error } = await supabase
-        //     .from('nf_headers')
-        //     .insert(form.value)
-        //     .select()
-        // ...
+        const { data, error } = await supabase
+            .from('nf_headers')
+            .insert([event.data])
+            .select()
+        console.log({ data }, { error });
+        if (!error) {
+            toast.add({ icon: 'i-heroicons-check-circle', title: 'Congratulations !', description: 'Your note has been created !', color: 'green' })
+        } else {
+            toast.add({ icon: 'i-heroicons-check-circle', title: 'Something went wrong !', description: 'Your note has not been created. ' + error.message, color: 'red' })
+        }
     } catch (err) {
+        console.log({ err });
         if (err.statusCode === 422) {
             form.value.setErrors(err.data.errors.map((err) => ({
                 // Map validation errors to { path: string, message: string }
@@ -104,13 +112,18 @@ function onSelectBeneficiaire(option) {
     option.click()
 }
 
-function submitHeader() {
-    form.value?.submit();
+async function submitHeader() {
+    await form.value?.submit();
+    console.log('errors...', form.value.errors);
 }
 
 defineExpose({
     submitHeader
 });
+
+onBeforeMount(() => {
+    supabase = useSupabase()
+})
 
 </script>
 
@@ -121,21 +134,21 @@ defineExpose({
             <div class="flex flex-col space-y-3 grow">
                 <UCard class="flex flex-row w-full grow">
                     <div class="flex flex-row space-x-3 w-full grow">
-                        <UFormGroup label="CRG" name="direction_demandeur" class="grow flex-auto min-w-[200px]">
+                        <UFormGroup label="CRG" name="crg_demandeur" class="grow flex-auto min-w-[200px]">
                             <USelect v-model="state.crg_id" option-attribute="name" class="w-[200px]" color="gray"
                                 variant="outline" :options="_orgs" />
                         </UFormGroup>
-                        <UFormGroup label="CR" name="cr" class=" w-[200px]">
-                            <USelect v-model="state.cr_id" option-attribute="name" name="cr" color="gray"
+                        <UFormGroup label="CR" name="cr_id" class="w-[200px]">
+                            <USelect v-model="state.cr_id" option-attribute="name" name="cr_id" color="gray"
                                 variant="outline" :options="_cr" />
                         </UFormGroup>
                         <UFormGroup label="1er Approbateur" name="org_id" class="w-[200px]">
                             <USelect v-model="state.org_id" option-attribute="name" name="org_id" color="gray"
                                 variant="outline" :options="_orgs" />
                         </UFormGroup>
-                        <UFormGroup label="Catégorie" name="categorie" class="mb-2 w-[200px]">
-                            <USelect v-model="state.categorie" option-attribute="name" name="categorie" color="gray"
-                                variant="outline" :options="_categories" />
+                        <UFormGroup label="Catégorie" name="categorie_id" class="mb-2 w-[200px]">
+                            <USelect v-model="state.categorie_id" option-attribute="name" name="categorie_id"
+                                color="gray" variant="outline" :options="_categories" />
                         </UFormGroup>
                         <UFormGroup label="A justifier" name="a_justifier" class="mb-2 w-[200px]">
                             <UToggle v-model="state.a_justifier" on-icon="i-heroicons-check-20-solid"
@@ -144,15 +157,21 @@ defineExpose({
                     </div>
                 </UCard>
                 <UCard>
-                    <UFormGroup label="Beneficiaire" name="beneficiaire_id" class=" mb-2">
-                        <UButton icon="i-heroicons-user-circle-16-solid" :label="selectedEmp.label" class="w-[50%]"
-                            variant="solid" @click="isCommOpen = true" />
-                        <UModal v-model="isCommOpen">
-                            <UCommandPalette v-model="selectedEmp" nullable
-                                :groups="[{ key: 'people', commands: _employes }]"
-                                @update:model-value="onSelectBeneficiaire" />
-                        </UModal>
-                    </UFormGroup>
+                    <div class="flex flex-row w-full ">
+                        <UFormGroup label="Beneficiaire" name="beneficiaire_id" class=" mb-2 mr-3">
+                            <UButton icon="i-heroicons-user-circle-16-solid" :label="selectedEmp.label"
+                                class="min-w-[200px]" variant="solid" @click="isCommOpen = true" />
+                            <UModal v-model="isCommOpen">
+                                <UCommandPalette v-model="selectedEmp" nullable
+                                    :groups="[{ key: 'people', commands: _employes }]"
+                                    @update:model-value="onSelectBeneficiaire" />
+                            </UModal>
+                        </UFormGroup>
+                        <UFormGroup label="Type Budget" name="type_budget" class="mb-2 w-[200px]">
+                            <USelect v-model="state.type_budget" option-attribute="name" name="type_budget" color="gray"
+                                variant="outline" :options="_type_budget" />
+                        </UFormGroup>
+                    </div>
                 </UCard>
                 <UCard class="w-full">
                     <div class="flex flex-row space-x-3 w-full grow">
@@ -160,11 +179,12 @@ defineExpose({
                             <USelect v-model="state.devise" option-attribute="name" color="gray" variant="outline"
                                 :options="_devises" />
                         </UFormGroup>
-                        <UFormGroup label="Taux de change" name="taux_change" class="w-[200px] z-0">
-                            <UInput placeholder="2875" icon="i-heroicons-currency-dollar-solid" variant="outline" />
+                        <UFormGroup label="Taux de change" name="taux_echange" class="w-[200px] z-0">
+                            <UInput v-model="state.taux_echange" type="number" placeholder="2875"
+                                icon="i-heroicons-currency-dollar-solid" variant="outline" />
                         </UFormGroup>
                         <UFormGroup label="Nature NF" name="nature" class=" w-[200px]">
-                            <USelect v-model="state.nature_op" option-attribute="name" color="gray" variant="outline"
+                            <USelect v-model="state.nature_id" option-attribute="name" color="gray" variant="outline"
                                 :options="_natureOP" />
                         </UFormGroup>
                         <UFormGroup label="Groupe de paiement" name="payment_group" class=" w-[200px]">

@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     "shadcn-nuxt",
     "radix-vue/nuxt",
     "@pinia/nuxt",
+    "@nuxtjs/supabase",
   ],
   ui: {
     icons: ["heroicons", "simple-icons", "solar"],
@@ -34,6 +35,16 @@ export default defineNuxtConfig({
       SUPABASE_ROLE_KEY: process.env.SUPABASE_ROLE_KEY,
     },
   },
+  supabase: {
+    url: process.env.SUPABASE_URL,
+    redirectOptions: {
+      login: "/auth",
+      callback: "/",
+      include: undefined,
+      exclude: [],
+      cookieRedirect: false,
+    },
+  },
   routeRules: {
     "/": { prerender: true },
   },
@@ -50,7 +61,7 @@ export default defineNuxtConfig({
     config: {
       stylistic: {
         commaDangle: "never",
-        braceStyle: "1tbs",
+        braceStyle: "1tbs"
       },
     },
   },

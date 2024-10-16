@@ -2,7 +2,7 @@
 const colorMode = useColorMode()
 
 const color = computed(() => colorMode.value === 'dark' ? '#111827' : 'white')
-
+const router = useRouter()
 useHead({
   meta: [
     { charset: 'utf-8' },
@@ -19,7 +19,7 @@ useHead({
 
 const title = 'Hazipro'
 const description = 'Hazipro'
-
+let supabase = null
 useSeoMeta({
   title,
   description,
@@ -29,6 +29,18 @@ useSeoMeta({
   twitterImage: 'https://dashboard-template.nuxt.dev/social-card.png',
   twitterCard: 'summary_large_image'
 })
+onBeforeMount(() => {
+  supabase = useSupabase()
+})
+onMounted(() => {
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log('Something changed', { event }, { session })
+    if (event === 'SIGNED_IN') {
+      router.push('/nf')
+    }
+  })
+})
+
 </script>
 
 <template>

@@ -13,7 +13,9 @@ const items = [[{
   icon: 'i-heroicons-user-plus',
   to: '/users'
 }]]
-
+definePageMeta({
+  middleware: ["auth"]
+})
 const range = ref<Range>({ start: sub(new Date(), { days: 14 }), end: new Date() })
 const period = ref<Period>('daily')
 </script>

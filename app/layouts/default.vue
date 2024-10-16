@@ -41,7 +41,7 @@ const links = [{
     text: 'Tresorerie',
     shortcuts: ['G', 'T']
   }
-}, 
+},
 {
   id: 'planification_paiements',
   label: 'Planification des paiements',

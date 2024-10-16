@@ -44,6 +44,10 @@ async function onSubmit(event: FormSubmitEvent<any>) {
 
   toast.add({ title: 'Profile updated', icon: 'i-heroicons-check-circle' })
 }
+
+definePageMeta({
+  middleware: ["auth"]
+})
 </script>
 
 <template>

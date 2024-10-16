@@ -11,7 +11,7 @@
 import type { AuthResponse, AuthTokenResponsePassword } from '@supabase/supabase-js';
 
 const router = useRouter()
-const supabase = useSupabase()
+let supabase = null
 const toast = useToast()
 definePageMeta({ layout: 'auth' })
 useSeoMeta({
@@ -35,7 +35,7 @@ async function onSubmit(payload: any) {
     console.log("onSubmit %o", payload);
     const { data, error }: AuthTokenResponsePassword = await supabase.auth.signInWithPassword({ email: payload.email, password: payload.password });
     // const response: AuthResponse = await supabase.auth.signUp({ email: data.email, password: data.password, options: {} });
-    console.log({ data });
+    console.log({ data }, { error });
     if (!error) {
         const current_user = await supabase.auth.getUser();
         console.log({ current_user });
@@ -43,9 +43,13 @@ async function onSubmit(payload: any) {
         router.push('/nf')
     } else {
         toast.add({ icon: 'i-heroicons-check-circle', title: 'Login unseccessful', color: 'red', description: error.message });
-        router.push('/')
+        // router.push('/')
     }
 }
+onBeforeMount(() => {
+    supabase = useSupabase()
+})
+
 </script>
 
 <style scoped></style>
