@@ -13,7 +13,7 @@ import {
 
 import type { User } from '~/types'
 
-const supabase = null
+const supabase = useSupabaseClient()
 
 const defaultColumns = [{
   key: 'id',
@@ -36,7 +36,7 @@ const defaultColumns = [{
 ]
 const nf_headers = ref([])
 const employes = ref([])
-async function getNf() {
+async function getAllNoteDeFrais() {
   const { data } = await supabase.from('nf_headers').select()
   nf_headers.value = data
 }
@@ -44,15 +44,14 @@ async function getEmployes() {
   const { data } = await supabase.from('employes').select()
   employes.value = data
 }
-onBeforeMount(() => {
-  supabase = useSupabase()
-})
+// onBeforeMount(() => {
+//   supabase = useSupabase()
+// })
 onMounted(() => {
   getEmployes()
-  getNf()
+  getAllNoteDeFrais()
 })
 const supabase_user = useSupabaseUser()
-const supabase_auth_client = useSupabaseAuthClient()
 const q = ref('')
 const sort = ref({ column: 'id', direction: 'asc' as const })
 const input = ref<{ input: HTMLInputElement }>()
@@ -197,7 +196,7 @@ function submitCurrentForm() {
 }
 function onChange(index) {
   selectedTab.value = index
-  alert(`${items[index].label} was clicked!`)
+  // alert(`${items[index].label} was clicked!`)
 }
 
 </script>
@@ -207,7 +206,6 @@ function onChange(index) {
     <UDashboardPanel grow>
       <UDashboardNavbar title="Note de frais" :badge="users.length">
         <template #right>
-          <UButton label="Note de frais 3" leading-icon="i-heroicons-plus" color="gray" @click="isOpen3 = true" />
           <USlideover v-model="isOpen3" :ui="{ width: 'min-w-[90%]' }" prevent-close>
             <UCard class="flex flex-col flex-1 overflow-y-auto"
               :ui="{ body: { base: 'flex-1' }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
@@ -258,7 +256,7 @@ function onChange(index) {
               </template>
             </UCard>
           </USlideover>
-          <UButton label="Note de frais 2" leading-icon="i-heroicons-plus" color="gray" @click="isOpen2 = true" />
+          <!-- <UButton label="Note de frais 2" leading-icon="i-heroicons-plus" color="gray" @click="isOpen2 = true" /> -->
           <UModal v-model="isOpen2" fullscreen>
             <UCard :ui="{
               base: 'h-full flex flex-col',
@@ -304,64 +302,7 @@ function onChange(index) {
                 </template>
               </UTabs>
             </UCard>
-          </UModal>
-          <DialogRoot>
-            <DialogTrigger class="">
-              <UButton label="Note de frais" leading-icon="i-heroicons-plus" color="gray" />
-            </DialogTrigger>
-            <DialogPortal>
-              <DialogOverlay
-                class=" backdrop-blur-sm bg-white/20 data-[state=open]:animate-overlayShow fixed inset-0 z-30" />
-              <DialogContent
-                class="data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] h-[90%] w-[90vw] max-w-[90%] translate-x-[-50%] translate-y-[-50%] rounded-[6px] bg-gray-900 p-[25px] shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none z-[100] overflow-auto">
-                <DialogTitle class="text-teal-200 m-0 text-[17px] font-semibold">
-                  Note de frais
-                </DialogTitle>
-                <DialogDescription class="text-mauve11 mt-[10px] mb-5 text-[15px] leading-normal">
-                  Create new employe expense
-                </DialogDescription>
-                <UTabs :items="items" class="w-full">
-                  <template #default="{ item, index, selected }">
-                    <div class="flex items-center gap-2 relative truncate">
-                      <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
-
-                      <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
-
-                      <span v-if="selected"
-                        class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
-                    </div>
-                  </template>
-                  <template #item="{ item }">
-                    <!-- {{ item }} -->
-                    <div class="flex flex-row space-x-4 p-0">
-                      <NfHeader v-if="item.key === 'header'" />
-                      <NfLines v-else-if="item.key === 'lines'" />
-                      <NfResume v-else-if="item.key === 'resume'" />
-                      <NfApercu v-else-if="item.key === 'apercu'" />
-
-                      <UCard :ui="{ base: 'w-[25%]' }">
-                        test
-                      </UCard>
-                    </div>
-                  </template>
-                </UTabs>
-
-                <div class="mt-[25px] flex justify-end">
-                  <DialogClose as-child>
-                    <button
-                      class="bg-green4 text-green11 hover:bg-green5 focus:shadow-green7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none focus:shadow-[0_0_0_2px] focus:outline-none">
-                      Save changes
-                    </button>
-                  </DialogClose>
-                </div>
-                <DialogClose
-                  class="text-white  hover:bg-white focus:shadow-green7 absolute top-[10px] right-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full focus:shadow-[0_0_0_2px] focus:outline-none"
-                  aria-label="Close">
-                  <UIcon name="solar-close-circle-line-duotone:x" class="text-white" />
-                </DialogClose>
-              </DialogContent>
-            </DialogPortal>
-          </DialogRoot>
+          </UModal>          
         </template>
       </UDashboardNavbar>
 
@@ -371,9 +312,6 @@ function onChange(index) {
             :options="defaultStatuses" :ui-menu="{ option: { base: 'capitalize' } }" />
           <USelectMenu v-model="selectedLocations" icon="i-heroicons-map-pin" placeholder="Location"
             :options="defaultLocations" multiple />
-        </template>
-        {{ selectedEmp }}
-        <template #right>
           <USelectMenu v-model="selectedColumns" icon="i-heroicons-adjustments-horizontal-solid"
             :options="defaultColumns" multiple class="hidden lg:block">
             <template #label>
@@ -381,11 +319,15 @@ function onChange(index) {
             </template>
           </USelectMenu>
         </template>
+        <template #right>
+          <UButton label="Nouvelle note de frais" leading-icon="i-heroicons-plus" color="gray" @click="isOpen3 = true" />
+        </template>
       </UDashboardToolbar>
-      There is {{ employes.length }} employes
-      {{ supabase_auth_client }}{{ supabase_user }}
+
+
       <UTable v-model="selectedUser" v-model:sort="sort" :rows="employes" :columns="columns" sort-mode="manual"
-        class="w-full" :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }" @select="onSelect">
+        class="w-[97%] self-center rounded-sm border border-gray-200 dark:border-gray-700 top-1"
+        :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }" @select="onSelect">
         <template #name-data="{ row }">
           <div class="flex items-center gap-3">
             <UAvatar v-bind="row.avatar" :alt="row.name" size="xs" />
@@ -400,6 +342,7 @@ function onChange(index) {
             variant="subtle" class="capitalize" />
         </template>
       </UTable>
+
       <USlideover v-model="isNewUserModalOpen" :ui="{ width: 'w-[700px]' }" size="md" prevent-close>
         <UCard class="flex flex-col flex-1"
           :ui="{ body: { base: 'flex-1', padding: 'px-1 py-1 sm:px-3' }, ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">

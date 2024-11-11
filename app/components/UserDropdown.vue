@@ -2,7 +2,7 @@
 const { isHelpSlideoverOpen } = useDashboard()
 const { isDashboardSearchModalOpen } = useUIState()
 const { metaSymbol } = useShortcuts()
-const supabase = useSupabase()
+const supabase = useSupabaseClient()
 const items = computed(() => [
   [{
     slot: 'account',

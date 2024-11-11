@@ -23,7 +23,8 @@ import type { FormError, FormSubmitEvent } from '#ui/types'
 const df = new DateFormatter('fr-FR', {
     dateStyle: 'long',
 })
-let supabase = null
+let supabase = useSupabaseClient()
+let supabaseUser = useSupabaseUser()
 const { signIn } = useAuth()
 const value = ref<DateValue>()
 const form = ref()
@@ -35,7 +36,7 @@ const _type_budget = [{ name: "BA - Budget d'activité", value: 1 }, { name: "TR
 const _devises = [{ name: 'USD', value: 'USD' }, { name: 'CDF', value: 'CDF' }, { name: 'ZAR', value: 'ZAR' }]
 const _payment_group = [{ name: 'PGF', value: 1 }, { name: 'TRO', value: 2 }, { name: 'TRC', value: 3 }]
 const isCommOpen = ref(false)
-const _natureOP = [{ name: 'Mission', value: 12 }]
+const _natureOP = [{ name: 'Mission', value: 1 }]
 const state = reactive({
     crg_id: undefined,
     org_id: undefined,
@@ -64,7 +65,7 @@ const header_schema = z.object({
     taux_echange: z.number().min(1, 'Must be at least 1'),
     a_justifier: z.boolean().default(false),
     date_creation: z.custom<DateValue>(() => true),
-    payment_group_id: z.number()
+    payment_group_id: z.string()
 })
 
 
@@ -84,7 +85,7 @@ const selectedEmp = ref(_employes[3])
 async function onSubmit(event: FormSubmitEvent<any>) {
     // form.value.clear()
     console.log({ data: event.data });
-    console.log('Current user on submit ', supabase.auth);
+    console.log('Current user on submit ', supabaseUser.value);
     try {
         const { data, error } = await supabase
             .from('nf_headers')
@@ -121,16 +122,12 @@ defineExpose({
     submitHeader
 });
 
-onBeforeMount(() => {
-    supabase = useSupabase()
-})
-
 </script>
 
 <template>
     <UCard :ui="{ base: 'w-[75%]' }">
         <UForm ref="form" :state="state" :schema="header_schema" class="flex flex-col" @submit="onSubmit">
-            {{ state }}
+            <!-- {{ state }} -->
             <div class="flex flex-col space-y-3 grow">
                 <UCard class="flex flex-row w-full grow">
                     <div class="flex flex-row space-x-3 w-full grow">
@@ -187,9 +184,9 @@ onBeforeMount(() => {
                             <USelect v-model="state.nature_id" option-attribute="name" color="gray" variant="outline"
                                 :options="_natureOP" />
                         </UFormGroup>
-                        <UFormGroup label="Groupe de paiement" name="payment_group" class=" w-[200px]">
-                            <USelect option-attribute="name" color="gray" variant="outline" :options="_payment_group"
-                                :model-value="state.devise" />
+                        <UFormGroup label="Groupe de paiement" name="payment_group_id" class=" w-[200px]">
+                            <USelect v-model="state.payment_group_id" option-attribute="name" color="gray" variant="outline" :options="_payment_group"
+                            />
                         </UFormGroup>
                         <UFormGroup label="Date de création" name="date_creation" class="w-[200px]">
                             <Popover>
@@ -211,8 +208,8 @@ onBeforeMount(() => {
                         </UFormGroup>
                     </div>
                 </UCard>
-                <UCard class="flex flex-row min-w-full">
-                    <div class="flex-grow block w-full">
+                <UCard class="flex flex-row min-w-fit">
+                    <div class="flex-grow ">
                         <UFormGroup size="lg" label="Description" name="description" class="mb-2 w-full ">
                             <UTextarea v-model="state.description" class="w-[100%]" variant="outline" />
                         </UFormGroup>
