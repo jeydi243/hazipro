@@ -5,6 +5,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (!user.value && to.path !== "/auth") {
     return navigateTo("/auth");
   } else {
-    console.log("No user connected ", user);
+    console.log("No user connected ", user.value);
   }
 });

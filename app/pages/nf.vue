@@ -60,6 +60,7 @@ const selectedColumns = ref(defaultColumns)
 const selectedStatuses = ref([])
 const selectedLocations = ref([])
 const isNewUserModalOpen = ref(false)
+const headerCreated = ref(false)
 const beneficiaireModalOpen = ref(false)
 const submitingHeader = ref(false)
 const isCommOpen = ref(false)
@@ -80,6 +81,7 @@ const people = [
   { id: 9, label: 'Claudie Smitham', click: () => { isCommOpen.value = false } },
   { id: 10, label: 'Emil Schaefer', click: () => { isCommOpen.value = false } }
 ]
+
 const defaultDevise = [
   { id: 1, label: 'USD' },
   { id: 2, label: 'CDF' },
@@ -107,6 +109,15 @@ function onSelect(row: User) {
     selectedUser.value.splice(index, 1)
   }
 }
+function onSubmitResult(result: string) {
+  if (result === "success") {
+    headerCreated.value = true
+    toast.add({ icon: 'i-heroicons-check-circle', title: 'Congratulations !', description: 'Your note has been created !', color: 'green' })
+  } else {
+    headerCreated.value = false
+    toast.add({ icon: 'i-heroicons-check-circle', title: 'Something went wrong !', description: 'Your note has not been created. ' + result, color: 'red' })
+  }
+}
 
 const header_schema = z.object({
   crg_demandeur: z.string().email('Invalid email'),
@@ -114,6 +125,7 @@ const header_schema = z.object({
 })
 
 type Schema = z.output<typeof header_schema>
+
 
 const state = reactive({
   crg_demandeur: undefined,
@@ -232,8 +244,9 @@ function onChange(index) {
                   </template>
                   <template #item="{ item }">
                     <!-- {{ item }} -->
+                    <StepperSlide />
                     <div class="flex flex-row space-x-4 p-0">
-                      <NfHeader v-if="item.key === 'header'" ref="childHeader" />
+                      <NfHeader v-if="item.key === 'header'" ref="childHeader" @submit-result="onSubmitResult" />
                       <NfLines v-else-if="item.key === 'lines'" />
                       <NfResume v-else-if="item.key === 'resume'" />
                       <NfApercu v-else-if="item.key === 'apercu'" />
@@ -248,9 +261,13 @@ function onChange(index) {
 
               <template #footer>
                 <div class="flex flex-row-reverse">
-                  <UButton color="primary" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false"
-                    :loading="_loadingForm" @click="submitCurrentForm">
+                  <UButton v-if="headerCreated" color="primary" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false"
+                     @click="nextTab">
                     Suivant
+                  </UButton>
+                  <UButton v-else color="primary" variant="soft" icon="heroicons:document-plus-20-solid" :trailing="false"
+                    :loading="_loadingForm" @click="submitCurrentForm">
+                    Créer
                   </UButton>
                 </div>
               </template>
@@ -302,7 +319,7 @@ function onChange(index) {
                 </template>
               </UTabs>
             </UCard>
-          </UModal>          
+          </UModal>
         </template>
       </UDashboardNavbar>
 
@@ -320,7 +337,8 @@ function onChange(index) {
           </USelectMenu>
         </template>
         <template #right>
-          <UButton label="Nouvelle note de frais" leading-icon="i-heroicons-plus" color="gray" @click="isOpen3 = true" />
+          <UButton label="Nouvelle note de frais" leading-icon="i-heroicons-plus" color="gray"
+            @click="isOpen3 = true" />
         </template>
       </UDashboardToolbar>
 

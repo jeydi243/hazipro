@@ -18,6 +18,7 @@ import {
 
 import type { FormError, FormSubmitEvent } from '#ui/types'
 
+const emit = defineEmits(['submit-result'])
 
 
 const df = new DateFormatter('fr-FR', {
@@ -26,6 +27,7 @@ const df = new DateFormatter('fr-FR', {
 let supabase = useSupabaseClient()
 let supabaseUser = useSupabaseUser()
 const { signIn } = useAuth()
+const { addNF } = useNF()
 const value = ref<DateValue>()
 const form = ref()
 const toast = useToast()
@@ -87,15 +89,15 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     console.log({ data: event.data });
     console.log('Current user on submit ', supabaseUser.value);
     try {
-        const { data, error } = await supabase
-            .from('nf_headers')
-            .insert([event.data])
-            .select()
+        const { data, error } = await supabase.from('nf_headers').insert([event.data]).select()
         console.log({ data }, { error });
         if (!error) {
             toast.add({ icon: 'i-heroicons-check-circle', title: 'Congratulations !', description: 'Your note has been created !', color: 'green' })
+            addNF(data.value)
+            emit('submit-result', 'success');
         } else {
             toast.add({ icon: 'i-heroicons-check-circle', title: 'Something went wrong !', description: 'Your note has not been created. ' + error.message, color: 'red' })
+            emit('submit-result', 'failed');
         }
     } catch (err) {
         console.log({ err });
@@ -185,8 +187,8 @@ defineExpose({
                                 :options="_natureOP" />
                         </UFormGroup>
                         <UFormGroup label="Groupe de paiement" name="payment_group_id" class=" w-[200px]">
-                            <USelect v-model="state.payment_group_id" option-attribute="name" color="gray" variant="outline" :options="_payment_group"
-                            />
+                            <USelect v-model="state.payment_group_id" option-attribute="name" color="gray"
+                                variant="outline" :options="_payment_group" />
                         </UFormGroup>
                         <UFormGroup label="Date de création" name="date_creation" class="w-[200px]">
                             <Popover>
@@ -208,7 +210,7 @@ defineExpose({
                         </UFormGroup>
                     </div>
                 </UCard>
-                <UCard class="flex flex-row min-w-fit">
+                <UCard :ui="{ base: 'w-750px', body: { base: 'w-full', padding: 'px-4 py-5 sm:p-6' } }" class="flex flex-row w-750px ff">
                     <div class="flex-grow ">
                         <UFormGroup size="lg" label="Description" name="description" class="mb-2 w-full ">
                             <UTextarea v-model="state.description" class="w-[100%]" variant="outline" />

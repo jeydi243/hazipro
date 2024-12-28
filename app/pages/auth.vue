@@ -41,10 +41,10 @@ async function onSubmit(payload: any) {
         const current_user = useSupabaseUser()
         console.log({ current_user });
         toast.add({ icon: 'i-solar-shield-warning-linear', title: 'Login successfully', color: 'green', description: 'Bienvenue cher membre !' });
-        // router.push('/nf')
+        router.push('/nf')
     } else {
         toast.add({ icon: 'i-heroicons-check-circle', title: 'Login unseccessful', color: 'red', description: error.message });
-        // router.push('/')
+        router.push('/')
     }
 }
 </script>
