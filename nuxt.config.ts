@@ -81,4 +81,5 @@ export default defineNuxtConfig({
   alias: {
     "~/lib": "./lib",
   },
+  
 });
