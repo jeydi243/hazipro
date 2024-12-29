@@ -57,6 +57,16 @@ export interface Lookups extends Audit {
   description: string;
   parent_lookups_id?: string;
 }
+export interface Organisation extends Audit {
+  id: string;
+  lookup_id: Classe;
+  name: string;
+  code: string;
+  description: string;
+  adresse: string;
+  email: string;
+  organisation_parent_id?: string;
+}
 export type Period = "daily" | "weekly" | "monthly";
 
 export interface Range {
