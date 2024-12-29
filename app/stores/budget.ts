@@ -10,7 +10,7 @@ export const useBudget = defineStore('budget', {
   },
   actions: {
     init() {
-      this.budgets = budgets
+      this.budgets = []
     },
   },
 })

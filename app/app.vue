@@ -21,9 +21,11 @@
   onMounted(() => {
     const store1 = useOrg()
     const store2 = useBudget()
+    const store3 = useNF()
     // Call the init actions
     store1.init()
     store2.init()
+    store3.init()
   })
   const title = 'Hazipro'
   const description = 'Hazipro'
