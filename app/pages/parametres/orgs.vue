@@ -9,17 +9,16 @@
   const selectedTab = ref(0)
   const selectedOrganisation = ref<Organisation | null>(null)
   const selectedLookups = ref<Lookups | null>(null)
-  const orgs = computed(() => orgStore.getListCrg)
 
   const filteredOrganisations = computed(() => {
     if (selectedTab.value === 1) {
-      return orgs.value
+      return orgStore.getListCrg
     }
 
-    return classes.value
+    return orgStore.getListCrg
   })
 
-  const lookupsColumns = [
+  const orgColumns = [
     {
       key: 'code',
       label: 'Code',
@@ -86,22 +85,12 @@
 
   function modalOrganisationClosed() {
     isNewOrganisationModalOpen.value = false
-    refresh()
-    fetchLookups(selectedOrganisation.value.id)
+    // fetchLookups(selectedOrganisation.value.id)
   }
 
   function modalLookupsClosed() {
     isNewLookupsModalOpen.value = false
-    fetchLookups(selectedOrganisation.value.id)
-  }
-
-  async function fetchLookups(id: string = 'default') {
-    try {
-      lookupsResults.value = await $fetch<Lookups[]>('http://127.0.0.1:4000/lookups/byclasse', { method: 'GET', params: { classe_id: id } })
-      // lookupsResults.value = data.value
-    } catch (error) {
-      console.log('Error', error)
-    }
+    // fetchLookups(selectedOrganisation.value.id)
   }
 
   // Reset selected mail if it's not in the filtered mails
@@ -114,7 +103,7 @@
   watch(selectedOrganisation, () => {
     console.log('Selected class ID = %s', selectedOrganisation.value.id)
     selectedLookups.value = null
-    fetchLookups(selectedOrganisation.value.id).then(() => console.log('Lookups fetched executed %s', selectedOrganisation.value.id))
+    // fetchLookups(selectedOrganisation.value.id).then(() => console.log('Lookups fetched executed %s', selectedOrganisation.value.id))
   })
 </script>
 
@@ -126,7 +115,7 @@
           <UButton icon="i-heroicons-plus-16-solid" color="teal" variant="ghost" @click="isNewOrganisationModalOpen = true" />
         </template>
       </UDashboardNavbar>
-      <OrganisationsList v-model="selectedOrganisation" :classes="filteredOrganisations" />
+      <OrganisationList v-model="selectedOrganisation" :orgs="orgStore.getOrgs" />
     </UDashboardPanel>
 
     <UDashboardPanel v-model="isMailPanelOpen" collapsible grow side="right">
@@ -139,7 +128,7 @@
 
           <template #left>
             <UTooltip text="Move to junk">
-              <UButton icon="i-heroicons-arrow-path" color="gray" variant="ghost" @click="fetchLookups(selectedOrganisation.id)" />
+              <UButton icon="i-heroicons-arrow-path" color="gray" variant="ghost" />
             </UTooltip>
           </template>
 
@@ -205,7 +194,7 @@
       :ui="{ width: 'sm:max-w-md' }"
     >
       <!-- ~/components/users/UsersForm.vue -->
-      <OrganisationLookupsForm :classe="selectedOrganisation" :action="actionToSubmit" :lookups="selectedLookups" @close="modalLookupsClosed" />
+      <OrganisationForm :classe="selectedOrganisation" :action="actionToSubmit" :lookups="selectedLookups" @close="modalLookupsClosed" />
     </UDashboardModal>
     <UDashboardModal v-model="isNewOrganisationModalOpen" title="Organisation" description="Ajouter une organisation" :ui="{ width: 'sm:max-w-md' }">
       <!-- ~/components/users/UsersForm.vue -->

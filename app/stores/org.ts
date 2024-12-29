@@ -1,33 +1,38 @@
 import type { SupabaseClient, User } from '@supabase/supabase-js'
+import type { Organisation } from '~/types'
 
-interface storeAuth {
-  user: User
-  description: string
+interface storeOrg {
   baseUrl: string
-  orgs: Org[]
+  orgs: Organisation[] | []
   supabase: SupabaseClient | null | any
 }
 
-export const useOrg = defineStore('org', {
-  state: (): storeAuth => ({
+export const useOrg = defineStore('organisation', {
+  state: (): storeOrg => ({
     baseUrl: 'http://127.0.0.1:4000/v1',
-    description: '',
     supabase: null,
+    orgs: [],
   }),
   getters: {
-    getOrgs(state: storeAuth) {
-      return state.getters.getCrgs
-    },
-    getListCrg(state: storeAuth) {
-      return state.orgs.filter(org => (org.tag_budget = 'Y'))
-    },
-    getListCr(state: storeAuth) {
-      return state.orgs.filter(org => (org.tag_cr = 'Y'))
-    },
+    getOrgs: (state: storeOrg) => state.orgs,
+    getListCrg: (state: storeOrg) => (state.orgs ? state.orgs.filter(org => org.lookup_id == 1) : []),
+    getListCr: (state: storeOrg) => (state.orgs ? state.orgs.filter(org => org.lookup_id == 2) : []),
   },
   actions: {
     async init() {
       this.supabase = useSupabaseClient()
+      const { data, error } = await this.supabase.from('organisations').select(`
+            organisation_id,
+            name,
+            code,
+            organisation_parent_id`)
+      if (!error) {
+        console.log('Organisations retrieved ', data)
+        this.orgs = data
+      } else {
+        console.log(error)
+      }
+      console.log('Store organisation initiated !')
     },
     async assign_to_org(payload: any) {
       const { data, error } = await this.supabase.from('users_access_rights').insert(payload)

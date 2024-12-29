@@ -59,12 +59,13 @@ export interface Lookups extends Audit {
 }
 export interface Organisation extends Audit {
   id: string;
-  lookup_id: Classe;
+  lookup_id: number;
   name: string;
   code: string;
   description: string;
   adresse: string;
   email: string;
+  statut: string;
   organisation_parent_id?: string;
 }
 export type Period = "daily" | "weekly" | "monthly";

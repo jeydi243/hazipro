@@ -6,7 +6,7 @@ export const useBudget = defineStore('budget', {
     budgets: [] as { description: string; amount: number }[],
   }),
   getters: {
-    remainingBudget: state => state.total - state.expenses.reduce((sum, expense) => sum + expense.amount, 0),
+    remainingBudget: state => state.budgets
   },
   actions: {
     init() {
