@@ -102,6 +102,10 @@
           to: '/parametres/orgs',
         },
         {
+          label: 'Budgets',
+          to: '/parametres/budgets',
+        },
+        {
           label: "Matrice d'approbation",
           to: '/parametres/matrice_approbation',
         },

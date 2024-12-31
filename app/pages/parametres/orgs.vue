@@ -120,49 +120,33 @@
 
     <UDashboardPanel v-model="isMailPanelOpen" collapsible grow side="right">
       <template v-if="selectedOrganisation">
-        <UDashboardNavbar>
-          <template #toggle>
-            <UDashboardNavbarToggle icon="i-heroicons-x-mark" />
-            <UDivider orientation="vertical" class="mx-1.5 lg:hidden" />
-          </template>
-
-          <template #left>
-            <UTooltip text="Move to junk">
-              <UButton icon="i-heroicons-arrow-path" color="gray" variant="ghost" />
-            </UTooltip>
-          </template>
-
-          <template #right>
-            <UButton icon="i-heroicons-plus-16-solid" label="Ajouter" color="teal" variant="solid" @click="isNewLookupsModalOpen = true" />
-          </template>
-        </UDashboardNavbar>
-
-        <!-- <OrganisationsMail :classe="selectedOrganisation" /> -->
+        <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+          <ul class="flex flex-wrap -mb-px">
+            <li class="me-2">
+              <a href="#" class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">Profile</a>
+            </li>
+            <li class="me-2">
+              <a href="#" class="inline-block p-2 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active dark:text-blue-500 dark:border-blue-500" aria-current="page">Dashboard</a>
+            </li>
+            <li class="me-2">
+              <a href="#" class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">Settings</a>
+            </li>
+            <li class="me-2">
+              <a href="#" class="inline-block p-2 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">Contacts</a>
+            </li>
+            <li>
+              <a class="inline-block p-2 text-gray-400 rounded-t-lg cursor-not-allowed dark:text-gray-500">Disabled</a>
+            </li>
+          </ul>
+        </div>
         <UCard
           :ui="{
             base: 'm-2',
             divide: 'divide-y divide-gray-200 dark:divide-gray-700',
             header: {
-              base: '',
-              background: '',
-              padding: 'py-3 px-3',
-            },
-          }"
-        >
-          <template #header>Informations de la classe</template>
-        </UCard>
-        <UCard
-          :ui="{
-            base: 'm-2',
-            divide: 'divide-y divide-gray-200 dark:divide-gray-700',
-            header: {
-              base: '',
-              background: '',
               padding: 'px-1',
             },
             body: {
-              base: '',
-              background: '',
               padding: 'px-1',
             },
           }"
@@ -171,7 +155,7 @@
             <h2 class="font-semibold text-xl text-gray-900 dark:text-white leading-tight">Lookups</h2>
           </template>
 
-          <UTable :rows="lookupsResults" :columns="lookupsColumns" class="m-2 border border-separate rounded-md">
+          <UTable :rows="lookupsResults" :columns="orgColumns" class="m-2 border border-separate rounded-md">
             <template #actions-data="{ row }">
               <UDropdown :items="items(row)">
                 <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />

@@ -33,6 +33,11 @@
         to: '/parametres/orgs',
       },
       {
+        label: 'Budgets',
+        icon: 'i-heroicons-bell',
+        to: '/parametres/budgets',
+      },
+      {
         label: "Matrice d'approbation",
         icon: 'i-heroicons-bell',
         to: '/parametres/matrice_approbation',
@@ -61,7 +66,7 @@
 <template>
   <UDashboardPage>
     <UDashboardPanel grow>
-      <UDashboardNavbar title="Parametres" />
+      <!-- <UDashboardNavbar title="Parametres" /> -->
 
       <UDashboardToolbar class="py-0 px-1.5 overflow-x-auto">
         <UHorizontalNavigation :links="links" />

@@ -39,15 +39,14 @@
     })
   })
 
-  const stepperList = []
 
   const props = defineProps({
     modelValue: {
-      type: Object as PropType<Classe | null>,
+      type: Object as PropType<any>,
       default: null,
     },
     steppers: {
-      type: Array as PropType<[]>,
+      type: Array as PropType<any[]>,
       default: () => [],
     },
   })

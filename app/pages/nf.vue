@@ -1,6 +1,5 @@
 <script lang="ts" setup>
   import { z } from 'zod'
-  import { DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from 'radix-vue'
 
   import type { User } from '~/types'
 
@@ -108,6 +107,7 @@
   const headerCreated = ref(false)
   const beneficiaireModalOpen = ref(false)
   const submitingHeader = ref(false)
+  const toast = useToast()
   const isCommOpen = ref(false)
   const _loadingForm = ref(false)
   const form = ref()
@@ -123,78 +123,7 @@
     query,
     default: () => [],
   })
-  const people = [
-    {
-      id: 1,
-      label: 'Wade Cooper',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 2,
-      label: 'Arlene Mccoy',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 3,
-      label: 'Devon Webb',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 4,
-      label: 'Tom Cook',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 5,
-      label: 'Tanya Fox',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 6,
-      label: 'Hellen Schmidt',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 7,
-      label: 'Caroline Schultz',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 8,
-      label: 'Mason Heaney',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 9,
-      label: 'Claudie Smitham',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 10,
-      label: 'Emil Schaefer',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-  ]
+
 
   const state = reactive({
     crg_demandeur: undefined,
@@ -314,14 +243,8 @@
       },
     },
   ]
-  const selectedEmp = ref([_employes[3]])
   const childHeader = ref(null)
   const selectedTab = ref(0)
-  const defaultDevise = [
-    { id: 1, label: 'USD' },
-    { id: 2, label: 'CDF' },
-    { id: 3, label: 'ZAR' },
-  ]
   const defaultLocations = users.value.reduce((acc, user) => {
     if (!acc.includes(user.location)) {
       acc.push(user.location)
@@ -346,7 +269,7 @@
     //   selectedNF.value.splice(index, 1)
     // }
   }
-  function onSubmitResult({ statut: string, data: any }) {
+  function onSubmitResult({ statut, data }) {
     if (statut === 'success') {
       current_nf_header.value = data
       headerCreated.value = true
@@ -361,7 +284,7 @@
       toast.add({
         icon: 'i-heroicons-check-circle',
         title: 'Something went wrong !',
-        description: 'Your note has not been created. ' + result,
+        description: 'Your note has not been created. ' + statut,
         color: 'red',
       })
     }
@@ -410,8 +333,10 @@
     // alert(`${items[index].label} was clicked!`)
   }
   async function uploadFile() {
-    const file = document.getElementById('file_annexe').files[0]
-    // file = this.$refs.file.files[0]
+    const fileInput = document.getElementById('file_annexe') as HTMLInputElement
+    const file = fileInput?.files?.[0]
+    if (!file) return
+    
     const { data, error } = await supabase.storage.from('annexes').upload('file_path', file)
     if (error) {
       // Handle error
@@ -420,6 +345,9 @@
       console.log({ data })
       // Handle success
     }
+  }
+  function goNextTab(){
+    console.log('Go next tab');
   }
   onMounted(() => {
     getEmployes()
@@ -474,13 +402,13 @@
                           <!-- <div></div> -->
                         </template>
                         <ol class="list-decimal pl-5">
-                          <li v-for="(item, index) in items" :key="index" class="flex items-start space-x-2 mb-2">
+                          <!-- <li v-for="(file, index) in itemsFiles" :key="index" class="flex items-start space-x-2 mb-2">
                             <UIcon :name="item.icon" class="w-9 h-9 flex-shrink-0 self-center" />
                             <div>
-                              <p class="font-medium">{{ item.filename }}</p>
+                              <p class="font-medium">{{ file.filename }}</p>
                               <p class="text-sm text-gray-500">{{ item.description }}</p>
                             </div>
-                          </li>
+                          </li> -->
                         </ol>
                         <template #footer>
                           <div v-if="item.key === 'header'">
@@ -496,7 +424,7 @@
 
               <template #footer>
                 <div class="flex flex-row-reverse">
-                  <UButton v-if="headerCreated" color="primary" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false" @click="nextTab">Suivant</UButton>
+                  <UButton v-if="headerCreated" color="primary" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false" @click="goNextTab">Suivant</UButton>
                   <UButton v-else color="primary" variant="soft" icon="heroicons:document-plus-20-solid" :trailing="false" :loading="_loadingForm" @click="submitCurrentForm">Créer</UButton>
                 </div>
               </template>
@@ -523,7 +451,7 @@
 
               <UTabs :items="items" class="w-full">
                 <template #default="{ item, index, selected }">
-                  <div class="flex items-center gap-2 relative truncate sticky">
+                  <div class="flex items-center gap-2 truncate sticky">
                     <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
 
                     <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
@@ -586,7 +514,7 @@
         <template #status_approbation-data="{ row }">
           <UBadge
             :label="row.status_approbation"
-            :color="row.status_approbation === 'En cours' ? 'green' : row.status === 'Non soumis' ? 'blueu' : 'red'"
+            :color="row.status_approbation === 'En cours' ? 'green' : row.status === 'Non soumis' ? 'blue' : 'red'"
             variant="subtle"
             class="capitalize"
           />
