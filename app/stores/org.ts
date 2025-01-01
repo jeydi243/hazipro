@@ -7,7 +7,7 @@ interface storeOrg {
   supabase: SupabaseClient | null | any
 }
 
-export const useOrg = defineStore('organisation', {
+export const useStoreOrg = defineStore('organisation', {
   state: (): storeOrg => ({
     baseUrl: 'http://127.0.0.1:4000/v1',
     supabase: null,

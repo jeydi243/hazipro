@@ -1,7 +1,7 @@
 <template>
   <UDashboardPage>
-    <UDashboardPanel grow>
-      <UDashboardNavbar title="Budgets" :badge="users.length">
+    <UDashboardPanel grow class="bg-red">
+      <UDashboardNavbar title="Budgets" :badge="20">
         <template #right>
           <UModal v-model="isOpen2" fullscreen>
             <UCard
@@ -25,21 +25,43 @@
         </template>
       </UDashboardNavbar>
 
+      <UDashboardSlideover
+        :ui="{
+          overlay: {
+            base: 'fixed inset-0 transition-opacity',
+            background: 'bg-gray-500/75 dark:bg-gray-800/75',
+          },
+        }"
+        v-model="openEditSlide"
+        title="Modifier un Budget"
+      >
+        <BudgetForm />
+      </UDashboardSlideover>
+
       <UDashboardToolbar>
         <template #left>
-          <USelectMenu v-model="selectedStatuses" icon="i-heroicons-check-circle" placeholder="Status" multiple :options="defaultStatuses" :ui-menu="{ option: { base: 'capitalize' } }" />
-          <USelectMenu v-model="selectedYear" icon="i-heroicons-map-pin" placeholder="Location" :options="defaultLocations" multiple />
-          <USelectMenu v-model="selectedColumns" icon="i-heroicons-adjustments-horizontal-solid" :options="defaultColumns" multiple class="hidden lg:block">
-            <template #label>Display</template>
+          <USelectMenu
+            v-model="selectedComptes"
+            searchable
+            searchable-placeholder="Search a person..."
+            icon="i-heroicons-check-circle"
+            placeholder="Comptes"
+            multiple
+            :options="defaultComptes"
+            :ui-menu="{ option: { base: 'capitalize' } }"
+          />
+          <USelectMenu v-model="selectedYear" searchable icon="i-heroicons-map-pin" placeholder="Année" :options="defaultYears" multiple />
+          <USelectMenu v-model="selectedColumns" searchable icon="i-heroicons-adjustments-horizontal-solid" :options="defaultColumns" multiple class="hidden lg:block">
+            <template #label>Colonnes</template>
           </USelectMenu>
         </template>
         <template #right>
-          <UButton label="Nouvelle note de frais" leading-icon="i-heroicons-plus" color="gray" @click="isOpen3 = true" />
+          <UButton label="Nouvelle ligne" leading-icon="i-heroicons-plus" color="gray" @click="openEditSlide = !openEditSlide" />
         </template>
       </UDashboardToolbar>
       <UTable
         v-model:sort="sort"
-        :rows="storeBudget.budgets"
+        :rows="budgets({ comptes: selectedComptes })"
         :columns="columns"
         sort-mode="manual"
         class="w-[97%] self-center rounded-sm border border-gray-200 dark:border-gray-700 top-1"
@@ -53,10 +75,10 @@
           </div>
         </template>
         <template #action-data="{ row }">
-          <UDropdown :items="dropdownItems" :popper="{ placement: 'bottom-start' }" @click="onSelect(row)">
-            <!-- {{ row }} -->
-            <UButton color="white" label="Options" trailing-icon="i-heroicons-chevron-down-20-solid" variant="solid" />
-          </UDropdown>
+          <UButton :id="row" color="white" icon="i-humbleicons-dots-horizontal" variant="solid" @click="openEditSlide = !openEditSlide" />
+        </template>
+        <template #org-data="{ row }">
+          {{ row.org.name }}
         </template>
 
         <template #beneficiaires-data="{ row }">{{ row.beneficiaires.code }} - {{ row.beneficiaires.name }}</template>
@@ -66,7 +88,6 @@
 </template>
 
 <script lang="ts" setup>
-  import { z } from 'zod'
   import type { User } from '~/types'
 
   const supabase = useSupabaseClient()
@@ -108,7 +129,7 @@
       label: '#',
     },
     {
-      key: 'organisations',
+      key: 'org',
       label: 'Organisation',
       sortable: true,
     },
@@ -140,10 +161,6 @@
       label: 'Montant de la ligne',
     },
     {
-      key: 'montant_convertie',
-      label: 'Montant converti',
-    },
-    {
       key: 'COMPTE_BUDGETAIRE',
       label: 'Compte',
     },
@@ -157,27 +174,15 @@
     },
   ]
 
-  const q = ref('')
   const toast = useToast()
   const sort = ref({ column: 'id', direction: 'asc' as const })
   const input = ref<{ input: HTMLInputElement }>()
   const selectedColumns = ref(defaultColumns)
-  const selectedStatuses = ref([])
+  const selectedComptes = ref([])
   const selectedYear = ref([])
-  const storeBudget = useStoreBudget()
-  const beneficiaireModalOpen = ref(false)
+  const { getListBudgets: budgets } = useStoreBudget()
+  const openEditSlide = ref(false)
   const columns = computed(() => defaultColumns.filter(column => selectedColumns.value.includes(column)))
-  const query = computed(() => ({
-    q: q.value,
-    statuses: selectedStatuses.value,
-    years: selectedYear.value,
-    sort: sort.value.column,
-    order: sort.value.direction,
-  }))
-  const { data: users } = await useFetch<User[]>('/api/users', {
-    query,
-    default: () => [],
-  })
 
   const state = reactive({
     crg_demandeur: undefined,
@@ -225,16 +230,16 @@
   const isOpen2 = ref(false)
   const isOpen3 = ref(false)
   const childHeader = ref(null)
-  const defaultLocations = users.value.reduce((acc, user) => {
-    if (!acc.includes(user.location)) {
-      acc.push(user.location)
+  const defaultYears = budgets({ comptes: [] }).reduce((acc, budget) => {
+    if (!acc.includes(budget.BUDGET_YEAR)) {
+      acc.push(budget.BUDGET_YEAR)
     }
     return acc
   }, [] as string[])
 
-  const defaultStatuses = users.value.reduce((acc, user) => {
-    if (!acc.includes(user.status)) {
-      acc.push(user.status)
+  const defaultComptes = budgets({ comptes: [] }).reduce((acc, budget) => {
+    if (!acc.includes(budget.COMPTE_BUDGETAIRE)) {
+      acc.push(budget.COMPTE_BUDGETAIRE)
     }
     return acc
   }, [] as string[])

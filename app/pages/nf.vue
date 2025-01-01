@@ -4,6 +4,7 @@
   import type { User } from '~/types'
 
   const supabase = useSupabaseClient()
+  const supabase_user = useSupabaseUser()
   const dropdownItems = [
     {
       label: 'Initiateur',
@@ -85,11 +86,11 @@
       key: 'action',
       label: 'Action',
     },
-  ]
+  ] 
   let current_nf_header = ref(null)
   const nf_headers = ref([])
   const employes = ref([])
-  const supabase_user = useSupabaseUser()
+
   const steppersList = ref([
     { label: 'Header', key: 'header' },
     { label: 'Lines', key: 'lines' },
@@ -99,7 +100,6 @@
   const q = ref('')
   const sort = ref({ column: 'id', direction: 'asc' as const })
   const input = ref<{ input: HTMLInputElement }>()
-  const selectedNF = ref<any[]>([])
   const selectedColumns = ref(defaultColumns)
   const selectedStatuses = ref([])
   const selectedLocations = ref([])

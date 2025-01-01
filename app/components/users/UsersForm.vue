@@ -4,6 +4,7 @@ import type { FormError, FormSubmitEvent } from '#ui/types'
 const toast = useToast()
 const emit = defineEmits(['close'])
 const isCommOpen = ref(false)
+
 const _employes = [
   { id: 1, label: 'Wade Cooper', click: () => { isCommOpen.value = false } },
   { id: 2, label: 'Arlene Mccoy', click: () => { isCommOpen.value = false } },

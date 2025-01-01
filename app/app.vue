@@ -9,26 +9,15 @@
       lang: 'en',
     },
   })
-  useSeoMeta({
-    title,
-    description,
-    ogTitle: title,
-    ogDescription: description,
-    ogImage: 'https://dashboard-template.nuxt.dev/social-card.png',
-    twitterImage: 'https://dashboard-template.nuxt.dev/social-card.png',
-    twitterCard: 'summary_large_image',
-  })
-  onMounted(() => {
-    const store1 = useOrg()
-    const store2 = useBudget()
+  onMounted(async () => {
+    const store1 = useStoreOrg()
+    const store2 = useStoreBudget()
     const store3 = useNF()
     // Call the init actions
     store1.init()
-    store2.init()
+    await store2.init()
     store3.init()
   })
-  const title = 'Hazipro'
-  const description = 'Hazipro'
 </script>
 
 <template>
