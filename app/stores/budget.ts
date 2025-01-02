@@ -8,6 +8,7 @@ export const useStoreBudget = defineStore('budget', {
   state: () => ({
     total: 0,
     budgets: [] as any[],
+    budgets_correlation: [] as any[],
   }),
   getters: {
     getListBudgets:
@@ -41,6 +42,7 @@ export const useStoreBudget = defineStore('budget', {
       if (!error) {
         this.budgets = data
         console.log({ data })
+        await this.getBudgetCorrelation()
       } else {
         console.log('Un erreur est survenue ', error)
       }
@@ -48,6 +50,10 @@ export const useStoreBudget = defineStore('budget', {
     },
     async updateBudgetLine(filter, updatedValue) {
       return 0
+    },
+    async getBudgetCorrelation() {
+      const { data, error } = await useSupabaseClient().from('budgets_correlation').select('*')
+      if (!error) this.budgets_correlation = data
     },
   },
 })

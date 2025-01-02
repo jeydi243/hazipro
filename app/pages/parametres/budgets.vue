@@ -1,6 +1,6 @@
 <template>
   <UDashboardPage>
-    <UDashboardPanel grow class="bg-red">
+    <UDashboardPanel grow class="bg-slate-50 dark:bg-transparent">
       <UDashboardNavbar title="Budgets" :badge="20">
         <template #right>
           <UModal v-model="isOpen2" fullscreen>
@@ -30,6 +30,10 @@
           overlay: {
             base: 'fixed inset-0 transition-opacity',
             background: 'bg-gray-500/75 dark:bg-gray-800/75',
+          },
+          body: {
+            base: 'flex-1 overflow-y-auto bg-slate-50',
+            padding: 'p-4',
           },
         }"
         v-model="openEditSlide"
@@ -64,7 +68,7 @@
         :rows="budgets({ comptes: selectedComptes })"
         :columns="columns"
         sort-mode="manual"
-        class="w-[97%] self-center rounded-sm border border-gray-200 dark:border-gray-700 top-1"
+        class="w-[97%] self-center rounded-sm border border-gray-200 dark:border-gray-700 top-1 bg-white dark:bg-transparent"
         :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
       >
         <template #name-data="{ row }">

@@ -114,7 +114,7 @@ watch(selectedClasse, () => {
 
 <template>
     <UDashboardPage>
-        <UDashboardPanel id="inbox" :width="400" :resizable="{ min: 300, max: 500 }">
+        <UDashboardPanel id="inbox" :width="400" :resizable="{ min: 300, max: 500 }" class="bg-slate-50 dark:bg-transparent">
             <UDashboardNavbar title="Beneficiaires" :badge="filteredBeneficiaires.length">
                 <template #right>
                     <UButton icon="i-heroicons-plus-16-solid" color="teal" variant="ghost"

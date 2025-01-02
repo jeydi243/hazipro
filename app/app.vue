@@ -13,10 +13,14 @@
     const store1 = useStoreOrg()
     const store2 = useStoreBudget()
     const store3 = useNF()
+    const store4 = useStorePayments()
+    const store5 = useStoreGeneral()
     // Call the init actions
     store1.init()
     await store2.init()
     store3.init()
+    store4.init()
+    store5.init()
   })
 </script>
 

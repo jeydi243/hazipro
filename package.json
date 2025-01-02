@@ -20,6 +20,7 @@
     "@pinia/nuxt": "^0.5.4",
     "@radix-icons/vue": "^1.0.0",
     "@supabase/supabase-js": "^2.44.3",
+    "@tato30/vue-pdf": "^1.11.3",
     "@unovis/ts": "^1.4.1",
     "@unovis/vue": "^1.4.1",
     "@vueuse/nuxt": "^10.11.0",
@@ -45,6 +46,7 @@
     "@nuxtjs/tailwindcss": "^6.12.1",
     "eslint": "^9.5.0",
     "nuxt": "^3.15.0",
+    "nuxt-security": "^2.1.5",
     "typescript": "^5.5.4",
     "vue-tsc": "^2.0.22"
   }

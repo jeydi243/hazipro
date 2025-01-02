@@ -28,7 +28,8 @@
       id: 'tresorerie',
       label: 'Tresorerie',
       to: '/tresorerie',
-      icon: 'i-heroicons-cog-8-tooth',
+      defaultOpen: false,
+      icon: 'i-fluent:money-calculator-24-regular',
       children: [
         {
           label: 'Caisse Transaction',
@@ -52,8 +53,9 @@
     {
       id: 'planification_paiements',
       label: 'Planification des paiements',
+      defaultOpen: false,
       to: '/planification_paiements',
-      icon: 'i-heroicons-cog-8-tooth',
+      icon: 'i-uil:schedule',
       children: [
         {
           label: 'Plan de decaissement',
@@ -75,6 +77,7 @@
       label: 'Parametres',
       to: '/parametres',
       icon: 'i-heroicons-cog-8-tooth',
+      defaultOpen: false,
       children: [
         {
           label: 'General',
@@ -112,6 +115,28 @@
       ],
       tooltip: {
         text: 'Settings',
+        shortcuts: ['G', 'S'],
+      },
+    },
+    {
+      id: 'workflows_tasks',
+      label: 'Workflows & Tasks',
+      defaultOpen: false,
+      to: '/wft',
+      icon: 'i-octicon:workflow-16',
+      children: [
+        {
+          label: 'Worflows',
+          to: '/wft',
+          exact: true,
+        },
+        {
+          label: 'Tasks',
+          to: '/wft/tasks',
+        },
+      ],
+      tooltip: {
+        text: 'workflows_tasks',
         shortcuts: ['G', 'S'],
       },
     },
@@ -185,7 +210,7 @@
 
         <UDivider />
 
-        <UDashboardSidebarLinks :links="[{ label: 'Colors', draggable: true, children: colors }]" @update:links="colors => (defaultColors = colors)" />
+        <UDashboardSidebarLinks :links="[{ label: 'Colors', defaultOpen: false, draggable: true, children: colors }]" @update:links="colors => (defaultColors = colors)" />
 
         <div class="flex-1" />
 

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <UForm :validate="validate" :validate-on="['submit']" :state="state" class="space-y-4 " @submit="onSubmit">
+  <div class=" p-0 bg-slate-50">
+    <UForm :validate="validate" :validate-on="['submit']" :state="state" class="space-y-4 bg-slate-50 dark:bg-transparent" @submit="onSubmit">
       {{ state }}
       <UFormGroup label="CRG Gerant" name="CRG_GERANT">
         <USelectMenu

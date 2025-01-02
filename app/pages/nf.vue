@@ -1,8 +1,15 @@
 <script lang="ts" setup>
   import { z } from 'zod'
-
+  import { VuePDF, usePDF } from '@tato30/vue-pdf'
   import type { User } from '~/types'
 
+  // const { pdf } = usePDF('sample.pdf')
+
+  function getPDF(url) {
+    const { pdf } = usePDF({ url })
+
+    return pdf
+  }
   const supabase = useSupabaseClient()
   const supabase_user = useSupabaseUser()
   const dropdownItems = [
@@ -14,28 +21,37 @@
     },
     [
       {
-        label: 'Edit',
+        label: 'Editer',
         icon: 'i-heroicons-pencil-square-20-solid',
         shortcuts: ['E'],
         click: () => {
-          console.log('Edit nf with ID = ', current_nf_header)
+          console.log('Editer nf with ID = ', current_nf_header.value.nf_header_id)
         },
       },
       {
-        label: 'Duplicate',
+        label: 'Apercu',
         icon: 'i-heroicons-document-duplicate-20-solid',
-        shortcuts: ['D'],
-        disabled: true,
-      },
-    ],
-    [
-      {
-        label: 'Archive',
-        icon: 'i-heroicons-archive-box-20-solid',
+        shortcuts: ['A'],
+        click: () => {
+          console.log('Apercu clicked for ', current_nf_header.value.nf_header_id)
+        },
       },
       {
-        label: 'Move',
-        icon: 'i-heroicons-arrow-right-circle-20-solid',
+        label: 'Historique',
+        icon: 'i-heroicons-document-duplicate-20-solid',
+        shortcuts: ['H'],
+        click: () => {
+          console.log('Historique clicked for ', current_nf_header.value.nf_header_id)
+        },
+      },
+      {
+        label: 'Annexes',
+        icon: 'i-vscode-icons:file-type-pdf2',
+        shortcuts: ['N'],
+        click: () => {
+          console.log('Annexes clicked for ', current_nf_header.value.nf_header_id)
+          openAnnexes.value = !openAnnexes.value
+        },
       },
     ],
     [
@@ -43,6 +59,10 @@
         label: 'Annuler',
         icon: 'mingcute-close-circle-fill',
         shortcuts: ['⌘', 'D'],
+        class: 'bg-red-500 text-white',
+        click: () => {
+          console.log('Annuler clicked for ', current_nf_header.value.nf_header_id)
+        },
       },
     ],
   ]
@@ -59,6 +79,8 @@
     {
       key: 'description',
       label: 'Description',
+      rowClass: '',
+      class: 'text-ellipsis',
       sortable: false,
     },
     {
@@ -86,7 +108,7 @@
       key: 'action',
       label: 'Action',
     },
-  ] 
+  ]
   let current_nf_header = ref(null)
   const nf_headers = ref([])
   const employes = ref([])
@@ -103,12 +125,13 @@
   const selectedColumns = ref(defaultColumns)
   const selectedStatuses = ref([])
   const selectedLocations = ref([])
-  const isNewUserModalOpen = ref(false)
+  const openAnnexes = ref(false)
+  const openApercu = ref(false)
   const headerCreated = ref(false)
   const beneficiaireModalOpen = ref(false)
   const submitingHeader = ref(false)
   const toast = useToast()
-  const isCommOpen = ref(false)
+  const openViewer = ref(false)
   const _loadingForm = ref(false)
   const form = ref()
   const columns = computed(() => defaultColumns.filter(column => selectedColumns.value.includes(column)))
@@ -123,7 +146,6 @@
     query,
     default: () => [],
   })
-
 
   const state = reactive({
     crg_demandeur: undefined,
@@ -171,78 +193,6 @@
   const isOpen = ref(false)
   const isOpen2 = ref(false)
   const isOpen3 = ref(false)
-  const _employes = [
-    {
-      id: 1,
-      label: 'Wade Cooper',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 2,
-      label: 'Arlene Mccoy',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 3,
-      label: 'Devon Webb',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 4,
-      label: 'Tom Cook',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 5,
-      label: 'Tanya Fox',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 6,
-      label: 'Hellen Schmidt',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 7,
-      label: 'Caroline Schultz',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 8,
-      label: 'Mason Heaney',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 9,
-      label: 'Claudie Smitham',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-    {
-      id: 10,
-      label: 'Emil Schaefer',
-      click: () => {
-        isOpen.value = false
-      },
-    },
-  ]
   const childHeader = ref(null)
   const selectedTab = ref(0)
   const defaultLocations = users.value.reduce((acc, user) => {
@@ -260,14 +210,8 @@
   }, [] as string[])
 
   function onSelect(row) {
-    console.log('ddddddddd ', row)
+    console.log('onSelect ', row)
     current_nf_header.value = row
-    // const index = selectedNF.value.findIndex(item => item.id === row.id)
-    // if (index === -1) {
-    //   selectedNF.value.push(row.nf_header_id)
-    // } else {
-    //   selectedNF.value.splice(index, 1)
-    // }
   }
   function onSubmitResult({ statut, data }) {
     if (statut === 'success') {
@@ -336,7 +280,7 @@
     const fileInput = document.getElementById('file_annexe') as HTMLInputElement
     const file = fileInput?.files?.[0]
     if (!file) return
-    
+
     const { data, error } = await supabase.storage.from('annexes').upload('file_path', file)
     if (error) {
       // Handle error
@@ -346,8 +290,8 @@
       // Handle success
     }
   }
-  function goNextTab(){
-    console.log('Go next tab');
+  function goNextTab() {
+    console.log('Go next tab')
   }
   onMounted(() => {
     getEmployes()
@@ -357,7 +301,7 @@
 
 <template>
   <UDashboardPage>
-    <UDashboardPanel grow>
+    <UDashboardPanel grow class="bg-slate-50 dark:bg-transparent">
       <UDashboardNavbar title="Note de frais" :badge="users.length">
         <template #right>
           <USlideover v-model="isOpen3" :ui="{ width: 'min-w-[90%]' }" prevent-close>
@@ -488,7 +432,7 @@
           <UButton label="Nouvelle note de frais" leading-icon="i-heroicons-plus" color="gray" @click="isOpen3 = true" />
         </template>
       </UDashboardToolbar>
-      current_nf_header = {{ current_nf_header }}
+      <!-- current_nf_header = {{ current_nf_header }} -->
       <UTable
         v-model:sort="sort"
         :rows="nf_headers"
@@ -504,10 +448,15 @@
             <span class="text-gray-900 dark:text-white font-medium">{{ row.name }}</span>
           </div>
         </template>
+        <template #description-data="{ row }">
+          <span class="text-ellipsis overflow-hidden">
+            {{ row.description }}
+          </span>
+        </template>
         <template #action-data="{ row }">
           <UDropdown :items="dropdownItems" :popper="{ placement: 'bottom-start' }" @click="onSelect(row)">
             <!-- {{ row }} -->
-            <UButton color="white" label="Options" trailing-icon="i-heroicons-chevron-down-20-solid" variant="solid" />
+            <UButton color="white" icon="humbleicons:dots-horizontal" variant="solid" />
           </UDropdown>
         </template>
 
@@ -521,6 +470,26 @@
         </template>
         <template #beneficiaires-data="{ row }">{{ row.beneficiaires.code }} - {{ row.beneficiaires.name }}</template>
       </UTable>
+
+      <UDashboardModal v-model="openAnnexes" title="Liste des annexes">
+        <ul class="space-y-2">
+          <li v-for="(item, index) in 5" :key="index" @click="openViewer = !openViewer">
+            <div class="flex flex-row h-14 bg-[#142240] rounded-md">
+              <div class="flex items-center p-2">
+                <UIcon name="i-lsicon:file-pdf-filled" class="w-5 h-5" />
+              </div>
+              <div class="flex flex-col content-center justify-center">
+                <span class="flex text-sm">Titre {{ item }}</span>
+                <span class="flex text-xs">Description {{ item }}</span>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </UDashboardModal>
+
+      <UDashboardModal v-model="openViewer" title="Viewer">
+        <!-- <VuePDF :pdf="getPDF('https://www.iris-france.org/wp-content/uploads/2021/04/Cycle-de-conf%C3%A9rence-Comprendre-le-monde.pdf')" /> -->
+      </UDashboardModal>
     </UDashboardPanel>
   </UDashboardPage>
 </template>
