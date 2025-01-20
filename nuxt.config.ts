@@ -67,7 +67,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  buildDir: 'nuxt-build',
+  buildDir: 'dist',
   shadcn: {
     /**
      * Prefix for all the imported component
