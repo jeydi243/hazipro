@@ -28,12 +28,13 @@ export const useStorePayments = defineStore('payments', {
   },
   actions: {
     async init() {
-      const { data, error } = await useSupabaseClient().from('payment_plan_headers').select('*, groupe_paiment:lookups!payment_group_id(lookup_id, name, code)')
+      const supabase = useSupabaseClient()
+      const { data, error } = await supabase.from('payment_plan_headers').select('*, groupe_paiment:lookups!payment_group_id(lookup_id, name, code)')
       if (!error) {
         this.payment_plan_headers = data
         console.log({ data })
       } else {
-        console.log('Un erreur est survenue ', error)
+        console.log('Un erreur est survenue ', { error })
       }
       console.log('Payments store initiated !')
     },

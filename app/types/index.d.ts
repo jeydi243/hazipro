@@ -1,3 +1,4 @@
+import type { ZodStringDef } from 'zod'
 import type { Avatar } from '#ui/types'
 
 export type UserStatus = 'subscribed' | 'unsubscribed' | 'bounced'
@@ -13,6 +14,25 @@ export interface User {
   avatar?: Avatar
   status: UserStatus
   location: string
+}
+export interface NF {
+  nf_header_id: string
+  description: string
+  statut_approbation: string
+  statut_paiement: string
+  statut_programmation: string
+  statut_plannification: string
+  montant_original: number
+  montant_conversion: number
+  devise: string
+  beneficiaire_id: number | Beneficiaire
+  crg_id: number | Organisation
+}
+export interface Beneficiaire {
+  id: string
+  code: string
+  name: string
+  category: string
 }
 export interface Matrice {
   id: number

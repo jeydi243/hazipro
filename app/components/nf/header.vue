@@ -3,23 +3,24 @@
   import { ref } from 'vue'
   import { DateFormatter, type DateValue, getLocalTimeZone } from '@internationalized/date'
   import { CalendarIcon } from '@radix-icons/vue'
+  import { format } from 'date-fns'
   import { Calendar } from '@/components/ui/calendar'
   import { cn } from '@/lib/utils'
   import { Button } from '@/components/ui/button'
   import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
-  import type { FormError, FormSubmitEvent } from '#ui/types'
+  import type { FormSubmitEvent } from '#ui/types'
+  import type { Beneficiaire } from '~/types'
 
   const emit = defineEmits(['submit-result'])
-
+  const { getEmployes } = useStoreGeneral()
   const df = new DateFormatter('fr-FR', {
     dateStyle: 'long',
   })
   let supabase = useSupabaseClient()
   let supabaseUser = useSupabaseUser()
-  const { signIn } = useAuth()
-  const { addNF } = useNF()
-  const value = ref<DateValue>()
+  const { signIn } = useStoreAuth()
+  const { addNF } = useStoreNF()
   const form = ref()
   const toast = useToast()
   const _orgs = [{ name: 'APR', value: 14 }]
@@ -48,13 +49,13 @@
     beneficiaire_id: undefined,
     type_budget: undefined,
     categorie_id: undefined,
-    description: 'Irure excepteur voluptate aute incididunt cillum magna tempor elit velit Lorem do aute qui consequat. Proident do duis nulla nisi ut. Cupidatat duis reprehenderit commodo officia aliqua proident est esse non aliqua cupidatat. Deserunt ad laborum aliqua culpa ea sit aliqua anim in velit velit.',
-    date_creation: undefined,
-    devise: 'CDF',
+    description:
+      'Irure excepteur voluptate aute incididunt cillum magna tempor elit velit Lorem do aute qui consequat. Proident do duis nulla nisi ut. Cupidatat duis reprehenderit commodo officia aliqua proident est esse non aliqua cupidatat',
+    date_creation: new Date(),
+    currency_code: 'CDF',
     nature_id: undefined,
     taux_echange: undefined,
     payment_group_id: 1,
-    a_justifier: false,
   })
   const header_schema = z.object({
     crg_id: z.string().transform(v => Number(v)), // .min(1, 'Le crg demandeur doit etre un ID'),
@@ -67,94 +68,102 @@
     currency_code: z.string().max(3, 'Vous devez indiquer une devise'),
     nature_id: z.string().min(1, 'Vous devez indiquer une nature de note de frais'),
     taux_echange: z.number().min(1, 'Must be at least 1'),
-    a_justifier: z.boolean().default(false),
     date_creation: z.custom<DateValue>(() => true),
     payment_group_id: z.string(),
   })
-
-  const _employes = [
-    {
-      id: 1,
-      label: 'Wade Cooper',
+  const _employes = getEmployes.reduce((acc, emp) => {
+    acc.push({
+      ...emp,
+      label: emp.name,
       click: () => {
         isCommOpen.value = false
       },
-    },
-    {
-      id: 2,
-      label: 'Arlene Mccoy',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 3,
-      label: 'Devon Webb',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 4,
-      label: 'Tom Cook',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 5,
-      label: 'Tanya Fox',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 6,
-      label: 'Hellen Schmidt',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 7,
-      label: 'Caroline Schultz',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 8,
-      label: 'Mason Heaney',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 9,
-      label: 'Claudie Smitham',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-    {
-      id: 10,
-      label: 'Emil Schaefer',
-      click: () => {
-        isCommOpen.value = false
-      },
-    },
-  ]
+    })
+    return acc
+  }, [] as any[])
+  // const _employes = [
+  //   {
+  //     id: 1,
+  //     label: 'Wade Cooper',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 2,
+  //     label: 'Arlene Mccoy',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 3,
+  //     label: 'Devon Webb',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 4,
+  //     label: 'Tom Cook',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 5,
+  //     label: 'Tanya Fox',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 6,
+  //     label: 'Hellen Schmidt',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 7,
+  //     label: 'Caroline Schultz',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 8,
+  //     label: 'Mason Heaney',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 9,
+  //     label: 'Claudie Smitham',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  //   {
+  //     id: 10,
+  //     label: 'Emil Schaefer',
+  //     click: () => {
+  //       isCommOpen.value = false
+  //     },
+  //   },
+  // ]
   const selectedEmp = ref(_employes[3])
   async function onSubmit(event: FormSubmitEvent<any>) {
     // form.value.clear()
     console.log({ data: event.data })
-    console.log('Current user on submit ', supabaseUser.value)
+    // console.log('Current user on submit ', supabaseUser.value)
     try {
       const { data, error } = await supabase.from('nf_headers').insert([event.data]).select()
       console.log({ data }, { error })
       if (!error) {
         // toast.add({ icon: 'i-heroicons-check-circle', title: 'Congratulations !', description: 'Your note has been created !', color: 'green' })
-        addNF(data.value)
+        // addNF(data.value)
         emit('submit-result', { statut: 'success', data: data.value })
       } else {
         toast.add({ icon: 'i-heroicons-check-circle', title: 'Something went wrong !', description: 'Your note has not been created. ' + error.message, color: 'red' })
@@ -180,7 +189,6 @@
 
   async function submitHeader() {
     await form.value?.submit()
-    console.log('errors...', form.value.errors)
   }
 
   defineExpose({
@@ -207,15 +215,12 @@
             <UFormGroup label="Catégorie" name="categorie_id" class="mb-2 w-[200px]">
               <USelect v-model="state.categorie_id" option-attribute="name" name="categorie_id" color="gray" variant="outline" :options="_categories" />
             </UFormGroup>
-            <UFormGroup label="A justifier" name="a_justifier" class="mb-2 w-[200px]">
-              <UToggle v-model="state.a_justifier" on-icon="i-heroicons-check-20-solid" off-icon="i-heroicons-x-mark-20-solid" />
-            </UFormGroup>
           </div>
         </UCard>
         <UCard>
           <div class="flex flex-row w-full">
             <UFormGroup label="Beneficiaire" name="beneficiaire_id" class="mb-2 mr-3">
-              <UButton icon="i-heroicons-user-circle-16-solid" :label="selectedEmp.label" class="min-w-[200px]" variant="solid" @click="isCommOpen = true" />
+              <UButton icon="i-heroicons-user-circle-16-solid" :label="selectedEmp?.name" class="min-w-[200px]" variant="solid" @click="isCommOpen = true" />
               <UModal v-model="isCommOpen">
                 <UCommandPalette v-model="selectedEmp" nullable :groups="[{ key: 'people', commands: _employes }]" @update:model-value="onSelectBeneficiaire" />
               </UModal>
@@ -240,7 +245,7 @@
               <USelect v-model="state.payment_group_id" option-attribute="name" color="gray" variant="outline" :options="_payment_group" />
             </UFormGroup>
             <UFormGroup label="Date de création" name="date_creation" class="w-[200px]">
-              <Popover>
+              <!-- <Popover>
                 <PopoverTrigger as-child>
                   <Button variant="outline" :class="cn('w-[280px] justify-start text-left font-normal', !state.date_creation && 'text-muted-foreground')">
                     <CalendarIcon class="mr-2 h-4 w-4" />
@@ -250,7 +255,14 @@
                 <PopoverContent class="w-auto p-0">
                   <Calendar v-model="state.date_creation" initial-focus />
                 </PopoverContent>
-              </Popover>
+              </Popover> -->
+
+              <UPopover :popper="{ placement: 'bottom-start' }">
+                <UButton icon="i-heroicons-calendar-days-20-solid" :label="format(state.date_creation, 'd MMM, yyy')" />
+                <template #panel="{ close }">
+                  <DatePicker v-model="state.date_creation" is-required @close="close" />
+                </template>
+              </UPopover>
             </UFormGroup>
           </div>
         </UCard>

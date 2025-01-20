@@ -29,5 +29,6 @@ export default withNuxt({
     '@stylistic/space-before-blocks': 'off',
     'vue/comma-dangle': 'off',
     'vue/singleline-html-element-content-newline': 'off',
+    'vue/require-explicit-emits': 'off',
   },
 })

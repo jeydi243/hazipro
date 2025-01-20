@@ -1,15 +1,10 @@
 <script lang="ts" setup>
-  import { z } from 'zod'
   import { VuePDF, usePDF } from '@tato30/vue-pdf'
-  import type { User } from '~/types'
 
-  // const { pdf } = usePDF('sample.pdf')
-
-  function getPDF(url) {
-    const { pdf } = usePDF({ url })
-
-    return pdf
-  }
+  const { pdf } = usePDF('https://www.iris-france.org/wp-content/uploads/2021/04/Cycle-de-conf%C3%A9rence-Comprendre-le-monde.pdf')
+  useHead({
+    title: 'Note de frais',
+  })
   const supabase = useSupabaseClient()
   const supabase_user = useSupabaseUser()
   const dropdownItems = [
@@ -112,40 +107,28 @@
   let current_nf_header = ref(null)
   const nf_headers = ref([])
   const employes = ref([])
-
+  const { defaultStatutApprobation, defaultStatutPaiement, defaultStatutPlannification, defaultStatutProgammation } = useStoreNF()
   const steppersList = ref([
     { label: 'Header', key: 'header' },
     { label: 'Lines', key: 'lines' },
     { label: 'Resume', key: 'resume' },
     { label: 'Apercu', key: 'apercu' },
   ])
-  const q = ref('')
   const sort = ref({ column: 'id', direction: 'asc' as const })
   const input = ref<{ input: HTMLInputElement }>()
   const selectedColumns = ref(defaultColumns)
-  const selectedStatuses = ref([])
-  const selectedLocations = ref([])
+  const selectedStatusApprobation = ref([])
+  const selectedStatusPaiement = ref([])
+  const selectedStatusPlannification = ref([])
+  const selectedStatusProgrammation = ref([])
   const openAnnexes = ref(false)
   const openApercu = ref(false)
   const headerCreated = ref(false)
   const beneficiaireModalOpen = ref(false)
-  const submitingHeader = ref(false)
   const toast = useToast()
   const openViewer = ref(false)
   const _loadingForm = ref(false)
-  const form = ref()
   const columns = computed(() => defaultColumns.filter(column => selectedColumns.value.includes(column)))
-  const query = computed(() => ({
-    q: q.value,
-    statuses: selectedStatuses.value,
-    locations: selectedLocations.value,
-    sort: sort.value.column,
-    order: sort.value.direction,
-  }))
-  const { data: users } = await useFetch<User[]>('/api/users', {
-    query,
-    default: () => [],
-  })
 
   const state = reactive({
     crg_demandeur: undefined,
@@ -190,24 +173,10 @@
       description: "Change your password here. After saving, you'll be logged out.",
     },
   ]
-  const isOpen = ref(false)
-  const isOpen2 = ref(false)
+
   const isOpen3 = ref(false)
   const childHeader = ref(null)
   const selectedTab = ref(0)
-  const defaultLocations = users.value.reduce((acc, user) => {
-    if (!acc.includes(user.location)) {
-      acc.push(user.location)
-    }
-    return acc
-  }, [] as string[])
-
-  const defaultStatuses = users.value.reduce((acc, user) => {
-    if (!acc.includes(user.status)) {
-      acc.push(user.status)
-    }
-    return acc
-  }, [] as string[])
 
   function onSelect(row) {
     console.log('onSelect ', row)
@@ -217,6 +186,7 @@
     if (statut === 'success') {
       current_nf_header.value = data
       headerCreated.value = true
+      console.log(data)
       toast.add({
         icon: 'i-heroicons-check-circle',
         title: 'Congratulations !',
@@ -225,26 +195,13 @@
       })
     } else {
       headerCreated.value = false
+      console.log(statut)
       toast.add({
         icon: 'i-heroicons-check-circle',
         title: 'Something went wrong !',
         description: 'Your note has not been created. ' + statut,
         color: 'red',
       })
-    }
-  }
-  async function getAllNoteDeFrais() {
-    const { data, error } = await supabase
-      .from('nf_headers')
-      .select(`nf_header_id, beneficiaires (id, name, code), description, statut_approbation, statut_paiement, devise, montant_original, montant_conversion`)
-
-    // const { data, error } = await supabase.from('beneficiaires').select(`id, name, code`)
-
-    if (error) {
-      console.log({ error })
-    } else {
-      console.log({ data })
-      nf_headers.value = data
     }
   }
   async function getEmployes() {
@@ -266,7 +223,7 @@
     }, 2000)
     if (selectedTab.value === 0) {
       childHeader.value?.submitHeader()
-      console.log('The selected tab is: ' + items[selectedTab.value].key)
+      // console.log('The selected tab is: ' + items[selectedTab.value].key)
     } else {
       console.log('The tab is: ' + selectedTab.value)
       alert('Selected Tab is null')
@@ -295,135 +252,108 @@
   }
   onMounted(() => {
     getEmployes()
-    getAllNoteDeFrais()
   })
 </script>
 
 <template>
   <UDashboardPage>
     <UDashboardPanel grow class="bg-slate-50 dark:bg-transparent">
-      <UDashboardNavbar title="Note de frais" :badge="users.length">
-        <template #right>
-          <USlideover v-model="isOpen3" :ui="{ width: 'min-w-[90%]' }" prevent-close>
-            <UCard
-              class="flex flex-col flex-1 overflow-y-auto"
-              :ui="{
-                body: { base: 'flex-1' },
-                ring: '',
-                divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-              }"
-            >
-              <template #header>
-                <div class="flex items-center justify-between">
-                  <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">Note de frais</h3>
-                  <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isOpen3 = false" />
-                </div>
-              </template>
-              <div class="scrollbar">
-                <UTabs v-model="selectedTab" :items="items" class="w-full" @change="onChange">
-                  <!-- <template #default="{ item, index, selected }">
-                    <div class="flex items-center gap-2 relative truncate">
-                      <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
+      <UDashboardNavbar title="Note de frais" :badge="37">
+        <template #right></template>
+      </UDashboardNavbar>
 
-                      <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
+      <USlideover v-model="isOpen3" :ui="{ width: 'min-w-[90%]' }" prevent-close>
+        <UCard
+          class="flex flex-col flex-1 overflow-y-auto"
+          :ui="{
+            body: { base: 'flex-1' },
+            ring: '',
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+          }"
+        >
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">Note de frais</h3>
+              <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isOpen3 = false" />
+            </div>
+          </template>
 
-                      <span v-if="selected" class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
-                    </div>
-                  </template> -->
-                  <template #item="{ item }">
-                    <!-- {{ item }} -->
-                    <StepperSlide v-model="selectedTab" :steppers="steppersList" />
-                    {{ current_nf_header }}
-                    <div class="flex flex-row space-x-4 p-0">
-                      <NfHeader v-if="item.key === 'header'" ref="childHeader" @submit-result="onSubmitResult" />
-                      <NfLines v-else-if="item.key === 'lines'" />
-                      <NfResume v-else-if="item.key === 'resume'" />
-                      <NfApercu v-else-if="item.key === 'apercu'" />
+          <div class="scrollbar h-full w-full grow">
+            <StepperSlide v-model="selectedTab" :steppers="steppersList" />
+            {{ current_nf_header }}
+            <div class="flex flex-row space-x-4 p-0 h-full">
+              <NfHeader v-if="steppersList[selectedTab].key === 'header'" ref="childHeader" @submit-result="onSubmitResult" />
+              <NfLines v-else-if="steppersList[selectedTab].key === 'lines'" />
+              <NfResume v-else-if="steppersList[selectedTab].key === 'resume'" />
+              <NfApercu v-else-if="steppersList[selectedTab].key === 'apercu'" class="h-full" />
 
-                      <UCard :ui="{ base: 'w-[25%]' }">
-                        <template #header>
-                          <p v-if="item.key === 'header'">Annexes</p>
-                          <!-- <div></div> -->
-                        </template>
-                        <ol class="list-decimal pl-5">
-                          <!-- <li v-for="(file, index) in itemsFiles" :key="index" class="flex items-start space-x-2 mb-2">
+              <UCard :ui="{ base: 'w-[25%]' }">
+                <template #header>
+                  <p v-if="steppersList[selectedTab].key === 'header'">Annexes</p>
+                  <!-- <div></div> -->
+                </template>
+                <ol class="list-decimal pl-5">
+                  <!-- <li v-for="(file, index) in itemsFiles" :key="index" class="flex items-start space-x-2 mb-2">
                             <UIcon :name="item.icon" class="w-9 h-9 flex-shrink-0 self-center" />
                             <div>
                               <p class="font-medium">{{ file.filename }}</p>
                               <p class="text-sm text-gray-500">{{ item.description }}</p>
                             </div>
                           </li> -->
-                        </ol>
-                        <template #footer>
-                          <div v-if="item.key === 'header'">
-                            <UInput id="file_annexe" type="file" size="2xs" icon="i-heroicons-folder" />
-                          </div>
-                          <UButton :loading="false" @click="uploadFile">Charger</UButton>
-                        </template>
-                      </UCard>
-                    </div>
-                  </template>
-                </UTabs>
-              </div>
-
-              <template #footer>
-                <div class="flex flex-row-reverse">
-                  <UButton v-if="headerCreated" color="primary" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false" @click="goNextTab">Suivant</UButton>
-                  <UButton v-else color="primary" variant="soft" icon="heroicons:document-plus-20-solid" :trailing="false" :loading="_loadingForm" @click="submitCurrentForm">Créer</UButton>
-                </div>
-              </template>
-            </UCard>
-          </USlideover>
-          <!-- <UButton label="Note de frais 2" leading-icon="i-heroicons-plus" color="gray" @click="isOpen2 = true" /> -->
-          <UModal v-model="isOpen2" fullscreen>
-            <UCard
-              :ui="{
-                base: 'h-full flex flex-col',
-                rounded: '',
-                divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-                body: {
-                  base: 'grow',
-                },
-              }"
-            >
-              <template #header>
-                <div class="flex items-center justify-between sticky">
-                  <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">Modal</h3>
-                  <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1" @click="isOpen2 = false" />
-                </div>
-              </template>
-
-              <UTabs :items="items" class="w-full">
-                <template #default="{ item, index, selected }">
-                  <div class="flex items-center gap-2 truncate sticky">
-                    <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
-
-                    <span class="truncate">{{ index + 1 }}. {{ item.label }}</span>
-
-                    <span v-if="selected" class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
+                </ol>
+                <template #footer>
+                  <div v-if="steppersList[selectedTab].key === 'header'">
+                    <UInput id="file_annexe" type="file" size="2xs" icon="i-heroicons-folder" />
                   </div>
+                  <UButton :loading="false" @click="uploadFile">Charger</UButton>
                 </template>
-                <template #item="{ item }">
-                  <!-- {{ item }} -->
-                  <div class="flex flex-row space-x-4 p-0">
-                    <NfHeader v-if="item.key === 'header'" />
-                    <NfLines v-else-if="item.key === 'lines'" />
-                    <NfResume v-else-if="item.key === 'resume'" />
-                    <NfApercu v-else-if="item.key === 'apercu'" />
+              </UCard>
+            </div>
+          </div>
 
-                    <UCard :ui="{ base: 'w-[25%]' }">test</UCard>
-                  </div>
-                </template>
-              </UTabs>
-            </UCard>
-          </UModal>
-        </template>
-      </UDashboardNavbar>
+          <template #footer>
+            <div class="flex flex-row-reverse">
+              <UButton v-if="headerCreated" color="primary" variant="soft" icon="i-heroicons-arrow-long-right-solid" :trailing="false" @click="goNextTab">Suivant</UButton>
+              <UButton v-else color="primary" variant="soft" icon="heroicons:document-plus-20-solid" :trailing="false" :loading="_loadingForm" @click="submitCurrentForm">Créer</UButton>
+            </div>
+          </template>
+        </UCard>
+      </USlideover>
 
       <UDashboardToolbar>
         <template #left>
-          <USelectMenu v-model="selectedStatuses" icon="i-heroicons-check-circle" placeholder="Status" multiple :options="defaultStatuses" :ui-menu="{ option: { base: 'capitalize' } }" />
-          <USelectMenu v-model="selectedLocations" icon="i-heroicons-map-pin" placeholder="Location" :options="defaultLocations" multiple />
+          <USelectMenu
+            v-model="selectedStatusApprobation"
+            icon="i-heroicons-map-pin"
+            placeholder="Statut approbation"
+            :options="defaultStatutApprobation"
+            multiple
+            :ui-menu="{ option: { base: 'capitalize' } }"
+          />
+          <USelectMenu
+            v-model="selectedStatusPaiement"
+            icon="i-heroicons-map-pin"
+            placeholder="Statut paiement"
+            :options="defaultStatutPaiement"
+            multiple
+            :ui-menu="{ option: { base: 'capitalize' } }"
+          />
+          <USelectMenu
+            v-model="selectedStatusPlannification"
+            icon="i-heroicons-map-pin"
+            placeholder="Statut plannification"
+            :options="defaultStatutPlannification"
+            multiple
+            :ui-menu="{ option: { base: 'capitalize' } }"
+          />
+          <USelectMenu
+            v-model="selectedStatusProgrammation"
+            icon="i-heroicons-map-pin"
+            placeholder="Statut programmation"
+            :options="defaultStatutProgammation"
+            multiple
+            :ui-menu="{ option: { base: 'capitalize' } }"
+          />
           <USelectMenu v-model="selectedColumns" icon="i-heroicons-adjustments-horizontal-solid" :options="defaultColumns" multiple class="hidden lg:block">
             <template #label>Display</template>
           </USelectMenu>
@@ -432,13 +362,13 @@
           <UButton label="Nouvelle note de frais" leading-icon="i-heroicons-plus" color="gray" @click="isOpen3 = true" />
         </template>
       </UDashboardToolbar>
-      <!-- current_nf_header = {{ current_nf_header }} -->
+
       <UTable
         v-model:sort="sort"
         :rows="nf_headers"
         :columns="columns"
         sort-mode="manual"
-        class="w-[97%] self-center rounded-sm border border-gray-200 dark:border-gray-700 top-1"
+        class="w-[97%] self-center rounded-sm border border-gray-200 bg-white dark:bg-transparent dark:border-gray-700 top-1"
         :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
       >
         <template #name-data="{ row }">
@@ -471,7 +401,7 @@
         <template #beneficiaires-data="{ row }">{{ row.beneficiaires.code }} - {{ row.beneficiaires.name }}</template>
       </UTable>
 
-      <UDashboardModal v-model="openAnnexes" title="Liste des annexes">
+      <UDashboardModal v-model="openAnnexes" title="Liste des annexes" prevent-close>
         <ul class="space-y-2">
           <li v-for="(item, index) in 5" :key="index" @click="openViewer = !openViewer">
             <div class="flex flex-row h-14 bg-[#142240] rounded-md">
@@ -487,8 +417,9 @@
         </ul>
       </UDashboardModal>
 
-      <UDashboardModal v-model="openViewer" title="Viewer">
-        <!-- <VuePDF :pdf="getPDF('https://www.iris-france.org/wp-content/uploads/2021/04/Cycle-de-conf%C3%A9rence-Comprendre-le-monde.pdf')" /> -->
+      <UDashboardModal v-model="openViewer" title="Viewer" prevent-close>
+        <!-- <iframe class="w-full h-auto" src="https://www.iris-france.org/wp-content/uploads/2021/04/Cycle-de-conf%C3%A9rence-Comprendre-le-monde.pdf" frameborder="0"></iframe> -->
+        <VuePDF :pdf="pdf" />
       </UDashboardModal>
     </UDashboardPanel>
   </UDashboardPage>

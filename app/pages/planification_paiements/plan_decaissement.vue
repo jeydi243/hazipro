@@ -62,7 +62,7 @@
       </UDashboardToolbar>
       <UTable
         v-model:sort="sort"
-        :rows="budgets({ comptes: selectedComptes })"
+        :rows="payment_plan_headers"
         :columns="columns"
         sort-mode="manual"
         class="w-[97%] self-center rounded-sm border border-gray-200 dark:border-gray-700 top-1 bg-white dark:bg-transparent"
@@ -86,8 +86,6 @@
 <script lang="ts" setup>
   import type { User } from '~/types'
 
-  const supabase = useSupabaseClient()
-  const supabase_user = useSupabaseUser()
   const dropdownItems = [
     {
       label: 'Initiateur',
@@ -123,7 +121,6 @@
     {
       key: 'id',
       label: '#',
-      
     },
     {
       key: 'code',
@@ -167,7 +164,7 @@
   const selectedColumns = ref(defaultColumns)
   const selectedPaymentsGroup = ref([])
   const selectedYear = ref([])
-  const { getListBudgets: budgets } = useStoreBudget()
+  const { payment_plan_headers } = useStorePayments()
   const openPlanDecaissement = ref(false)
   const columns = computed(() => defaultColumns.filter(column => selectedColumns.value.includes(column)))
 
@@ -213,14 +210,14 @@
   const isOpen2 = ref(false)
   const isOpen3 = ref(false)
   const childHeader = ref(null)
-  const defaultYears = budgets({ comptes: [] }).reduce((acc, budget) => {
+  const defaultYears = payment_plan_headers.reduce((acc, budget) => {
     if (!acc.includes(budget.BUDGET_YEAR)) {
       acc.push(budget.BUDGET_YEAR)
     }
     return acc
   }, [] as string[])
 
-  const defaultComptes = budgets({ comptes: [] }).reduce((acc, budget) => {
+  const defaultComptes = payment_plan_headers.reduce((acc, budget) => {
     if (!acc.includes(budget.COMPTE_BUDGETAIRE)) {
       acc.push(budget.COMPTE_BUDGETAIRE)
     }

@@ -5,18 +5,30 @@ interface storeAuth {
   description: string
   baseUrl: string
   users: User[]
+  users_access_rights: any[]
 }
 
-export const useAuth = defineStore('auth', {
+export const useStoreAuth = defineStore('auth', {
   state: (): storeAuth => ({
     user: null,
     users: [],
     baseUrl: 'http://127.0.0.1:4000/v1',
     description: '',
+    users_access_rights: [],
   }),
   actions: {
+    async init() {
+      try {
+        await this.getAccessRights()
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async onSignedOut() {
+      this.users_access_rights = []
+    },
     async signIn(email: string, password: string) {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await useSupabaseClient().auth.signInWithPassword({
         email: email,
         password: password,
       })
@@ -24,14 +36,10 @@ export const useAuth = defineStore('auth', {
       this.user = data.user
       console.log({ data, error })
     },
-    async getAssignedOrg() {
-      const { data, error } = await supabase.from('assignments').select(`
-            name,
-            organisations (
-                code,
-                nom
-            )
-        `)
+    async getAccessRights() {
+      const { data, error } = await useSupabaseClient().from('users_access_rights').select('*').eq('user_id', useSupabaseUser().value.id)
+      if (!error) this.users_access_rights = data
+      else console.log('Error', error)
     },
     async createUser(user) {
       const data = await $fetch<User[] | any>(this.baseUrl + '/users', {

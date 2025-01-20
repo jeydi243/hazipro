@@ -45,9 +45,9 @@ export default defineNuxtConfig({
       crossOriginResourcePolicy: 'cross-origin',
       crossOriginEmbedderPolicy: process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp',
       contentSecurityPolicy: {
-        'connect-src': ["'self'", 'https:', 'http:'],
+        'connect-src': ["'self'", 'https:', 'http:', 'wss:', 'ws:'],
         'img-src': ["'self'", 'data:', 'https:'],
-        'frame-src': ["'self'"],
+        'frame-src': ["'self'", 'data:', 'https:'],
       },
     },
   },
@@ -67,6 +67,7 @@ export default defineNuxtConfig({
       },
     },
   },
+  buildDir: 'nuxt-build',
   shadcn: {
     /**
      * Prefix for all the imported component

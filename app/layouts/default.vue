@@ -153,19 +153,6 @@
     },
   ]
 
-  const footerLinks = [
-    {
-      label: 'Invite people',
-      icon: 'i-heroicons-plus',
-      to: '/parametres/users',
-    },
-    {
-      label: 'Help & Support',
-      icon: 'i-heroicons-question-mark-circle',
-      click: () => (isHelpSlideoverOpen.value = true),
-    },
-  ]
-
   const groups = [
     {
       key: 'links',
@@ -194,14 +181,14 @@
 
 <template>
   <UDashboardLayout>
-    <UDashboardPanel :width="250" :resizable="{ min: 200, max: 300 }" collapsible>
+    <UDashboardPanel :width="250" :resizable="{ min: 200, max: 300 }" collapsible >
       <UDashboardNavbar class="!border-transparent" :ui="{ left: 'flex-1' }">
         <template #left>
           <TeamsDropdown />
         </template>
       </UDashboardNavbar>
 
-      <UDashboardSidebar>
+      <UDashboardSidebar >
         <template #header>
           <UDashboardSearchButton />
         </template>
@@ -214,7 +201,6 @@
 
         <div class="flex-1" />
 
-        <UDashboardSidebarLinks :links="footerLinks" />
 
         <UDivider class="sticky bottom-0" />
 
