@@ -8,11 +8,10 @@
 </template>
 
 <script setup lang="ts">
-import type { AuthResponse, AuthTokenResponsePassword } from '@supabase/supabase-js';
+// import type { AuthResponse, AuthTokenResponsePassword } from '@supabase/supabase-js';
 
 const router = useRouter()
 let supabase = useSupabaseClient()
-let supbaseUer = useSupabaseUser()
 const toast = useToast()
 definePageMeta({ layout: 'auth' })
 useSeoMeta({
@@ -34,7 +33,7 @@ const providers = [{
 }]
 async function onSubmit(payload: any) {
     console.log("onSubmit %o", payload);
-    const { data, error }: AuthTokenResponsePassword = await supabase.auth.signInWithPassword({ email: payload.email, password: payload.password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email: payload.email, password: payload.password });
     // const response: AuthResponse = await supabase.auth.signUp({ email: data.email, password: data.password, options: {} });
     console.log({ data }, { error });
     if (!error) {
@@ -43,10 +42,11 @@ async function onSubmit(payload: any) {
         toast.add({ icon: 'i-solar-shield-warning-linear', title: 'Login successfully', color: 'green', description: 'Bienvenue cher membre !' });
         router.push('/nf')
     } else {
-        toast.add({ icon: 'i-heroicons-check-circle', title: 'Login unseccessful', color: 'red', description: error.message });
+        toast.add({ icon: 'i-heroicons-check-circle', title: 'Login failed', color: 'red', description: error.message });
         router.push('/')
     }
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

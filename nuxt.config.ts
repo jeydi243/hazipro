@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   },
   extends: [process.env.NUXT_UI_PRO_PATH || '@nuxt/ui-pro'],
 
-  modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/fonts', '@vueuse/nuxt', 'shadcn-nuxt', 'radix-vue/nuxt', '@pinia/nuxt', '@nuxtjs/supabase', 'nuxt-security'],
+  modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/fonts', '@vueuse/nuxt', 'shadcn-nuxt', 'radix-vue/nuxt', '@pinia/nuxt', 'nuxt-security'],
   ui: {
     // icons: ['heroicons', 'simple-icons', 'solar'],
     safelistColors: ['primary', 'red', 'orange', 'green'],
@@ -26,16 +26,16 @@ export default defineNuxtConfig({
       SUPABASE_ROLE_KEY: process.env.SUPABASE_ROLE_KEY,
     },
   },
-  supabase: {
-    url: process.env.SUPABASE_URL,
-    redirectOptions: {
-      login: '/auth',
-      callback: '/',
-      include: undefined,
-      exclude: [],
-      cookieRedirect: false,
-    },
-  },
+  // supabase: {
+  //   url: process.env.SUPABASE_URL,
+  //   redirectOptions: {
+  //     login: '/auth',
+  //     callback: '/',
+  //     include: undefined,
+  //     exclude: [],
+  //     cookieRedirect: false,
+  //   },
+  // },
   routeRules: {
     '/': { prerender: true, cors: true },
     '/nf': { cors: true },
