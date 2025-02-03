@@ -33,7 +33,7 @@
             background: 'bg-gray-500/75 dark:bg-gray-800/75',
           },
           body: {
-            base: 'flex-1 overflow-y-auto bg-slate-50',
+            base: 'flex-1 overflow-y-auto bg-slate-50 dark:bg-transparent',
             padding: 'p-4',
           },
         }"
@@ -58,7 +58,7 @@
           </USelectMenu>
         </template>
         <template #right>
-          <UButton label="Nouveau plan" leading-icon="i-heroicons-plus" color="gray" @click="openEditSlide = !openEditSlide" />
+          <UButton label="Nouvelle programmation" leading-icon="i-heroicons-plus" color="gray" @click="openEditSlide = !openEditSlide" />
         </template>
       </UDashboardToolbar>
       <UTable

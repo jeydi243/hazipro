@@ -11,6 +11,7 @@ export default defineNuxtConfig({
   ui: {
     // icons: ['heroicons', 'simple-icons', 'solar'],
     safelistColors: ['primary', 'red', 'orange', 'green'],
+    
   },
   tailwindcss: {
     quiet: true,
