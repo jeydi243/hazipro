@@ -16,7 +16,7 @@ RUN bun install
 # RUN bun run build
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 7000
 
 # Start the application
 CMD ["bun", "run", "dev"]

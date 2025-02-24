@@ -12,7 +12,7 @@ import type { AuthResponse, AuthTokenResponsePassword } from '@supabase/supabase
 
 const router = useRouter()
 let supabase = useSupabaseClient()
-let supbaseUer = useSupabaseUser()
+
 const toast = useToast()
 definePageMeta({ layout: 'auth' })
 useSeoMeta({
