@@ -1,6 +1,7 @@
 {
   "eslint.experimental.useFlatConfig": true,
   "editor.fontFamily": "'Cascadia Code', 'Courier New', monospace",
+  "editor.cursorStyle": ,
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
