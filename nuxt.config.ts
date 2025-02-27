@@ -79,7 +79,7 @@ export default defineNuxtConfig({
      */
     componentDir: './app/components/ui',
   },
-  devServer: { port: 5000, host: '0.0.0.0' },
+  devServer: { port: 5000 },
   vite: {
     server: { allowedHosts: ['hazipro-production.up.railway.app'] },
   },
