@@ -11,7 +11,6 @@ export default defineNuxtConfig({
   ui: {
     // icons: ['heroicons', 'simple-icons', 'solar'],
     safelistColors: ['primary', 'red', 'orange', 'green'],
-    
   },
   tailwindcss: {
     quiet: true,
@@ -80,7 +79,10 @@ export default defineNuxtConfig({
      */
     componentDir: './app/components/ui',
   },
-  devServer: { port: 5000 },
+  devServer: { port: 5000, host: '0.0.0.0' },
+  vite: {
+    server: { allowedHosts: ['hazipro-production.up.railway.app'] },
+  },
   compatibilityDate: '2024-07-11',
   alias: {
     '~/lib': './lib',
