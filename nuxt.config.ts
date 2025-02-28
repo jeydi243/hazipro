@@ -37,7 +37,7 @@ export default defineNuxtConfig({
   //   },
   // },
   routeRules: {
-    '/': { prerender: true, cors: true },
+    '/': { cors: true },
     '/nf': { cors: true },
   },
   security: {
