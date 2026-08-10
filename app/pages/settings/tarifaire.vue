@@ -210,7 +210,7 @@ function getRowItems(row: Row<Tarifaire>) {
 }
 
 // 8. Chargement des données
-const { data: Tarifaires, pending, refresh: refreshTarifaires } = await useAsyncData('tarifaires', async () => {
+const { data: Tarifaires, pending, refresh: refreshTarifaires } = useAsyncData('tarifaires', async () => {
     const { data, error } = await supabase
         .from('tarifaires')
         .select('*, organisation:organisations!inner(*)')

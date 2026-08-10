@@ -1,4 +1,4 @@
-# Nuxt Template
+# Hazipro
 
 Template Nuxt 4 avec Nuxt UI v4, Supabase, Pinia et Tailwind CSS v4.
 

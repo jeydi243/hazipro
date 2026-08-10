@@ -11,6 +11,17 @@ export interface Classe {
     date_debut: Date
     end_date: Date
 }
+export interface NF {
+    id: string
+    organisation_id: string
+    description: string
+    nature_nf: string
+    devise: string
+    beneficiaire_id: string
+    created_at: string
+    updated_at: string
+    update: Date
+}
 
 export interface Lookup {
     id: string
@@ -25,7 +36,7 @@ export interface Organisation {
     nom: string
     description?: string
     code?: string
-    lookup?: Lookup
+    type?: Lookup
     status?: string
     nid?: string
     prefixe?: string

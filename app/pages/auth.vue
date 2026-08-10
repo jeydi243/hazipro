@@ -1,9 +1,18 @@
 <template>
-    <div class="flex flex-col items-center justify-center gap-4 p-4 min-h-screen">
-        <UPageCard class="w-full max-w-md " variant="outline">
-            <UAuthForm :schema="schema" title="Login" description="Enter your credentials to access your account."
-                icon="i-lucide-user" :fields="fields" :providers="providers" @submit="onSubmit" />
-        </UPageCard>
+    <div>
+        <!-- Page heading -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-semibold tracking-tight text-(--ui-text-highlight)">
+                Connectez-vous
+            </h1>
+            <p class="mt-1.5 text-sm text-(--ui-text-muted)">
+                Accédez à votre espace de facturation Hazipro
+            </p>
+        </div>
+
+        <!-- Form -->
+        <UAuthForm :schema="schema" :fields="fields" :providers="providers" icon="i-lucide-user" :validate-on="[]"
+            @submit="onSubmit" />
     </div>
 </template>
 
@@ -12,10 +21,8 @@
     import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
     useHead({
-        title: 'Login - Wazi',
-        meta: [
-            { name: 'description', content: 'Login to your Wazi account.' }
-        ]
+        title: 'Connexion — Hazipro',
+        meta: [{ name: 'description', content: 'Connectez-vous à votre espace de facturation Hazipro.' }],
     })
 
     const auth = useAuth()
@@ -24,46 +31,43 @@
         {
             name: 'tenant',
             type: 'text',
-            label: 'Tenant',
-            placeholder: 'Enter your tenant',
-            required: true
+            label: 'Espace de travail',
+            placeholder: 'Nom de votre organisation',
+            required: true,
         },
         {
             name: 'email',
             type: 'email',
-            label: 'Email',
-            placeholder: 'Enter your email',
-            required: true
+            label: 'Adresse email',
+            placeholder: 'vous@exemple.com',
+            required: true,
         },
         {
             name: 'password',
-            label: 'Password',
+            label: 'Mot de passe',
             type: 'password',
-            placeholder: 'Enter your password',
-            required: true
-        }]
-
-    const providers = [{
-        label: 'Passkey',
-        icon: 'i-lucide-fingerprint',
-        color: 'white' as const,
-        onClick: () => auth.loginWithPasskey()
-    }, {
-        label: 'Google',
-        icon: 'i-simple-icons-google',
-        onClick: () => {
-            toast.add({ title: 'Google', description: 'Login with Google' })
-        }
-    }
+            placeholder: 'Votre mot de passe',
+            required: true,
+        },
     ]
+
+    const providers = [
+        {
+            label: 'Clé d\'accès',
+            icon: 'i-lucide-fingerprint',
+            color: 'neutral' as const,
+            onClick: () => auth.loginWithPasskey(),
+        },
+    ]
+
     definePageMeta({
-        layout: 'auth'
+        layout: 'auth',
     })
 
     const schema = z.object({
-        email: z.email('Invalid email'),
-        tenant: z.string().min(1, 'Veuillez indiquer le tenant'),
-        password: z.string().min(1, 'Veuillez indiquer le mot de passe')
+        email: z.email('Adresse email invalide'),
+        tenant: z.string().min(1, 'Veuillez indiquer votre espace de travail'),
+        password: z.string().min(1, 'Veuillez indiquer votre mot de passe'),
     })
 
     type Schema = z.output<typeof schema>
@@ -74,5 +78,3 @@
         await auth.login(event.data.tenant, event.data.email, event.data.password)
     }
 </script>
-
-<style scoped></style>

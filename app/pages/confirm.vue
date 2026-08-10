@@ -31,6 +31,19 @@ onMounted(() => {
             }
         }
     }, 700)
+
+    // Sécurité : si l'utilisateur n'est toujours pas connecté après 12 secondes,
+    // on redirige vers /auth pour éviter un blocage infini
+    const timeout = setTimeout(() => {
+        if (!user.value) {
+            navigateTo('/auth')
+        }
+    }, 12000)
+
+    onUnmounted(() => {
+        clearInterval(interval)
+        clearTimeout(timeout)
+    })
 })
 
 // Sécurité au cas où l'animation est finie mais user n'est pas encore là (rare avec Supabase)

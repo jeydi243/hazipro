@@ -22,8 +22,8 @@
                                                 {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
                                             </UKbd>
                                         </template>
-</UButton>
-</CustomersDeleteModal> -->
+                                    </UButton>
+                                </CustomersDeleteModal> -->
 
                                 <USelect v-model="statusFilter" :items="[
                                     { label: 'All', value: 'all' },
@@ -60,7 +60,8 @@
                 <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                     v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                         getPaginationRowModel: getPaginationRowModel()
-                    }" class="shrink-0 m-2 bg-white dark:bg-(--ui-bg)" :data="Roles || []" :columns="columns" :loading="status === 'pending'" :ui="{
+                    }" class="shrink-0 m-2 bg-white dark:bg-default" :data="Roles || []" :columns="columns"
+                    :loading="pending" :ui="{
                         base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                         thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                         tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -68,8 +69,8 @@
                         td: 'border-b border-(--ui-border) p-2'
                     }" />
 
-                <div class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto">
-                    <div class="text-sm text-(--ui-text-muted)">
+                <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
+                    <div class="text-sm text-muted">
                         {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
                         {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
                     </div>
@@ -88,178 +89,181 @@
     </div>
 </template>
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
-import { upperFirst } from 'scule'
-import * as z from 'zod'
-import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import type { Profil, Role } from '~/types'
+    import type { TableColumn } from '@nuxt/ui'
+    import { upperFirst } from 'scule'
+    import * as z from 'zod'
+    import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+    import type { Profil, Role } from '~/types'
 
-useHead({
-    title: 'Roles - Settings',
-    meta: [
-        { name: 'description', content: 'Manage Roles.' }
-    ]
-})
+    useHead({
+        title: 'Roles - Settings',
+        meta: [
+            { name: 'description', content: 'Manage Roles.' }
+        ]
+    })
 
-const supabase = useSupabaseClient()
-const table = useTemplateRef('table')
-const status = ref('success')
-const statusFilter = ref('all')
-const columnFilters = ref([{
-    id: 'email',
-    value: ''
-}])
+    const supabase = useSupabaseClient()
+    const table = useTemplateRef('table')
+    const statusFilter = ref('all')
+    const columnFilters = ref([{
+        id: 'email',
+        value: ''
+    }])
 
-const UButton = resolveComponent('UButton')
-const UDropdownMenu = resolveComponent('UDropdownMenu')
-const columnVisibility = ref()
-const openDetailsRole = ref(false)
-const selectedRole = ref<Role | null>(null)
-const rowSelection = ref({ 2: true })
-const toast = useToast()
-const pagination = ref({
-    pageIndex: 0,
-    pageSize: 10
-})
+    const UButton = resolveComponent('UButton')
+    const UDropdownMenu = resolveComponent('UDropdownMenu')
+    const columnVisibility = ref()
+    const openDetailsRole = ref(false)
+    const selectedRole = ref<Role | null>(null)
+    const rowSelection = ref({ 2: true })
+    const toast = useToast()
+    const pagination = ref({
+        pageIndex: 0,
+        pageSize: 10
+    })
 
-const { copy } = useClipboard()
-const searchInput = ref('')
+    const { copy } = useClipboard()
+    const searchInput = ref('')
 
-const debouncedSearch = useDebounceFn((val: string) => {
-    table.value?.tableApi?.getColumn('nom')?.setFilterValue(val)
-}, 300)
+    const debouncedSearch = useDebounceFn((val: string) => {
+        table.value?.tableApi?.getColumn('nom')?.setFilterValue(val)
+    }, 300)
 
-watch(searchInput, (val) => {
-    debouncedSearch(val)
-})
-const columns: TableColumn<Role>[] = [
-    {
-        id: 'details',
-        header: 'Details',
-        cell: ({ row }) => h(UButton, {
-            color: 'primary',
-            variant: 'ghost',
-            icon: 'i-lucide-eye',
-            onClick: () => {
-                selectedRole.value = row.original;
-                openDetailsRole.value = !openDetailsRole.value;
-                // console.log(row.original, openDetailsRole.value)
+    watch(searchInput, (val) => {
+        debouncedSearch(val)
+    })
+    const columns: TableColumn<Role>[] = [
+        {
+            id: 'details',
+            header: 'Details',
+            cell: ({ row }) => h(UButton, {
+                color: 'primary',
+                variant: 'ghost',
+                icon: 'i-lucide-eye',
+                onClick: () => {
+                    selectedRole.value = row.original;
+                    openDetailsRole.value = !openDetailsRole.value;
+                    // console.log(row.original, openDetailsRole.value)
+                }
+            }),
+        },
+        {
+            accessorKey: 'nom',
+            header: 'Nom',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+
+                    h('div', undefined, [
+                        h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.nom),
+                    ])
+                ])
             }
-        }),
-    },
-    {
-        accessorKey: 'nom',
-        header: 'Nom',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
+        },
+        {
+            accessorKey: 'description',
+            header: 'Description',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
 
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.nom),
+                    h('div', undefined, [
+                        h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.description),
+                    ])
                 ])
-            ])
-        }
-    },
-    {
-        accessorKey: 'description',
-        header: 'Description',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
+            }
+        },
+        {
+            accessorKey: 'nom',
+            header: 'Nom',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
 
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.description),
+                    h('div', undefined, [
+                        h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.nom),
+                    ])
                 ])
-            ])
-        }
-    },
-    {
-        accessorKey: 'nom',
-        header: 'Nom',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.nom),
-                ])
-            ])
-        }
-    },
-    {
-        header: () => h('div', { class: 'text-center' }, 'Actions'),
-        id: 'actions',
-        cell: ({ row }) => {
-            return h(
-                'div',
-                { class: 'text-center' },
-                h(
-                    UDropdownMenu,
-                    {
-                        content: {
-                            align: 'end'
+            }
+        },
+        {
+            header: () => h('div', { class: 'text-center' }, 'Actions'),
+            id: 'actions',
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-center' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: {
+                                align: 'end'
+                            },
+                            items: getRowItems(row)
                         },
-                        items: getRowItems(row)
-                    },
-                    () =>
-                        h(UButton, {
-                            icon: 'i-lucide-ellipsis-vertical',
-                            color: 'neutral',
-                            variant: 'ghost',
-                            class: 'ml-auto'
-                        })
+                        () =>
+                            h(UButton, {
+                                icon: 'i-lucide-ellipsis-vertical',
+                                color: 'neutral',
+                                variant: 'ghost',
+                                class: 'ml-auto'
+                            })
+                    )
                 )
-            )
+            }
         }
+    ]
+
+    function getRowItems(row: Row<Role>) {
+        return [
+            {
+                type: 'label',
+                label: 'Actions'
+            },
+            {
+                label: 'Copie ID User',
+                icon: 'i-lucide-copy',
+                onSelect() {
+                    copy(row.original.id.toString())
+                    toast.add({
+                        title: 'Copié !',
+                        description: 'ID de l\'utilisateur copié dans le presse-papiers'
+                    })
+                }
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Details',
+                icon: 'material-symbols:open-in-full-rounded',
+                onSelect() {
+                    openDetailsRole.value = !openDetailsRole.value
+                }
+            },
+            {
+                label: 'View customer payments',
+                icon: 'i-lucide-wallet'
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Delete classe',
+                icon: 'i-lucide-trash',
+                color: 'error',
+                onSelect() {
+                    toast.add({
+                        title: 'Customer deleted',
+                        description: 'The customer has been deleted.'
+                    })
+                }
+            }
+        ];
     }
-]
-
-function getRowItems(row: Row<Role>) {
-    return [
-        {
-            type: 'label',
-            label: 'Actions'
-        },
-        {
-            label: 'Copie ID User',
-            icon: 'i-lucide-copy',
-            onSelect() {
-                copy(row.original.id.toString())
-                toast.add({
-                    title: 'Copié !',
-                    description: 'ID de l\'utilisateur copié dans le presse-papiers'
-                })
-            }
-        },
-        {
-            type: 'separator'
-        },
-        {
-            label: 'Details',
-            icon: 'material-symbols:open-in-full-rounded',
-            onSelect() {
-                openDetailsRole.value = !openDetailsRole.value
-            }
-        },
-        {
-            label: 'View customer payments',
-            icon: 'i-lucide-wallet'
-        },
-        {
-            type: 'separator'
-        },
-        {
-            label: 'Delete classe',
-            icon: 'i-lucide-trash',
-            color: 'error',
-            onSelect() {
-                toast.add({
-                    title: 'Customer deleted',
-                    description: 'The customer has been deleted.'
-                })
-            }
-        }
-    ];
-}
 
 
-const { data: Roles, error } = await supabase.from('roles').select()
+    const { data: Roles, pending } = useAsyncData('roles', async () => {
+        const { data, error } = await supabase.from('roles').select()
+        if (error) throw error
+        return data
+    })
 
 </script>

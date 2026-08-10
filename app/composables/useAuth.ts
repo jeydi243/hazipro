@@ -1,99 +1,118 @@
 export function useAuth() {
-  const supabase = useSupabaseClient()
-  const user = useSupabaseUser()
-  const toast = useToast()
-  const parametresStore = useParametresStore()
+  const supabase = useSupabaseClient();
+  const user = useSupabaseUser();
+  const toast = useToast();
+  const parametresStore = useParametresStore();
 
-  const isAuthenticated = computed(() => !!user.value)
+  const isAuthenticated = computed(() => !!user.value);
   const isAdmin = computed(() => {
-    const usersStore = useUsersStore()
-    return usersStore.usersRoles?.some((ur: any) => ur.role?.code === 'admin') ?? false
-  })
+    const usersStore = useUsersStore();
+    return usersStore.usersRoles?.some((ur: any) =>
+      ur.role?.code === "admin"
+    ) ?? false;
+  });
 
   async function login(tenant: string, email: string, password: string) {
     const { data: profil } = await supabase
-      .from('profils')
-      .select('*, owner:owner_id(*)')
-      .eq('owner.nom', tenant)
-
+      .from("profils")
+      .select("*, owner:owner_id(*)")
+      .eq("owner.nom", tenant);
+    console.log(profil);
     if (!profil?.length) {
       toast.add({
-        title: 'Erreur de connexion',
-        description: `Le tenant "${tenant}" n'a pas été trouvé. Veuillez vérifier vos informations.`,
-        color: 'error',
-      })
-      return null
+        title: "Erreur de connexion",
+        description:
+          `Le tenant "${tenant}" n'a pas été trouvé. Veuillez vérifier vos informations.`,
+        color: "error",
+      });
+      return null;
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-    })
+    });
 
     if (error) {
       toast.add({
-        title: 'Erreur de connexion',
+        title: "Erreur de connexion",
         description: error.message,
-        color: 'error',
-      })
-      return null
+        color: "error",
+      });
+      return null;
     }
 
     if (data.user) {
-      parametresStore.setOwnerID(profil[0]?.owner_id || '')
-      await navigateTo('/')
+      parametresStore.setOwnerID(profil[0]?.owner_id || "");
+      await navigateTo("/");
       toast.add({
-        title: 'Connexion réussie',
-        description: `Bienvenue ${data.user.email || ''} !`,
-        color: 'success',
-      })
+        title: "Connexion réussie",
+        description: `Bienvenue ${data.user.email || ""} !`,
+        color: "success",
+      });
     }
 
-    return data.user
+    return data.user;
   }
 
   async function loginWithPasskey() {
-    const { data, error } = await supabase.auth.signInWithPasskey()
+    const { data, error } = await supabase.auth.signInWithPasskey();
 
     if (error) {
-      toast.add({ title: 'Erreur', description: error.message, color: 'error' })
-      return null
+      toast.add({
+        title: "Erreur",
+        description: error.message,
+        color: "error",
+      });
+      return null;
     }
 
     if (data?.user) {
-      await navigateTo('/')
-      toast.add({ title: 'Connexion réussie', description: 'Bienvenue via Passkey !', color: 'success' })
+      await navigateTo("/");
+      toast.add({
+        title: "Connexion réussie",
+        description: "Bienvenue via Passkey !",
+        color: "success",
+      });
     }
 
-    return data?.user ?? null
+    return data?.user ?? null;
   }
 
   async function logout() {
-    const currentUser = user.value
-    const { error } = await supabase.auth.signOut()
+    const currentUser = user.value;
+    const { error } = await supabase.auth.signOut();
 
     if (error) {
-      toast.add({ title: 'Erreur', description: error.message, color: 'error' })
-      return
+      toast.add({
+        title: "Erreur",
+        description: error.message,
+        color: "error",
+      });
+      return;
     }
 
-    await navigateTo('/auth')
+    await navigateTo("/auth");
     toast.add({
-      title: `Au revoir ${currentUser?.email || ''} !`,
-      description: 'Vous êtes déconnecté.',
-      color: 'warning',
-    })
+      title: `Au revoir ${currentUser?.email || ""} !`,
+      description: "Vous êtes déconnecté.",
+      color: "warning",
+    });
   }
 
   async function register(email: string, password: string) {
-    const { data, error } = await supabase.auth.signUp({ email, password })
+    const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
-      toast.add({ title: 'Erreur', description: error.message, color: 'error' })
-      return null
+      toast.add({
+        title: "Erreur",
+        description: error.message,
+        color: "error",
+      });
+      return null;
     }
 
-    return data.user
+    return data.user;
   }
 
   return {
@@ -104,5 +123,5 @@ export function useAuth() {
     loginWithPasskey,
     logout,
     register,
-  }
+  };
 }

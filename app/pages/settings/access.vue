@@ -241,7 +241,7 @@ function getRowItems(row: Row<Role>) {
     ]
 }
 
-const { data: Roles, pending, refresh: refreshRoles } = await useAsyncData('roles', async () => {
+const { data: Roles, pending, refresh: refreshRoles } = useAsyncData('roles', async () => {
     const { data, error } = await supabase.from('roles').select('*')
     if (error) {
         throw error

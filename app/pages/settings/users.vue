@@ -60,7 +60,7 @@
                 <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                     v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                         getPaginationRowModel: getPaginationRowModel()
-                    }" class="shrink-0 m-2 bg-white dark:bg-(--ui-bg)" :data="Users || []" :columns="columns" :loading="status === 'pending'" :ui="{
+                    }" class="shrink-0 m-2 bg-white dark:bg-(--ui-bg)" :data="Users || []" :columns="columns" :loading="pending" :ui="{
                         base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                         thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                         tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -103,7 +103,6 @@ useHead({
 
 const supabase = useSupabaseClient()
 const table = useTemplateRef('table')
-const status = ref('success')
 const statusFilter = ref('all')
 const columnFilters = ref([{
     id: 'email',
@@ -260,6 +259,10 @@ function getRowItems(row: Row<Profil>) {
 }
 
 
-const { data: Users, error } = await supabase.from('profils').select()
+const { data: Users, pending } = useAsyncData('users', async () => {
+    const { data, error } = await supabase.from('profils').select()
+    if (error) throw error
+    return data
+})
 
 </script>

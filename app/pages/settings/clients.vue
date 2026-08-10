@@ -243,7 +243,7 @@ function getRowItems(row: Row<Client>) {
     ]
 }
 
-const { data: clients, pending, refresh: refreshClients } = await useAsyncData('clients', async () => {
+const { data: clients, pending, refresh: refreshClients } = useAsyncData('clients', async () => {
     const { data, error } = await supabase.from('clients').select('*, type:type_id(*)')
     if (error) {
         throw error

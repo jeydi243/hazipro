@@ -22,8 +22,8 @@
                             td: 'border-b border-(--ui-border) p-2'
                         }" />
 
-                <div class="flex items-center justify-between gap-3 border-t border-(--ui-border) pt-4 mt-auto">
-                    <div class="text-sm text-(--ui-text-muted)">
+                <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
+                    <div class="text-sm text-muted">
                         {{ selectedRowCount }} of {{ totalFilteredRows }} row(s) selected.
                     </div>
 
@@ -39,7 +39,7 @@
             <template #body>
                 <div class="p-4 text-center">
                     <p v-if="selectedClasse" class="font-medium">{{ selectedClasse.nom }}</p>
-                    <p v-if="selectedClasse" class="text-sm text-(--ui-text-muted)">{{ selectedClasse.description }}</p>
+                    <p v-if="selectedClasse" class="text-sm text-muted">{{ selectedClasse.description }}</p>
                     <p v-else>Sélectionnez une classe pour voir les détails.</p>
                 </div>
             </template>
@@ -100,7 +100,7 @@ watch(searchInput, (val) => {
 })
 
 // Data loading
-const { data: classes, refresh: refreshClassesData } = await useLazyAsyncData<Classe[]>('lookups-classes', async () => {
+const { data: classes, refresh: refreshClassesData } = useLazyAsyncData<Classe[]>('lookups-classes', async () => {
     const { data, error } = await supabase.from('classes').select()
     if (error) throw error
     return data as Classe[]

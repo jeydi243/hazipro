@@ -15,7 +15,7 @@ const links = [{
     icon: 'i-lucide-users',
     to: '/settings/lookups'
 }, {
-    label: 'Point de facturation',
+    label: 'Organisations',
     icon: 'octicon:organization-16',
     to: '/settings/organisations'
 },

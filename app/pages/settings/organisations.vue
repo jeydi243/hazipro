@@ -67,7 +67,7 @@ import type { Organisation } from '~/types'
 import { storeToRefs } from 'pinia'
 
 useHead({
-    title: 'Organisations - Point de facturation',
+    title: 'Organisations',
     meta: [
         { name: 'description', content: 'Gérer les organisations.' }
     ]
@@ -275,11 +275,11 @@ function getRowItems(row: Row<Organisation>): DropdownMenuItem[][] {
     ]]
 }
 
-const { data: organisations, pending, refresh: refreshOrganisations } = await useAsyncData('organisations', async () => {
-    const { data, error } = await supabase.from('organisations').select('*, lookup:type_id(*)')
+const { data: organisations, pending, refresh: refreshOrganisations } = useAsyncData('organisations', async () => {
+    const { data, error } = await supabase.from('organisations').select('*, type:type_organisation_id(*)')
     if (error) {
         throw error
     }
-    return data
+    return data as Organisation[]
 })
 </script>

@@ -17,7 +17,7 @@ const uploading = ref(false)
 const fileInput = ref<HTMLInputElement>()
 const selectedFile = ref<File | null>(null)
 
-const { data: profil, refresh } = await useLazyAsyncData('mon-profil', async () => {
+const { data: profil, pending, refresh } = useLazyAsyncData('mon-profil', async () => {
   if (!authUser.value) return null
   const { data } = await supabase
     .from('profils')

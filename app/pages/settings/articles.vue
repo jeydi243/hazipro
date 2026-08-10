@@ -329,7 +329,7 @@ function getRowItems(row: Row<Article>) {
     ]
 }
 
-const { data: Articles, pending, refresh: refreshArticles } = await useLazyAsyncData('articles', async () => {
+const { data: Articles, pending, refresh: refreshArticles } = useLazyAsyncData('articles', async () => {
     const { data, error } = await supabase.from('articles').select('*, lookup:type_article_id(*), unite_conso:unite_conso_id(*), unite_stock:unite_stock_id(*)')
     if (error) {
         throw error
