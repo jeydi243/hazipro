@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import type { NF } from "~/types";
+import type { Beneficiaire } from "~/types";
 
-export const useNFStore = defineStore("nf", () => {
-    const items = ref<NF[]>([]);
+export const useBeneficiairesStore = defineStore("beneficiaires", () => {
+    const items = ref<Beneficiaire[]>([]);
     const loading = ref(false);
 
     async function fetchAll(_ownerId?: string | null) {
@@ -12,18 +12,18 @@ export const useNFStore = defineStore("nf", () => {
             "id, code, nom, description, organisation_id, client:owner_id(id, nom, code)",
         );
         if (error) throw error;
-        if (data) items.value = data as unknown as NF[];
+        if (data) items.value = data as unknown as Beneficiaire[];
         loading.value = false;
         return items.value;
     }
 
-    async function create(data: Partial<NF>) {
+    async function create(data: Partial<Beneficiaire>) {
         const supabase = useSupabaseClient();
         const { data: created, error } = await supabase.from("nf").insert(
             data,
         ).select("id, code, nom, description, organisation_id");
         if (error) throw error;
-        if (created) items.value.unshift(created[0] as unknown as NF);
+        if (created) items.value.unshift(created[0] as unknown as Beneficiaire);
         return created[0];
     }
 

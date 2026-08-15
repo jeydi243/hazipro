@@ -38,7 +38,7 @@ import type { Organisation } from '~/types/organisation'
         date_document: undefined
     })
     
-    const Organisations = useParametresStore().getOrganisations;
+    const Organisations = useParametresStore().organisations;
 
     const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
         label: org.nom,
@@ -85,7 +85,7 @@ import type { Organisation } from '~/types/organisation'
                         <USelectMenu v-model="state.organisation_id" value-key="id" :items="itemsOrganisations"
                             class="w-full" />
                     </UFormField>
-                    <UFormField label="Nom" placeholder="John Doe" name="nom">
+                    <UFormField label="Type NF" placeholder="Employé" name="type_nf">
                         <UInput v-model="state.type_nf" class="w-full" />
                     </UFormField>
                     <UFormField label="Nature de la note" placeholder="" name="nature_nf">

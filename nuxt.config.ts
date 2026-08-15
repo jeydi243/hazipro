@@ -20,8 +20,8 @@ export default defineNuxtConfig({
                 { rel: "preconnect", href: "https://api.supabase.com" },
             ],
         },
-        pageTransition: { name: "page", mode: "out-in" },
-        layoutTransition: { name: "layout", mode: "out-in" },
+        // pageTransition: { name: "page", mode: "out-in" },
+        // layoutTransition: { name: "layout", mode: "out-in" },
     },
     runtimeConfig: {
         // Private keys are only available on the server

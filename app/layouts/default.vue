@@ -31,49 +31,11 @@
         },
         {
             label: 'Bénéficiaires',
+            icon: 'duo-icons:user',
             to: '/beneficiaires',
-            icon: 'i-lucide-settings',
-            defaultOpen: true,
-            children: [{
-                label: 'Bénéficiaires',
-                icon: 'solar:settings-bold-duotone',
-                to: '/beneficiaires',
-                exact: true,
-                onSelect: () => {
-                    open.value = false
-                }
-            }, {
-                label: 'Employés',
-                to: '/settings/employes',
-                icon: 'solar:card-transfer-bold-duotone',
-                onSelect: () => {
-                    open.value = false
-                }
-            }, {
-                label: 'Tiers',
-                to: '/settings/tiers',
-                icon: 'solar:card-transfer-bold-duotone',
-                onSelect: () => {
-                    open.value = false
-                }
-            },
-            {
-                label: 'Fiscalité',
-                to: '/settings/fiscalite',
-                icon: 'solar:tag-price-bold-duotone',
-                onSelect: () => {
-                    open.value = false
-                }
-            },
-            {
-                label: 'Fournisseurs',
-                to: '/settings/fournisseurs',
-                icon: 'solar:users-group-two-rounded-line-duotone',
-                onSelect: () => {
-                    open.value = false
-                }
+            onSelect: () => {
+                open.value = false
             }
-            ]
         },
         {
             label: 'Workflow & Task',

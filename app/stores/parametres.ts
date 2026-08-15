@@ -4,11 +4,12 @@ export const useParametresStore = defineStore('parametres', () => {
   const owner_id = ref<string | null>(null)
 
   const lookupsStore = useLookupsStore()
-  const organisationsStore = useOrganisationsStore()
-  const articlesStore = useArticlesStore()
   const clientsStore = useClientsStore()
-  const facturesStore = useFacturesStore()
   const profilsStore = useProfilsStore()
+  const articlesStore = useArticlesStore()
+  const facturesStore = useFacturesStore()
+  const organisationsStore = useOrganisationsStore()
+  const beneficiairesStore = useBeneficiairesStore()
 
   function setOwnerID(id: string) {
     owner_id.value = id
@@ -22,6 +23,7 @@ export const useParametresStore = defineStore('parametres', () => {
       owner_id.value ? clientsStore.fetchAll(owner_id.value) : Promise.resolve(),
       owner_id.value ? facturesStore.fetchAll(owner_id.value) : Promise.resolve(),
       owner_id.value ? profilsStore.fetchAll(owner_id.value) : Promise.resolve(),
+      owner_id.value ? beneficiairesStore.fetchAll(owner_id.value) : Promise.resolve()
     ])
 
     const errors = results.filter(r => r.status === 'rejected').map(r => (r as PromiseRejectedResult).reason)
