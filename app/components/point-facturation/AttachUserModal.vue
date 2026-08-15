@@ -54,7 +54,7 @@ const dateFinModel = computed<any>({
 })
 
 // Fetch users (profils)
-const { data: profils } = await useAsyncData('profil-items-for-attach', async () => {
+const { data: profils } = useAsyncData('profil-items-for-attach', async () => {
     const { data, error } = await supabase
         .from('profils')
         .select('id, nom, prenom, postnom, user_id')
@@ -73,7 +73,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     // Find lookup for affectation type "Facturation" or general TYPE_AFFECTATION
     const { data: lookupData } = await (supabase
         .from('lookups')
-        .select('id, classes!inner(*)')
+        .select('id, classes!inner(id, table_name)')
         .eq('classes.table_name', 'TYPE_AFFECTATION')
         .ilike('nom', '%facturation%')
         .single() as any)
@@ -82,7 +82,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     if (!lookupId) {
         const { data: fallbackLookup } = await (supabase
             .from('lookups')
-            .select('id, classes!inner(*)')
+            .select('id, classes!inner(id, table_name)')
             .eq('classes.table_name', 'TYPE_AFFECTATION')
             .limit(1)
             .single() as any)

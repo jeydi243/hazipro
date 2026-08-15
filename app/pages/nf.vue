@@ -6,7 +6,7 @@
                 <template #right>
                     <div class="flex flex-wrap items-center justify-between gap-1.5">
                         <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                            placeholder="Filter nf..." />
+                            placeholder="Filter nf…" />
                     </div>
                     <NfAddModal />
                 </template>
@@ -91,6 +91,8 @@
     const selectedNf = ref<NF | null>(null)
     const searchInput = ref('')
 
+    
+
     const debouncedSearch = useDebounceFn((val: string) => {
         tableNfs.value?.tableApi?.getColumn('nom')?.setFilterValue(val)
     }, 300)
@@ -101,7 +103,7 @@
 
     // Data loading
     const { data: nfs, refresh: refreshNfData } = useLazyAsyncData<NF[]>('nfs', async () => {
-        const { data, error } = await supabase.from('nf').select()
+        const { data, error } = await supabase.from('nf').select('id, code, nom, description, organisation_id')
         if (error) throw error
         return data as NF[]
     })
@@ -120,6 +122,7 @@
                     color: 'neutral',
                     variant: 'ghost',
                     icon: 'i-lucide-edit',
+                    'aria-label': 'Modifier',
                     onClick: () => {
                         selectedNf.value = row.original;
                         openClasseUpdateModal.value = true;
@@ -157,11 +160,7 @@
                 })
             }
         },
-        {
-            accessorKey: 'table_name',
-            header: 'Table name',
-            cell: ({ row }) => row.original.table_name
-        },
+
         {
             id: 'details',
             header: () => h('div', { class: 'text-center' }, 'Lookups'),
@@ -170,6 +169,7 @@
                     color: 'neutral',
                     variant: 'solid',
                     icon: 'i-lucide-eye',
+                    'aria-label': 'Voir les détails',
                     onClick: () => {
                         selectedNf.value = row.original;
                         openSlideOver.value = true;
@@ -182,7 +182,7 @@
             id: 'actions',
             cell: ({ row }) => h('div', { class: 'text-center' },
                 h(UDropdownMenu, { content: { align: 'end' }, items: getRowItemsClasse(row) },
-                    () => h(UButton, { icon: 'i-lucide-ellipsis-vertical', color: 'neutral', variant: 'ghost', class: 'ml-auto' })
+                    () => h(UButton, { icon: 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", color: 'neutral', variant: 'ghost', class: 'ml-auto' })
                 )
             )
         }

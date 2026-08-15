@@ -10,7 +10,7 @@
                     <template #right>
                         <div class="flex flex-wrap items-center justify-between gap-1.5">
                             <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                                placeholder="Rechercher un utilisateur (email)..." />
+                                placeholder="Rechercher un utilisateur (email)…" />
 
                             <div class="flex flex-wrap items-center gap-1.5">
                                 <!-- <CustomersDeleteModal
@@ -60,7 +60,7 @@
                 <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                     v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                         getPaginationRowModel: getPaginationRowModel()
-                    }" class="shrink-0 m-2 bg-white dark:bg-(--ui-bg)" :data="Users || []" :columns="columns" :loading="pending" :ui="{
+                    }" class="shrink-0 m-2 bg-(--ui-bg)" :data="Users || []" :columns="columns" :loading="pending" :ui="{
                         base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                         thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                         tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -139,10 +139,10 @@ const columns: TableColumn<Profil>[] = [
             color: 'primary',
             variant: 'ghost',
             icon: 'i-lucide-eye',
+            'aria-label': 'Voir les détails',
             onClick: () => {
                 selectedUser.value = row.original;
                 openDetailsUser.value = !openDetailsUser.value;
-                // console.log(row.original, openDetailsUser.value)
             }
         }),
     },
@@ -200,6 +200,7 @@ const columns: TableColumn<Profil>[] = [
                     () =>
                         h(UButton, {
                             icon: 'i-lucide-ellipsis-vertical',
+                            'aria-label': "Plus d'actions",
                             color: 'neutral',
                             variant: 'ghost',
                             class: 'ml-auto'
@@ -260,7 +261,7 @@ function getRowItems(row: Row<Profil>) {
 
 
 const { data: Users, pending } = useAsyncData('users', async () => {
-    const { data, error } = await supabase.from('profils').select()
+    const { data, error } = await supabase.from('profils').select('id, email, nom, prenom, postnom, avatar, user_id')
     if (error) throw error
     return data
 })

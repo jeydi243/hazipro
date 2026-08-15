@@ -2,14 +2,14 @@ import { defineStore } from 'pinia'
 import type { Profil } from '~/types'
 
 export const useProfilsStore = defineStore('profils', () => {
+  const supabase = useSupabaseClient()
   const items = ref<Profil[]>([])
   const currentProfil = ref<Profil | null>(null)
   const loading = ref(false)
 
   async function fetchAll(ownerId?: string | null) {
-    const supabase = useSupabaseClient()
     loading.value = true
-    let query = supabase.from('profils').select('*')
+    let query = supabase.from('profils').select('id, email, nom, prenom, postnom, avatar, user_id, owner_id')
     if (ownerId) query = query.eq('owner_id', ownerId)
     const { data, error } = await query
     if (error) throw error
@@ -19,7 +19,7 @@ export const useProfilsStore = defineStore('profils', () => {
   }
 
   async function fetchByUserId(userId: string) {
-    const { data, error } = await supabase.from('profils').select('*').eq('user_id', userId).single()
+    const { data, error } = await supabase.from('profils').select('id, email, nom, prenom, postnom, avatar, user_id, owner_id').eq('user_id', userId).single()
     if (error) throw error
     currentProfil.value = data as unknown as Profil
     return currentProfil.value

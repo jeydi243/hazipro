@@ -25,8 +25,8 @@ const state = reactive<Partial<Schema>>({
     lookup_id: undefined,
     type_article_id: undefined,
 })
-const { data: lookups } = await useAsyncData<Lookup[]>('lookups-articles', async () => {
-    const { data } = await supabase.from('lookups').select('id, nom, classes!inner(*)').eq('classes.table_name', 'TYPE_ARTICLES')
+const { data: lookups } = useAsyncData<Lookup[]>('lookups-articles', async () => {
+    const { data } = await supabase.from('lookups').select('id, nom, code, classe_id, classes!inner(id, table_name)').eq('classes.table_name', 'TYPE_ARTICLES')
     return (data || []) as unknown as Lookup[]
 })
 

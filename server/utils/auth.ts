@@ -16,7 +16,7 @@ export async function requireAuth(event: H3Event) {
 export async function requireAdmin(event: H3Event) {
   const user = await requireAuth(event)
 
-  const client = serverSupabaseServiceRole(event)
+  const client = serverSupabaseClient(event)
 
   const { data: userRoles, error: rolesError } = await client
     .from('user_roles')

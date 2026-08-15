@@ -1,7 +1,8 @@
 <script setup lang="ts">
     import * as z from 'zod'
-    import type { FormSubmitEvent } from '@nuxt/ui'
+    import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
     import { generateRandomCode } from '~/utils'
+import type { Organisation } from '~/types/organisation'
 
     const schema = z.object({
         nom: z.string().min(3, 'Too short'),
@@ -36,8 +37,14 @@
         taux: undefined,
         date_document: undefined
     })
+    
+    const Organisations = useParametresStore().getOrganisations;
 
-    const { data: beneficiaires, execute } = await useLazyFetch('https://jsonplaceholder.typicode.com/users', {
+    const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
+        label: org.nom,
+        id: org.id
+    })) || [])
+    const { data: beneficiaires, execute } = useLazyFetch('https://jsonplaceholder.typicode.com/users', {
         key: 'typicode-users-email',
         transform: (data: { id: number, name: string, email: string }[]) => {
             return data?.map(user => ({
@@ -75,12 +82,8 @@
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <div class="grid grid-cols-4 gap-4">
                     <UFormField label="Direction" name="code">
-                        <UInput v-model="state.organisation_id" class="w-full" placeholder="Code de l'article">
-                            <template #trailing>
-                                <UButton icon="i-lucide-refresh-cw" color="neutral" variant="ghost" size="xs"
-                                    @click="state.code = generateRandomCode()" />
-                            </template>
-                        </UInput>
+                        <USelectMenu v-model="state.organisation_id" value-key="id" :items="itemsOrganisations"
+                            class="w-full" />
                     </UFormField>
                     <UFormField label="Nom" placeholder="John Doe" name="nom">
                         <UInput v-model="state.type_nf" class="w-full" />
@@ -93,7 +96,7 @@
                         <UInput v-model="state.code" class="w-full" placeholder="Code de l'article">
                             <template #trailing>
                                 <UButton icon="i-lucide-refresh-cw" color="neutral" variant="ghost" size="xs"
-                                    @click="state.code = generateRandomCode()" />
+                                    aria-label="Régénérer le code" @click="state.code = generateRandomCode()" />
                             </template>
                         </UInput>
                     </UFormField>

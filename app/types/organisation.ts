@@ -7,7 +7,6 @@ export interface Classe {
     status: string
     created_at: string
     updated_at: string
-    update: Date
     date_debut: Date
     end_date: Date
 }

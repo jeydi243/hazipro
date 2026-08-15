@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import type { Role, UserRole, Affectation } from '~/types'
 
 export const useRolesStore = defineStore('roles', () => {
+  const supabase = useSupabaseClient()
   const roles = ref<Role[]>([])
   const loading = ref(false)
 
   async function fetchAll() {
-    const supabase = useSupabaseClient()
     loading.value = true
-    const { data, error } = await supabase.from('roles').select('*')
+    const { data, error } = await supabase.from('roles').select('id, code, nom, description, entite')
     if (error) throw error
     if (data) roles.value = data as unknown as Role[]
     loading.value = false
@@ -16,7 +16,7 @@ export const useRolesStore = defineStore('roles', () => {
   }
 
   async function create(data: Partial<Role>) {
-    const { data: created, error } = await supabase.from('roles').insert(data).select()
+    const { data: created, error } = await supabase.from('roles').insert(data).select('id, code, nom, description, entite')
     if (error) throw error
     if (created) roles.value.unshift(created[0] as unknown as Role)
     return created[0]
@@ -31,7 +31,7 @@ export const useRolesStore = defineStore('roles', () => {
   async function fetchUserRoles(userId: string) {
     const { data, error } = await supabase
       .from('user_roles')
-      .select('id, role:roles!inner(*), date_debut, date_fin')
+      .select('id, role:roles!inner(id, code, nom, description, entite), date_debut, date_fin')
       .eq('user_id', userId)
     if (error) throw error
     return data as unknown as UserRole[]
@@ -51,7 +51,7 @@ export const useRolesStore = defineStore('roles', () => {
   async function fetchAffectations(userId: string) {
     const { data, error } = await supabase
       .from('affectations')
-      .select('id, date_debut, date_fin, lookup:lookups!inner(*), organisation:organisations!inner(*)')
+      .select('id, date_debut, date_fin, lookup:lookups!inner(id, nom, code), organisation:organisations!inner(id, nom, code)')
       .eq('user_id', userId)
     if (error) throw error
     return data as unknown as Affectation[]

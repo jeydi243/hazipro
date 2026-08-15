@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import type { Organisation } from '~/types'
 
 export const useOrganisationsStore = defineStore('organisations', () => {
+  const supabase = useSupabaseClient()
   const items = ref<Organisation[]>([])
   const loading = ref(false)
 
   async function fetchAll(ownerId?: string | null) {
-    const supabase = useSupabaseClient()
     loading.value = true
-    let query = supabase.from('organisations').select('*, lookup:type_id(id, code, description, classe:classe_id(id, code, description))')
+    let query = supabase.from('organisations').select('id, nom, code, description, nid, status, owner_id, organisation_parent_id, lookup:type_id(id, code, description, classe:classe_id(id, code, description))')
     if (ownerId) query = query.eq('owner_id', ownerId)
     const { data, error } = await query
     if (error) throw error
@@ -18,13 +18,13 @@ export const useOrganisationsStore = defineStore('organisations', () => {
   }
 
   async function fetchById(id: string) {
-    const { data, error } = await supabase.from('organisations').select('*, lookup:type_id(*)').eq('id', id).single()
+    const { data, error } = await supabase.from('organisations').select('id, nom, code, description, nid, status, owner_id, organisation_parent_id, lookup:type_id(id, nom, code)').eq('id', id).single()
     if (error) throw error
     return data as unknown as Organisation
   }
 
   async function fetchChildren(parentId: string) {
-    const { data, error } = await supabase.from('organisations').select('*').eq('organisation_parent_id', parentId)
+    const { data, error } = await supabase.from('organisations').select('id, nom, code, description, nid, status, owner_id, organisation_parent_id').eq('organisation_parent_id', parentId)
     if (error) throw error
     return data as unknown as Organisation[]
   }
@@ -32,7 +32,7 @@ export const useOrganisationsStore = defineStore('organisations', () => {
   async function fetchChildrenEmplacements(parentId: string) {
     const { data, error } = await supabase
       .from('organisations')
-      .select('*, lookup:lookup_id!inner(*)')
+      .select('id, nom, code, description, nid, status, owner_id, organisation_parent_id, lookup:lookup_id!inner(id, nom, code, description)')
       .eq('organisation_parent_id', parentId)
       .eq('lookup.description', 'Emplacement')
     if (error) throw error
@@ -40,24 +40,24 @@ export const useOrganisationsStore = defineStore('organisations', () => {
   }
 
   async function fetchByLookupCode(code: string) {
-    const { data } = await supabase.from('organisations').select('id, nom, code, lookup:lookups!inner(*)').eq('lookup.code', code)
+    const { data } = await supabase.from('organisations').select('id, nom, code, lookup:lookups!inner(id, code)').eq('lookup.code', code)
     return data
   }
 
   async function fetchByLookupName(name: string) {
-    const { data } = await supabase.from('organisations').select('id, nom, description, lookups!inner(*)').eq('lookups.nom', name)
+    const { data } = await supabase.from('organisations').select('id, nom, description, lookups!inner(id, nom)').eq('lookups.nom', name)
     return data
   }
 
   async function create(data: Partial<Organisation>) {
-    const { data: created, error } = await supabase.from('organisations').insert(data).select()
+    const { data: created, error } = await supabase.from('organisations').insert(data).select('id, nom, code, description, nid, status, owner_id, organisation_parent_id')
     if (error) throw error
     if (created) items.value.unshift(created[0] as unknown as Organisation)
     return created[0]
   }
 
   async function update(id: string, data: Partial<Organisation>) {
-    const { data: updated, error } = await supabase.from('organisations').update(data).eq('id', id).select()
+    const { data: updated, error } = await supabase.from('organisations').update(data).eq('id', id).select('id, nom, code, description, nid, status, owner_id, organisation_parent_id')
     if (error) throw error
     if (updated) {
       const idx = items.value.findIndex(o => o.id === id)

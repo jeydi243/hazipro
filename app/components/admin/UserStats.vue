@@ -23,7 +23,7 @@ const UIcon = resolveComponent('UIcon')
       </div>
       <span class="text-2xl font-bold text-green-600 dark:text-green-400">{{ stats.confirmed }}</span>
       <div class="w-full h-1 bg-(--ui-border) rounded-full overflow-hidden">
-        <div class="h-full bg-green-500 rounded-full transition-all duration-500"
+        <div class="h-full bg-green-500 rounded-full transition-[width] duration-500"
           :style="{ width: stats.total ? `${(stats.confirmed / stats.total) * 100}%` : '0%' }" />
       </div>
     </div>

@@ -9,7 +9,7 @@
                 <template #right>
                     <div class="flex flex-wrap items-center justify-between gap-1.5">
                         <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                                placeholder="Rechercher un tarifaire..." />
+                                placeholder="Rechercher un tarifaire…" />
 
                         <div class="flex flex-wrap items-center gap-1.5">
                             <USelect v-model="statusFilter" :items="[
@@ -121,6 +121,7 @@ const columns: TableColumn<Tarifaire>[] = [
             color: 'neutral',
             variant: 'ghost',
             icon: 'solar:pen-new-square-line-duotone',
+            'aria-label': 'Modifier',
             class: '-mx-2.5',
             onClick: () => {
                 selectedTarifaire.value = row.original
@@ -158,6 +159,7 @@ const columns: TableColumn<Tarifaire>[] = [
                 children: getRowItems(row)
             }, () => h(UButton, {
                 icon: 'i-lucide-ellipsis-vertical',
+                'aria-label': "Plus d'actions",
                 color: 'neutral',
                 variant: 'ghost',
                 class: 'ml-auto'
@@ -213,7 +215,7 @@ function getRowItems(row: Row<Tarifaire>) {
 const { data: Tarifaires, pending, refresh: refreshTarifaires } = useAsyncData('tarifaires', async () => {
     const { data, error } = await supabase
         .from('tarifaires')
-        .select('*, organisation:organisations!inner(*)')
+        .select('id, code, nom, description, organisation_id, organisation:organisations!inner(id, nom, code)')
     if (error) throw error
     return data
 })

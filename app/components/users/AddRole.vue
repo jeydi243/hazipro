@@ -53,7 +53,7 @@ const dateDebutModel = computed({
 
 
 // Fetch Lookups for role types
-const { data: roles } = await useAsyncData('role-items', async () => {
+const { data: roles } = useAsyncData('role-items', async () => {
     const { data, error } = await supabase
         .from('roles')
         .select('id, nom, code')
@@ -62,7 +62,7 @@ const { data: roles } = await useAsyncData('role-items', async () => {
 })
 
 // Fetch Services (Organisations with "Service Médicale" description in lookup)
-const { data: profils } = await useAsyncData('profil-items', async () => {
+const { data: profils } = useAsyncData('profil-items', async () => {
     const { data, error } = await supabase
         .from('profils')
         .select('id, nom, prenom, postnom')
@@ -103,11 +103,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormField label="Utilisateur" name="user_id" class="w-full">
                     <USelectMenu v-model="state.user_id" class="w-full" value-key="id" :items="profilItems"
-                                 placeholder="Choisir un service..." icon="i-lucide-building" disabled />
+                                 placeholder="Choisir un service…" icon="i-lucide-building" disabled />
                 </UFormField>
                 <UFormField label="Role" name="role_id" class="w-full">
                     <USelectMenu v-model="state.role_id" class="w-full" value-key="id" :items="rolesItems"
-                                 placeholder="Sélectionner un role..." />
+                                 placeholder="Sélectionner un role…" />
                 </UFormField>
                 <UFormField label="Date de debut" placeholder="08/12/2025" name="date_debut">
                     <UInputDate v-model="dateDebutModel" class="w-full" :max-date="maxDate">

@@ -43,12 +43,12 @@ watch(() => props.article, (newArticle) => {
     }
 }, { immediate: true })
 
-const { data: lookups } = await useAsyncData<Lookup[]>('lookups-articles-edit', async () => {
-    const { data } = await supabase.from('lookups').select('id, nom, classes!inner(*)').eq('classes.table_name', 'TYPE_ARTICLES')
+const { data: lookups } = useAsyncData<Lookup[]>('lookups-articles-edit', async () => {
+    const { data } = await supabase.from('lookups').select('id, nom, code, classe_id, classes!inner(id, table_name)').eq('classes.table_name', 'TYPE_ARTICLES')
     return (data || []) as unknown as Lookup[]
 })
-const { data: lookupsUOM } = await useAsyncData<Lookup[]>('lookups-articles-uom', async () => {
-    const { data } = await supabase.from('lookups').select('id, nom, classes!inner(*)').eq('classes.table_name', 'CATEGORIE_UOM')
+const { data: lookupsUOM } = useAsyncData<Lookup[]>('lookups-articles-uom', async () => {
+    const { data } = await supabase.from('lookups').select('id, nom, code, classe_id, classes!inner(id, table_name)').eq('classes.table_name', 'CATEGORIE_UOM')
     return (data || []) as unknown as Lookup[]
 })
 

@@ -30,13 +30,13 @@ const items = [
 const supabase = useSupabaseClient()
 const toast = useToast()
 
-const { data: services, pending, refresh } = await useAsyncData<Organisation[]>(
+const { data: services, pending, refresh } = useAsyncData<Organisation[]>(
     () => `services-${props.organisation?.id}`,
     async () => {
         if (!props.organisation?.id) return []
         const { data, error } = await supabase
             .from('organisations')
-            .select('*')
+            .select('id, nom, code, description, nid, status, owner_id, organisation_parent_id')
             .eq('organisation_parent_id', props.organisation.id)
         if (error) {
             toast.add({ title: 'Erreur', description: error.message, color: 'error' })
@@ -46,13 +46,13 @@ const { data: services, pending, refresh } = await useAsyncData<Organisation[]>(
     },
     { watch: [() => props.organisation?.id, () => isOpen.value], immediate: true }
 )
-const { data: emplacements, pending: pendingEmplacements, refresh: refreshEmplacements } = await useAsyncData<Organisation[]>(
+const { data: emplacements, pending: pendingEmplacements, refresh: refreshEmplacements } = useAsyncData<Organisation[]>(
     () => `emplacements-${props.organisation?.id}`,
     async () => {
         if (!props.organisation?.id) return []
         const { data, error } = await supabase
             .from('organisations')
-            .select('*, lookup:lookup_id!inner(*)')
+            .select('id, nom, code, description, nid, status, owner_id, organisation_parent_id, lookup:lookup_id!inner(id, nom, code, description)')
             .eq('organisation_parent_id', props.organisation.id)
             .eq('lookup.description', 'Emplacement')
         if (error) {
@@ -99,6 +99,7 @@ const columns: TableColumn<Organisation>[] = [
             color: 'neutral',
             variant: 'ghost',
             icon: 'i-lucide-arrow-right',
+            'aria-label': 'Aller à',
             size: 'xs',
             onClick: () => {
                 // If the user wants to navigate to this organization's details
@@ -179,7 +180,7 @@ const columns: TableColumn<Organisation>[] = [
                                     <template #empty-state>
                                         <div
                                             class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
-                                            <p>Aucun service trouvé pour cette organisation.</p>
+                                            <p>Aucun emplacement trouvé pour cette organisation.</p>
                                         </div>
                                     </template>
                                 </UTable>

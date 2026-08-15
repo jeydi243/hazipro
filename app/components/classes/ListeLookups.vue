@@ -4,7 +4,7 @@
         <template #body>
             <div class="flex items-center justify-between gap-2 p-2">
                 <UInput v-model="searchInputLookups" class="max-w-xs" icon="i-lucide-search"
-                        placeholder="Filtrer par nom ou code..." />
+                        placeholder="Filtrer par nom ou code…" />
                 <div class="flex items-center gap-2">
                     <LookupsAddModal :classe_id="item?.id ?? ''" @lookup_added="refreshLookups" />
                     <LookupsUpdateModal v-model:open="openUpdateModal" :lookup="selectedLookup"
@@ -115,6 +115,7 @@ const columnsLookups: TableColumn<Lookup>[] = [
                 color: 'neutral',
                 variant: 'ghost',
                 icon: 'material-symbols:edit-outline-rounded',
+                'aria-label': 'Modifier',
                 onClick: () => {
                     selectedLookup.value = row.original
                     openUpdateModal.value = true
@@ -162,6 +163,7 @@ const columnsLookups: TableColumn<Lookup>[] = [
                     () =>
                         h(UButton, {
                             icon: 'i-lucide-ellipsis-vertical',
+                            'aria-label': "Plus d'actions",
                             color: 'neutral',
                             variant: 'ghost',
                             class: 'ml-auto'
@@ -215,7 +217,7 @@ async function refreshLookups() {
     try {
         const { data, error } = await supabase
             .from('lookups')
-            .select('*')
+            .select('id, nom, code, description, classe_id')
             .eq('classe_id', props.item.id)
         if (error) throw error
         lookups.value = data || []

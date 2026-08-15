@@ -9,7 +9,7 @@
                 <template #right>
                     <div class="flex flex-wrap items-center justify-between gap-1.5">
                         <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                            placeholder="Rechercher une organisation..." />
+                            placeholder="Rechercher une organisation…" />
 
                         <div class="flex flex-wrap items-center gap-1.5">
                             <USelect v-model="statusFilter" :items="[
@@ -27,7 +27,7 @@
                             </UDropdownMenu>
                         </div>
                     </div>
-                    <PointFacturationAddModal @organisation-added="refreshOrganisations" />
+                    <OrganisationsAddModal @organisation-added="refreshOrganisations" />
                 </template>
             </UDashboardNavbar>
         </template>
@@ -143,6 +143,7 @@ const columns: TableColumn<Organisation>[] = [
             color: 'neutral',
             variant: 'ghost',
             icon: 'i-lucide-maximize-2',
+            'aria-label': 'Agrandir',
             class: '-mx-2.5',
             onClick: () => {
                 selectedOrganisation.value = row.original
@@ -216,6 +217,7 @@ const columns: TableColumn<Organisation>[] = [
                     () =>
                         h(UButton, {
                             icon: 'i-lucide-ellipsis-vertical',
+                            'aria-label': "Plus d'actions",
                             color: 'neutral',
                             variant: 'ghost',
                             class: 'ml-auto'
@@ -276,7 +278,7 @@ function getRowItems(row: Row<Organisation>): DropdownMenuItem[][] {
 }
 
 const { data: organisations, pending, refresh: refreshOrganisations } = useAsyncData('organisations', async () => {
-    const { data, error } = await supabase.from('organisations').select('*, type:type_organisation_id(*)')
+    const { data, error } = await supabase.from('organisations').select('id, nom, code, description, nid, status, owner_id, organisation_parent_id, type:type_organisation_id(id, nom, code)')
     if (error) {
         throw error
     }

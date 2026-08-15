@@ -10,7 +10,7 @@
                     <template #right>
                         <div class="flex flex-wrap items-center justify-between gap-1.5">
                             <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                                    placeholder="Rechercher un article..." />
+                                    placeholder="Rechercher un article…" />
                         </div>
                         <RolesAddModal @role-added="refreshRoles" />
                     </template>
@@ -103,6 +103,7 @@ const columns: TableColumn<Role>[] = [
             color: 'primary',
             variant: 'ghost',
             icon: 'i-lucide-eye',
+            'aria-label': 'Voir les détails',
             onClick: () => {
                 selectedRole.value = row.original
                 openDetailsRole.value = !openDetailsRole.value
@@ -168,6 +169,7 @@ const columns: TableColumn<Role>[] = [
                     },
                     () => h(UButton, {
                         icon: 'i-lucide-ellipsis-vertical',
+                        'aria-label': "Plus d'actions",
                         color: 'neutral',
                         variant: 'ghost',
                         class: 'ml-auto'
@@ -217,7 +219,7 @@ function getRowItems(row: Row<Role>) {
             type: 'separator' as const
         },
         {
-            label: 'Supprimer l\'article',
+            label: 'Supprimer le rôle',
             icon: 'i-lucide-trash',
             color: 'error',
             async onSelect() {
@@ -225,14 +227,14 @@ function getRowItems(row: Row<Role>) {
                     await articlesStore.remove(row.original.id)
                     toast.add({
                         title: 'Role supprimé',
-                        description: `L'article "${row.original.nom}" a été supprimé.`,
+                        description: `Le rôle "${row.original.nom}" a été supprimé.`,
                         color: 'success'
                     })
                     await refreshRoles()
                 } catch (err: any) {
                     toast.add({
                         title: 'Erreur',
-                        description: `Impossible de supprimer l'article : ${err.message}`,
+                        description: `Impossible de supprimer le rôle : ${err.message}`,
                         color: 'error'
                     })
                 }
@@ -242,7 +244,7 @@ function getRowItems(row: Row<Role>) {
 }
 
 const { data: Roles, pending, refresh: refreshRoles } = useAsyncData('roles', async () => {
-    const { data, error } = await supabase.from('roles').select('*')
+    const { data, error } = await supabase.from('roles').select('id, code, nom, description, entite')
     if (error) {
         throw error
     }

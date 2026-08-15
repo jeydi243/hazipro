@@ -26,20 +26,20 @@ const state = reactive<Partial<Schema>>({
 })
 
 // Fetch Lookups for Affectation types
-const { data: lookups } = await useAsyncData('affectation-lookups', async () => {
+const { data: lookups } = useAsyncData('affectation-lookups', async () => {
     const { data, error } = await supabase
         .from('lookups')
-        .select('id, nom, classes!inner(*)')
+        .select('id, nom, code, classe_id, classes!inner(id, table_name)')
         .eq('classes.table_name', 'TYPE_AFFECTATION')
     if (error) throw error
     return data
 })
 
 // Fetch Services (Organisations with "Service Médicale" description in lookup)
-const { data: services } = await useAsyncData('medical-services', async () => {
+const { data: services } = useAsyncData('medical-services', async () => {
     const { data, error } = await supabase
         .from('organisations')
-        .select('id, nom, code, lookup:lookups!inner(*)')
+        .select('id, nom, code, lookup:lookups!inner(id, description)')
         .in('lookup.description', ['Service Médicale', 'Magasin'])
     if (error) throw error
     return data as unknown as Organisation[]
@@ -83,12 +83,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormField label="Type d'affectation" name="lookup_id" class="w-full">
                     <USelectMenu v-model="state.lookup_id" class="w-full" value-key="id" :items="lookupItems"
-                                 placeholder="Sélectionner un type..." />
+                                 placeholder="Sélectionner un type…" />
                 </UFormField>
 
                 <UFormField label="Service / Organisation" name="organisation_id" class="w-full">
                     <USelectMenu v-model="state.organisation_id" class="w-full" value-key="id" :items="serviceItems"
-                                 placeholder="Choisir un service..." icon="i-lucide-building" />
+                                 placeholder="Choisir un service…" icon="i-lucide-building" />
                 </UFormField>
 
                 <div class="flex justify-end gap-2 pt-2">

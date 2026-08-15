@@ -47,8 +47,8 @@ const state = reactive<Partial<Schema>>({
     nif: undefined,
 })
 
-const { data: lookups } = await useAsyncData<Client[]>('clients-type', async () => {
-    const { data } = await supabase.from('lookups').select('*').eq('classes.table_name', 'TYPE_CLIENTS')
+const { data: lookups } = useAsyncData<Client[]>('clients-type', async () => {
+    const { data } = await supabase.from('lookups').select('id, nom, code, classe_id, classes!inner(id, table_name)').eq('classes.table_name', 'TYPE_CLIENTS')
     return (data || []) as unknown as Client[]
 })
 
@@ -83,7 +83,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     <UInput v-model="state.code" class="w-full" placeholder="Code de l'article">
                         <template #trailing>
                             <UButton icon="i-lucide-refresh-cw" color="neutral" variant="ghost" size="xs"
-                                     @click="state.code = generateRandomCode()" />
+                                     aria-label="Régénérer le code" @click="state.code = generateRandomCode()" />
                         </template>
                     </UInput>
                 </UFormField>

@@ -4,7 +4,7 @@
         <template #body>
             <div class="flex flex-row justify-between">
                 <UButton icon="iconoir:refresh-double" color="primary" variant="ghost"
-                    @click="refreshTarifairesLines" />
+                    aria-label="Actualiser" @click="refreshTarifairesLines" />
                 <TarifairesAddArticle :tarifaire_id="props.tarifaire?.id" @tarifaire-added="refreshTarifairesLines" />
             </div>
             <div>
@@ -77,7 +77,6 @@ const { data: tarifairesLines, refresh: refreshTarifairesLines, status: tarifair
             })
             throw error
         }
-        console.log(data)
         return data as TarifaireLine[]
     },
     {
@@ -185,6 +184,7 @@ const columnsTarifaireLine: TableColumn<TarifaireLine>[] = [
                     () =>
                         h(UButton, {
                             icon: 'i-lucide-ellipsis-vertical',
+                            'aria-label': "Plus d'actions",
                             color: 'neutral',
                             variant: 'ghost',
                             class: 'ml-auto'

@@ -7,7 +7,7 @@ const schema = z.object({
     nom: z.string().min(3, 'Too short'),
     description: z.string(),
     code: z.string(),
-    lookup_id: z.string(),
+    type_organisation_id: z.string(),
 })
 const open = ref(false)
 const toast = useToast()
@@ -17,13 +17,14 @@ const state = reactive<Partial<Schema>>({
     nom: undefined,
     description: undefined,
     code: undefined,
-    lookup_id: undefined,
+    type_organisation_id: undefined,
 })
-const { data: lookups } = await useAsyncData('lookups', async () => {
-    const { data } = await supabase.from('lookups').select('id, nom')
+const { data: lookups } = useAsyncData('org-lookups', async () => {
+    const { data, error } = await supabase.from('lookups').select('id, nom')
+    if (error) throw error
     return data
 })
-const typeOrganisation = useParametresStore().getTypeOrganisation
+const typeOrganisation: Lookup[] = useParametresStore().getTypeOrganisations
 const items = computed<SelectMenuItem[]>(() => typeOrganisation?.map((lookup: Lookup) => ({
     label: lookup.nom,
     id: lookup.id
@@ -38,7 +39,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             nom: event.data.nom,
             description: event.data.description,
             code: event.data.code,
-            lookup_id: event.data.lookup_id
+            type_organisation_id: event.data.type_organisation_id
         } as any)
         toast.add({ title: 'Succès', description: `Nouvelle organisation ${event.data.nom} ajoutée`, color: 'success' })
         emit('organisation-added')
@@ -56,8 +57,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Type d'organisation" placeholder="_" name="lookup_id">
-                    <USelectMenu v-model="state.lookup_id" value-key="id" :items="items" class="w-full" />
+                <UFormField label="Type d'organisation" placeholder="_" name="type_organisation_id">
+                    <USelectMenu v-model="state.type_organisation_id" value-key="id" :items="items" class="w-full" />
                 </UFormField>
                 <UFormField label="Code" placeholder="Code d'organisation" name="code">
                     <UInput v-model="state.code" class="w-full" />

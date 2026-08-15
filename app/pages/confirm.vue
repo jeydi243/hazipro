@@ -72,13 +72,13 @@ watch(user, (newUser) => {
 
             <div class="space-y-6">
                 <div v-for="(step, index) in steps" :key="step.id" 
-                     class="flex items-center gap-5 transition-all duration-700 ease-out"
+                     class="flex items-center gap-5 transition-[transform,opacity] duration-700 ease-out"
                      :class="[
                          index <= currentStep ? 'opacity-100 translate-x-0' : 'opacity-10 -translate-x-4 blur-sm',
                          index < currentStep ? 'text-(--ui-text-muted)' : ''
                      ]">
                     <div class="relative flex items-center justify-center shrink-0">
-                        <div v-if="index < currentStep" class="bg-primary/20 text-primary rounded-full p-1.5 transition-all duration-500 scale-110">
+                        <div v-if="index < currentStep" class="bg-primary/20 text-primary rounded-full p-1.5 transition-[transform,opacity] duration-500 scale-110">
                             <UIcon name="i-lucide-check" class="w-4 h-4 stroke-[3]" />
                         </div>
                         <div v-else-if="index === currentStep" class="relative flex items-center justify-center">
@@ -98,7 +98,7 @@ watch(user, (newUser) => {
             <!-- Barre de progression discrète -->
             <div class="mt-16 relative">
                 <div class="h-1.5 w-full bg-(--ui-bg-elevated) rounded-full overflow-hidden">
-                    <div class="h-full bg-primary transition-all duration-1000 ease-in-out shadow-[0_0_15px_rgba(var(--ui-primary-rgb),0.5)]" 
+                    <div class="h-full bg-primary transition-[width] duration-1000 ease-in-out shadow-[0_0_15px_rgba(var(--ui-primary-rgb),0.5)]" 
                          :style="{ width: `${(currentStep / steps.length) * 100}%` }" />
                 </div>
             </div>
@@ -112,5 +112,22 @@ watch(user, (newUser) => {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   opacity: 0.02;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+
+  .animate-ping {
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin,
+  .animate-ping {
+    animation: none;
+  }
 }
 </style>

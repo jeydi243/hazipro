@@ -19,7 +19,7 @@ export const useUsersStore = defineStore('users', () => {
 
         const { data: usersRolesData, error: usersRolesError } = await supabase
             .from('user_roles')
-            .select('*')
+            .select('user_id, role_id, roles(code, nom)')
             .eq('user_id', user.value.id)
 
         if (usersRolesError) {

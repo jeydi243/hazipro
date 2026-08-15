@@ -9,7 +9,7 @@ export const useNFStore = defineStore("nf", () => {
         const supabase = useSupabaseClient();
         loading.value = true;
         const { data, error } = await supabase.from("nf").select(
-            "*, client:owner_id(*)",
+            "id, code, nom, description, organisation_id, client:owner_id(id, nom, code)",
         );
         if (error) throw error;
         if (data) items.value = data as unknown as Facture[];
@@ -21,7 +21,7 @@ export const useNFStore = defineStore("nf", () => {
         const supabase = useSupabaseClient();
         const { data: created, error } = await supabase.from("nf").insert(
             data,
-        ).select();
+        ).select("id, code, nom, description, organisation_id");
         if (error) throw error;
         if (created) items.value.unshift(created[0] as unknown as Facture);
         return created[0];
@@ -38,7 +38,7 @@ export const useNFStore = defineStore("nf", () => {
         const supabase = useSupabaseClient();
         const { data, error } = await supabase
             .from("nf_lines")
-            .select("*, article:article_id(*)")
+            .select("id, nf_header_id, article_id, article:article_id(id, nom, code)")
             .eq("nf_header_id", headerId);
         if (error) throw error;
         return data;
@@ -53,22 +53,19 @@ export const useNFStore = defineStore("nf", () => {
         if (error) throw error;
     }
 
-    function subscribeToRealtime(onChange: () => void) {
+    function subscribeToRealtime(onChange: () => void): () => void {
         const supabase = useSupabaseClient();
-        let channel: ReturnType<typeof supabase.channel> | null = null;
-        onMounted(() => {
-            channel = supabase
-                .channel("factures_realtime")
-                .on("postgres_changes", {
-                    event: "*",
-                    schema: "public",
-                    table: "factures",
-                }, onChange)
-                .subscribe();
-        });
-        onUnmounted(() => {
-            if (channel) supabase.removeChannel(channel as any);
-        });
+        const channel = supabase
+            .channel("factures_realtime")
+            .on("postgres_changes", {
+                event: "*",
+                schema: "public",
+                table: "factures",
+            }, onChange)
+            .subscribe();
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }
 
     return {

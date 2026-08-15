@@ -1,8 +1,9 @@
 export default defineAppConfig({
     ui: {
         colors: {
-            primary: "green",
-            neutral: "zinc",
+            primary: "blue",
+            secondary: "orange",
+            neutral: "slate",
         },
         dashboardGroup: {
             base: "fixed inset-0 flex overflow-hidden",

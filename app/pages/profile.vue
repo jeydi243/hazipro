@@ -21,7 +21,7 @@ const { data: profil, pending, refresh } = useLazyAsyncData('mon-profil', async 
   if (!authUser.value) return null
   const { data } = await supabase
     .from('profils')
-    .select('*')
+    .select('id, email, nom, prenom, postnom, avatar, user_id, owner_id')
     .eq('user_id', authUser.value.id)
     .single()
   return data
@@ -148,10 +148,10 @@ async function uploadAvatar() {
           <UForm :schema="schema" :state="state" @submit="onSubmit" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <UFormField label="Nom" name="nom" required>
-                <UInput v-model="state.nom" placeholder="Votre nom" />
+                <UInput v-model="state.nom" placeholder="Votre nom" autocomplete="family-name" />
               </UFormField>
               <UFormField label="Prénom" name="prenom" required>
-                <UInput v-model="state.prenom" placeholder="Votre prénom" />
+                <UInput v-model="state.prenom" placeholder="Votre prénom" autocomplete="given-name" />
               </UFormField>
               <UFormField label="Postnom" name="postnom">
                 <UInput v-model="state.postnom" placeholder="Votre postnom" />

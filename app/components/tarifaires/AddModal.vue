@@ -20,8 +20,8 @@ const state = reactive<Partial<Schema>>({
     description: undefined,
     organisation_id: undefined,
 })
-const { data: organisations } = await useAsyncData<Organisation[]>('organisation-tarifaire', async () => {
-    const { data } = await supabase.from('organisations').select('id, nom, lookups!inner(*)').ilike('lookups.code', 'clinique')
+const { data: organisations } = useAsyncData<Organisation[]>('organisation-tarifaire', async () => {
+    const { data } = await supabase.from('organisations').select('id, nom, lookups!inner(id, code)').ilike('lookups.code', 'clinique')
     return (data || []) as unknown as Organisation[]
 })
 
@@ -31,7 +31,6 @@ const items = computed<SelectMenuItem[]>(() => organisations.value?.map(organisa
 })) || [])
 
 function onError(error: FormErrorEvent) {
-    console.log(error)
     if (error?.errors?.[0]) {
     // const element = document.getElementById(error.errors[0].id)
     // element?.focus()

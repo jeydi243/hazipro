@@ -38,16 +38,16 @@ const schema = z.object({
     prix: z.number()
 })
 
-const { data: tarifaires } = await useAsyncData<Tarifaire[]>('add-article-tarifaires', async () => {
+const { data: tarifaires } = useAsyncData<Tarifaire[]>('add-article-tarifaires', async () => {
     const { data } = await supabase.from('tarifaires').select('id, nom, description')
     return data as any as Tarifaire[]
 })
-const { data: organisations } = await useAsyncData<Organisation[]>('organisations', async () => {
-    const { data } = await supabase.from('organisations').select()
+const { data: organisations } = useAsyncData<Organisation[]>('organisations', async () => {
+    const { data } = await supabase.from('organisations').select('id, nom, code')
     return data as any as Organisation[]
 })
-const { data: articles } = await useAsyncData<Article[]>('add-article-articles', async () => {
-    const { data } = await supabase.from('articles').select()
+const { data: articles } = useAsyncData<Article[]>('add-article-articles', async () => {
+    const { data } = await supabase.from('articles').select('id, nom, code')
     return data as any as Article[]
 })
 
@@ -82,8 +82,6 @@ const state = reactive<Partial<Schema>>({
     prix: undefined,
 })
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    console.log(event?.data)
-    console.log(props.tarifaire_id)
     try {
         await tarifairesStore.addLine(event?.data as any)
         toast.add({ title: 'Success', description: `New article added`, color: 'success' })

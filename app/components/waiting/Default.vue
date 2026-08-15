@@ -31,7 +31,7 @@ const items = [[{
                     </UTooltip>
 
                     <UDropdownMenu :items="items">
-                        <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
+                        <UButton icon="i-lucide-plus" size="md" class="rounded-full" aria-label="Ajouter" />
                     </UDropdownMenu>
                 </template>
             </UDashboardNavbar>

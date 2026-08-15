@@ -15,13 +15,13 @@ const openEditModal = ref(false)
 const emit = defineEmits(['article-updated'])
 
 // Fetch affectations (organisations) for the current article
-const { data: affectations, refresh: refreshAffectations, pending: loadingAffectations } = await useAsyncData(
+const { data: affectations, refresh: refreshAffectations, pending: loadingAffectations } = useAsyncData(
     () => `article-affectations-${props.article?.id}`,
     async () => {
         if (!props.article?.id) return []
         const { data, error } = await supabase
             .from('article_organisations')
-            .select('*, organisation:organisations(*)')
+            .select('id, created_at, organisation:organisations(id, nom)')
             .eq('article_id', props.article.id)
 
         if (error) {
@@ -34,7 +34,7 @@ const { data: affectations, refresh: refreshAffectations, pending: loadingAffect
 )
 
 // Fetch organisations for selection (excluding already assigned)
-const { data: organisations, refresh: refreshOrganisations } = await useAsyncData<Organisation[]>(
+const { data: organisations, refresh: refreshOrganisations } = useAsyncData<Organisation[]>(
     () => `organisations-available-${props.article?.id}`,
     async () => {
         if (!props.article?.id) return []
@@ -80,6 +80,7 @@ const columns: TableColumn<any>[] = [
             color: 'error',
             variant: 'ghost',
             icon: 'i-lucide-trash',
+            'aria-label': 'Supprimer',
             size: 'xs',
             onClick: () => deleteAffectation(row.original.id)
         }))
@@ -122,7 +123,7 @@ async function deleteAffectation(id: number) {
             <div v-if="props.article" class="space-y-6">
                 <!-- Détails de l'article -->
                 <div class="relative group">
-                    <UButton icon="i-lucide-pencil" color="neutral" variant="ghost" size="xs"
+                    <UButton icon="i-lucide-pencil" color="neutral" variant="ghost" size="xs" aria-label="Modifier"
                              class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
                              @click="openEditModal = true" />
                     <div
@@ -175,7 +176,7 @@ async function deleteAffectation(id: number) {
                         <div class="flex-1">
                             <UFormField label="Affecter à une organisation" name="organisation">
                                 <USelectMenu v-model="selectedOrgId" value-key="id" :items="orgItems"
-                                             placeholder="Choisir une organisation..." class="w-full" />
+                                             placeholder="Choisir une organisation…" class="w-full" />
                             </UFormField>
                         </div>
                         <UButton label="Ajouter" icon="i-lucide-link" :loading="isAddingRecord"
@@ -184,7 +185,7 @@ async function deleteAffectation(id: number) {
 
                     <!-- Liste des affectations -->
                     <UTable :data="affectations || []" :columns="columns" :loading="loadingAffectations"
-                            class="border border-(--ui-border) rounded-md overflow-hidden border border-(--ui-border) rounded-lg"
+                            class="border border-(--ui-border) rounded-md overflow-hidden"
                             :ui="{
                                 base: 'table-fixed border-separate border-spacing-0',
                                 thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',

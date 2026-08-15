@@ -1,9 +1,10 @@
 @import "tailwindcss" theme(static);
 @import "@nuxt/ui";
+@import "@fontsource-variable/plus-jakarta-sans";
 
 @layer base {
   :root {
-    --ui-bg: #f7f7f7; /* Un blanc cassé/gris très léger pour réduire l'éblouissement */
+    --ui-bg: #F8FAFC; /* slate-50 - fond design system Hazipro */
   }
 
   .dark {
@@ -12,7 +13,7 @@
 }
 
 @theme static {
-  --font-sans: 'Public Sans', sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
 
   --color-green-50: #EFFDF5;
   --color-green-100: #D9FBE8;
@@ -32,4 +33,21 @@
   background-image: url('/assets/img/pattern.jpg');
   background-size: cover;
   background-position: center top;
+}
+
+/* Respect des préférences de mouvement réduit */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -13,13 +13,13 @@ const selectedOrgId = ref<string | undefined>(undefined)
 const isAddingRecord = ref(false)
 
 // Fetch affectations (organisations) for the current article
-const { data: affectations, refresh: refreshAffectations, pending: loadingAffectations } = await useAsyncData(
+const { data: affectations, refresh: refreshAffectations, pending: loadingAffectations } = useAsyncData(
     () => `article-affectations-${props.client?.id}`,
     async () => {
         if (!props.client?.id) return []
         const { data, error } = await supabase
             .from('article_organisations')
-            .select('*, organisation:organisations(*)')
+            .select('id, created_at, organisation:organisations(id, nom)')
             .eq('article_id', props.client.id)
 
         if (error) {
@@ -32,7 +32,7 @@ const { data: affectations, refresh: refreshAffectations, pending: loadingAffect
 )
 
 // Fetch organisations for selection (excluding already assigned)
-const { data: organisations, refresh: refreshOrganisations } = await useAsyncData<Organisation[]>(
+const { data: organisations, refresh: refreshOrganisations } = useAsyncData<Organisation[]>(
     () => `organisations-available-${props.client?.id}`,
     async () => {
         if (!props.client?.id) return []
@@ -78,6 +78,7 @@ const columns: TableColumn<any>[] = [
             color: 'error',
             variant: 'ghost',
             icon: 'i-lucide-trash',
+            'aria-label': 'Supprimer',
             size: 'xs',
             onClick: () => deleteAffectation(row.original.id)
         }))
@@ -155,7 +156,7 @@ async function deleteAffectation(id: number) {
                         <div class="flex-1">
                             <UFormField label="Affecter à une organisation" name="organisation">
                                 <USelectMenu v-model="selectedOrgId" value-key="id" :items="orgItems"
-                                             placeholder="Choisir une organisation..." class="w-full" />
+                                             placeholder="Choisir une organisation…" class="w-full" />
                             </UFormField>
                         </div>
                         <UButton label="Ajouter" icon="i-lucide-link" :loading="isAddingRecord"
@@ -164,7 +165,7 @@ async function deleteAffectation(id: number) {
 
                     <!-- Liste des affectations -->
                     <UTable :data="affectations || []" :columns="columns" :loading="loadingAffectations"
-                            class="border border-(--ui-border) rounded-md overflow-hidden border border-(--ui-border) rounded-lg" :ui="{
+                            class="border border-(--ui-border) rounded-md overflow-hidden" :ui="{
                                 base: 'table-fixed border-separate border-spacing-0',
                                 thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                                 tbody: '[&>tr]:last:[&>td]:border-b-0',

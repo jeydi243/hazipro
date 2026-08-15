@@ -5,7 +5,7 @@
                 <UDashboardNavbar title="Classes">
                     <template #right>
                         <div class="flex flex-wrap items-center justify-between gap-1.5">
-                            <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search" placeholder="Filter classes..." />
+                            <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search" placeholder="Filter classes…" />
                         </div>
                         <ClassesAddModal />
                     </template>
@@ -101,7 +101,7 @@ watch(searchInput, (val) => {
 
 // Data loading
 const { data: classes, refresh: refreshClassesData } = useLazyAsyncData<Classe[]>('lookups-classes', async () => {
-    const { data, error } = await supabase.from('classes').select()
+    const { data, error } = await supabase.from('classes').select('id, nom, code, description, table_name')
     if (error) throw error
     return data as Classe[]
 })
@@ -120,6 +120,7 @@ const columns: TableColumn<Classe>[] = [
                 color: 'neutral',
                 variant: 'ghost',
                 icon: 'i-lucide-edit',
+                'aria-label': 'Modifier',
                 onClick: () => {
                     selectedClasse.value = row.original;
                     openClasseUpdateModal.value = true;
@@ -170,6 +171,7 @@ const columns: TableColumn<Classe>[] = [
                 color: 'neutral',
                 variant: 'solid',
                 icon: 'i-lucide-eye',
+                'aria-label': 'Voir les détails',
                 onClick: () => {
                     selectedClasse.value = row.original;
                     openSlideOver.value = true;
@@ -182,7 +184,7 @@ const columns: TableColumn<Classe>[] = [
         id: 'actions',
         cell: ({ row }) => h('div', { class: 'text-center' },
             h(UDropdownMenu, { content: { align: 'end' }, items: getRowItemsClasse(row) },
-                () => h(UButton, { icon: 'i-lucide-ellipsis-vertical', color: 'neutral', variant: 'ghost', class: 'ml-auto' })
+                () => h(UButton, { icon: 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", color: 'neutral', variant: 'ghost', class: 'ml-auto' })
             )
         )
     }

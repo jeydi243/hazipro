@@ -10,7 +10,7 @@
                     <template #right>
                         <div class="flex flex-wrap items-center justify-between gap-1.5">
                             <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                                placeholder="Rechercher un utilisateur (email)..." />
+                                placeholder="Rechercher un utilisateur (email)…" />
 
                             <div class="flex flex-wrap items-center gap-1.5">
                                 <!-- <CustomersDeleteModal
@@ -60,7 +60,7 @@
                 <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                     v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                         getPaginationRowModel: getPaginationRowModel()
-                    }" class="shrink-0 m-2 bg-white dark:bg-default" :data="Roles || []" :columns="columns"
+                    }" class="shrink-0 m-2 bg-(--ui-bg)" :data="Roles || []" :columns="columns"
                     :loading="pending" :ui="{
                         base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                         thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -140,10 +140,10 @@
                 color: 'primary',
                 variant: 'ghost',
                 icon: 'i-lucide-eye',
+                'aria-label': 'Voir les détails',
                 onClick: () => {
                     selectedRole.value = row.original;
                     openDetailsRole.value = !openDetailsRole.value;
-                    // console.log(row.original, openDetailsRole.value)
                 }
             }),
         },
@@ -201,6 +201,7 @@
                         () =>
                             h(UButton, {
                                 icon: 'i-lucide-ellipsis-vertical',
+                                'aria-label': "Plus d'actions",
                                 color: 'neutral',
                                 variant: 'ghost',
                                 class: 'ml-auto'
@@ -261,7 +262,7 @@
 
 
     const { data: Roles, pending } = useAsyncData('roles', async () => {
-        const { data, error } = await supabase.from('roles').select()
+        const { data, error } = await supabase.from('roles').select('id, code, nom, description, entite')
         if (error) throw error
         return data
     })

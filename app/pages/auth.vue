@@ -34,6 +34,7 @@
             label: 'Espace de travail',
             placeholder: 'Nom de votre organisation',
             required: true,
+            autocomplete: 'organization',
         },
         {
             name: 'email',
@@ -41,6 +42,7 @@
             label: 'Adresse email',
             placeholder: 'vous@exemple.com',
             required: true,
+            autocomplete: 'email',
         },
         {
             name: 'password',
@@ -48,6 +50,7 @@
             type: 'password',
             placeholder: 'Votre mot de passe',
             required: true,
+            autocomplete: 'current-password',
         },
     ]
 

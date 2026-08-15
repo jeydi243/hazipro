@@ -32,7 +32,7 @@ const state = reactive<Partial<Schema>>({
     lookup_id: undefined,
     organisation_parent_id: undefined
 })
-const { data: lookups } = await useLazyAsyncData(`lookups-emplacement-${props.parent?.id}`, async () => {
+const { data: lookups } = useLazyAsyncData(`lookups-emplacement-${props.parent?.id}`, async () => {
     const { data, error } = await supabase.from('lookups').select('id, nom, description').eq('description', 'Emplacement')
     if (error) {
         console.error('Erreur chargement lookups emplacement:', error)
@@ -95,7 +95,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     <UInput v-model="state.nom" class="w-full" placeholder="Nom de l'emplacement" />
                 </UFormField>
                 <UFormField label="Description" name="description">
-                    <UTextarea v-model="state.description" class="w-full" placeholder="Description courte..." />
+                    <UTextarea v-model="state.description" class="w-full" placeholder="Description courte…" />
                 </UFormField>
 
                 <div class="flex justify-end gap-2">

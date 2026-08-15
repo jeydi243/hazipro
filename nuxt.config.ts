@@ -12,8 +12,16 @@ export default defineNuxtConfig({
             "data-vaul-drawer-wrapper": "",
             "class": "bg-(--ui-bg)",
         },
-        // pageTransition: { name: 'page', mode: 'out-in' },
-        // layoutTransition: { name: 'layout', mode: 'out-in' }
+        head: {
+            meta: [
+                { name: "color-scheme", content: "dark light" },
+            ],
+            link: [
+                { rel: "preconnect", href: "https://api.supabase.com" },
+            ],
+        },
+        pageTransition: { name: "page", mode: "out-in" },
+        layoutTransition: { name: "layout", mode: "out-in" },
     },
     runtimeConfig: {
         // Private keys are only available on the server
@@ -32,8 +40,13 @@ export default defineNuxtConfig({
     css: ["~/assets/css/main.css"],
 
     routeRules: {
-        "/api/**": {
-            cors: true,
+        // Pas de CORS ouvert : les appels API sont same-origin.
+        // Pour un futur client cross-origin (ex: mobile), configurer
+        // explicitement les en-têtes Access-Control-Allow-* ici.
+        "/_nuxt/**": {
+            headers: {
+                "Cache-Control": "public, max-age=31536000, immutable",
+            },
         },
         "/**": {
             headers: {

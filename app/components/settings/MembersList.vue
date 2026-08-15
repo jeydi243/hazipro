@@ -7,11 +7,11 @@ defineProps<{
 
 const items = [{
     label: 'Edit member',
-    onSelect: () => console.log('Edit member')
+    onSelect: () => {}
 }, {
     label: 'Remove member',
     color: 'error' as const,
-    onSelect: () => console.log('Remove member')
+    onSelect: () => {}
 }]
 </script>
 

@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import type { Facture } from '~/types'
 
 export const useFacturesStore = defineStore('factures', () => {
+  const supabase = useSupabaseClient()
   const items = ref<Facture[]>([])
   const loading = ref(false)
 
   async function fetchAll(_ownerId?: string | null) {
-    const supabase = useSupabaseClient()
     loading.value = true
-    const { data, error } = await supabase.from('invoices').select('*, client:client_id(*)')
+    const { data, error } = await supabase.from('invoices').select('id, numero, date, owner_id, client_id, client:client_id(id, nom, code)')
     if (error) throw error
     if (data) items.value = data as unknown as Facture[]
     loading.value = false
@@ -16,7 +16,7 @@ export const useFacturesStore = defineStore('factures', () => {
   }
 
   async function create(data: Partial<Facture>) {
-    const { data: created, error } = await supabase.from('invoices').insert(data).select()
+    const { data: created, error } = await supabase.from('invoices').insert(data).select('id, numero, date, owner_id, client_id')
     if (error) throw error
     if (created) items.value.unshift(created[0] as unknown as Facture)
     return created[0]
@@ -31,7 +31,7 @@ export const useFacturesStore = defineStore('factures', () => {
   async function fetchLines(headerId: string) {
     const { data, error } = await supabase
       .from('invoices_lines')
-      .select('*, article:article_id(*)')
+      .select('id, invoice_id, article_id, article:article_id(id, nom, code)')
       .eq('invoice_id', headerId)
     if (error) throw error
     return data
@@ -42,17 +42,14 @@ export const useFacturesStore = defineStore('factures', () => {
     if (error) throw error
   }
 
-  function subscribeToRealtime(onChange: () => void) {
-    let channel: ReturnType<typeof supabase.channel> | null = null
-    onMounted(() => {
-      channel = supabase
-        .channel('factures_realtime')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'factures' }, onChange)
-        .subscribe()
-    })
-    onUnmounted(() => {
-      if (channel) supabase.removeChannel(channel as any)
-    })
+  function subscribeToRealtime(onChange: () => void): () => void {
+    const channel = supabase
+      .channel('factures_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'factures' }, onChange)
+      .subscribe()
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }
 
   return { items, loading, fetchAll, create, remove, fetchLines, removeLine, subscribeToRealtime }

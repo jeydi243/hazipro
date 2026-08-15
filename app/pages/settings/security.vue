@@ -33,6 +33,25 @@ const validate = (state: Partial<PasswordSchema>): FormError[] => {
 const supabase = useSupabaseClient()
 const toast = useToast()
 const registerPasskeyLoading = ref(false)
+const showDeleteAccountModal = ref(false)
+const deleteAccountLoading = ref(false)
+
+async function confirmDeleteAccount() {
+    deleteAccountLoading.value = true
+    try {
+        // Aucun endpoint de suppression côté serveur pour le moment :
+        // on déconnecte l'utilisateur et on l'informe que la suppression
+        // définitive doit être demandée à un administrateur.
+        await supabase.auth.signOut()
+        navigateTo('/auth')
+        toast.add({ title: 'Déconnecté', description: 'Pour supprimer définitivement votre compte, contactez un administrateur.', color: 'info' })
+    } catch (err: any) {
+        toast.add({ title: 'Erreur', description: err.message || 'Échec de la déconnexion.', color: 'error' })
+    } finally {
+        deleteAccountLoading.value = false
+        showDeleteAccountModal.value = false
+    }
+}
 
 async function registerPasskey() {
     registerPasskeyLoading.value = true
@@ -56,11 +75,11 @@ async function registerPasskey() {
         <UPageCard title="Password" description="Confirm your current password before setting a new one." variant="subtle">
             <UForm :schema="passwordSchema" :state="password" :validate="validate" class="flex flex-col gap-4 max-w-xs">
                 <UFormField name="current">
-                    <UInput v-model="password.current" type="password" placeholder="Current password" class="w-full" />
+                    <UInput v-model="password.current" type="password" placeholder="Current password" autocomplete="current-password" class="w-full" />
                 </UFormField>
 
                 <UFormField name="new">
-                    <UInput v-model="password.new" type="password" placeholder="New password" class="w-full" />
+                    <UInput v-model="password.new" type="password" placeholder="New password" autocomplete="new-password" class="w-full" />
                 </UFormField>
 
                 <UButton label="Update" class="w-fit" type="submit" />
@@ -77,8 +96,20 @@ async function registerPasskey() {
                    description="No longer want to use our service? You can delete your account here. This action is not reversible. All information related to this account will be deleted permanently."
                    class="bg-gradient-to-tl from-(--ui-error)/10 from-5% to-(--ui-bg)">
             <template #footer>
-                <UButton label="Delete account" color="error" />
+                <UButton label="Delete account" color="error" @click="showDeleteAccountModal = true" />
             </template>
         </UPageCard>
+
+        <UModal v-model:open="showDeleteAccountModal" title="Supprimer le compte"
+                description="Cette action est irréversible. Toutes les informations liées à ce compte seront définitivement supprimées.">
+            <template #footer>
+                <div class="flex justify-end gap-2">
+                    <UButton label="Annuler" color="neutral" variant="ghost"
+                             :disabled="deleteAccountLoading" @click="showDeleteAccountModal = false" />
+                    <UButton label="Supprimer définitivement" color="error"
+                             :loading="deleteAccountLoading" @click="confirmDeleteAccount" />
+                </div>
+            </template>
+        </UModal>
     </div>
 </template>

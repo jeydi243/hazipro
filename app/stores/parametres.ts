@@ -3,18 +3,18 @@ import { defineStore } from 'pinia'
 export const useParametresStore = defineStore('parametres', () => {
   const owner_id = ref<string | null>(null)
 
+  const lookupsStore = useLookupsStore()
+  const organisationsStore = useOrganisationsStore()
+  const articlesStore = useArticlesStore()
+  const clientsStore = useClientsStore()
+  const facturesStore = useFacturesStore()
+  const profilsStore = useProfilsStore()
+
   function setOwnerID(id: string) {
     owner_id.value = id
   }
 
   async function init() {
-    const lookupsStore = useLookupsStore()
-    const organisationsStore = useOrganisationsStore()
-    const articlesStore = useArticlesStore()
-    const clientsStore = useClientsStore()
-    const facturesStore = useFacturesStore()
-    const profilsStore = useProfilsStore()
-
     const results = await Promise.allSettled([
       lookupsStore.fetchAll(),
       owner_id.value ? organisationsStore.fetchAll(owner_id.value) : Promise.resolve(),
@@ -30,27 +30,27 @@ export const useParametresStore = defineStore('parametres', () => {
     return { error: errors.length > 0 ? errors : null, loading: false }
   }
 
-  const lookups = computed(() => useLookupsStore().lookups)
-  const classes = computed(() => useLookupsStore().classes)
-  const organisations = computed(() => useOrganisationsStore().items)
-  const articles = computed(() => useArticlesStore().items)
-  const clients = computed(() => useClientsStore().items)
-  const invoiceHeaders = computed(() => useFacturesStore().items)
-  const profils = computed(() => useProfilsStore().items)
+  const lookups = computed(() => lookupsStore.lookups)
+  const classes = computed(() => lookupsStore.classes)
+  const organisations = computed(() => organisationsStore.items)
+  const articles = computed(() => articlesStore.items)
+  const clients = computed(() => clientsStore.items)
+  const invoiceHeaders = computed(() => facturesStore.items)
+  const profils = computed(() => profilsStore.items)
 
   const getClasseById = computed(() => (id: string) => classes.value.find(c => c.id === id)?.nom)
   const getLookupsById = computed(() => (id: string) => lookups.value.find(l => l.id == id)?.nom)
 
-  const getTypeFactures = computed(() => useLookupsStore().getTypeFactures.value)
-  const getTypeAvoirs = computed(() => useLookupsStore().getTypeAvoirs.value)
-  const getModePaiement = computed(() => useLookupsStore().getModePaiement.value)
-  const getConditionPaiement = computed(() => useLookupsStore().getConditionPaiement.value)
-  const getDevise = computed(() => useLookupsStore().getDevise.value)
-  const getTypeClient = computed(() => useLookupsStore().getTypeClient.value)
-  const getTypeArticles = computed(() => useLookupsStore().getTypeArticles.value)
-  const getTypeOrganisations = computed(() => useLookupsStore().getTypeOrganisations.value)
-  const getGroupeTaxation = computed(() => useLookupsStore().getGroupeTaxation.value)
-  const getEmplacements = computed(() => useOrganisationsStore().getEmplacements.value)
+  const getTypeFactures = computed(() => lookupsStore.getTypeFactures.value)
+  const getTypeAvoirs = computed(() => lookupsStore.getTypeAvoirs.value)
+  const getModePaiement = computed(() => lookupsStore.getModePaiement.value)
+  const getConditionPaiement = computed(() => lookupsStore.getConditionPaiement.value)
+  const getDevise = computed(() => lookupsStore.getDevise.value)
+  const getTypeClient = computed(() => lookupsStore.getTypeClient.value)
+  const getTypeArticles = computed(() => lookupsStore.getTypeArticles.value)
+  const getTypeOrganisations = computed(() => lookupsStore.getTypeOrganisations.value)
+  const getGroupeTaxation = computed(() => lookupsStore.getGroupeTaxation.value)
+  const getEmplacements = computed(() => organisationsStore.getEmplacements.value)
 
   const getClasseItems = computed(() => classes.value.map(c => ({ label: c.nom, id: c.id })))
 

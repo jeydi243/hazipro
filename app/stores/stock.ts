@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import type { STKHeader, STKLine, STKLineDetail, Stock } from '~/types'
 
 export const useStockStore = defineStore('stock', () => {
+  const supabase = useSupabaseClient()
   const headers = ref<STKHeader[]>([])
   const stockData = ref<Stock[]>([])
   const loading = ref(false)
@@ -10,7 +11,7 @@ export const useStockStore = defineStore('stock', () => {
     loading.value = true
     const { data, error } = await supabase
       .from('stk_trx_headers')
-      .select('*, in_organisation:in_organisation_id(*), out_organisation:out_organisation_id(*), fournisseur:fournisseurs(*)')
+      .select('id, date_trx, numero_commande, numero_livraison, numero_document, statut, type, in_organisation:in_organisation_id(id, nom, code), out_organisation:out_organisation_id(id, nom, code), fournisseur:fournisseurs(id, nom)')
     if (error) throw error
     if (data) headers.value = data as unknown as STKHeader[]
     loading.value = false
@@ -18,14 +19,14 @@ export const useStockStore = defineStore('stock', () => {
   }
 
   async function createHeader(data: Partial<STKHeader>) {
-    const { data: created, error } = await supabase.from('stk_trx_headers').insert(data).select()
+    const { data: created, error } = await supabase.from('stk_trx_headers').insert(data as any).select('id, date_trx, numero_commande, numero_livraison, numero_document, statut, type')
     if (error) throw error
     if (created) headers.value.unshift(created[0] as unknown as STKHeader)
     return created[0]
   }
 
   async function updateHeader(id: string, data: Partial<STKHeader>) {
-    const { data: updated, error } = await supabase.from('stk_trx_headers').update(data).eq('id', id).select()
+    const { data: updated, error } = await supabase.from('stk_trx_headers').update(data as any).eq('id', id).select('id, date_trx, numero_commande, numero_livraison, numero_document, statut, type')
     if (error) throw error
     if (updated) {
       const idx = headers.value.findIndex(h => h.id === id)
@@ -43,14 +44,14 @@ export const useStockStore = defineStore('stock', () => {
   async function fetchLines(headerId: string) {
     const { data, error } = await supabase
       .from('stk_trx_lines')
-      .select('*, article:article_id(*)')
+      .select('id, header_id, article_id, quantite_trx, prix_unitaire, numero_lot, article:article_id(id, nom, code)')
       .eq('header_id', headerId)
     if (error) throw error
     return data as unknown as STKLine[]
   }
 
   async function createLine(data: any) {
-    const { data: created, error } = await supabase.from('stk_trx_lines').insert(data).select()
+    const { data: created, error } = await supabase.from('stk_trx_lines').insert(data).select('id, header_id, article_id, quantite_trx, prix_unitaire, numero_lot')
     if (error) throw error
     return created?.[0]
   }
@@ -61,7 +62,7 @@ export const useStockStore = defineStore('stock', () => {
   }
 
   async function fetchLineDetails(lineId: string) {
-    const { data, error } = await supabase.from('stk_trx_details').select('*').eq('line_id', lineId)
+    const { data, error } = await supabase.from('stk_trx_details').select('id, line_id, numero_serie, date_trx, statut').eq('line_id', lineId)
     if (error) throw error
     return data as unknown as STKLineDetail[]
   }
@@ -78,13 +79,13 @@ export const useStockStore = defineStore('stock', () => {
   }
 
   async function fetchLinesDetails(lineIds: string[]) {
-    const { data, error } = await supabase.from('stk_trx_lines_details').select('*').in('line_id', lineIds)
+    const { data, error } = await supabase.from('stk_trx_lines_details').select('id, line_id').in('line_id', lineIds)
     if (error) throw error
     return data
   }
 
   async function createLinesDetails(data: any[]) {
-    const { data: created, error } = await supabase.from('stk_trx_lines_details').insert(data).select()
+    const { data: created, error } = await supabase.from('stk_trx_lines_details').insert(data as any).select('id, line_id')
     if (error) throw error
     return created
   }
@@ -93,7 +94,7 @@ export const useStockStore = defineStore('stock', () => {
     loading.value = true
     const { data, error } = await supabase
       .from('stk_data')
-      .select('*, article:article_id(*), organisation:organisation_id(*), location:location_id(*)')
+      .select('id, quantite, numero_lot, statut, date_trx, article:article_id(id, nom, code), organisation:organisation_id(id, nom, code), location:location_id(id, nom, code)')
     if (error) throw error
     if (data) stockData.value = data as unknown as Stock[]
     loading.value = false
@@ -101,22 +102,19 @@ export const useStockStore = defineStore('stock', () => {
   }
 
   async function executeStockUpdate(headerId: string) {
-    const { data, error } = await supabase.rpc('stock_update', { p_stk_header_id: headerId })
+    const { data, error } = await supabase.rpc('stock_update', { p_stk_header_id: headerId } as any)
     if (error) throw error
     return data
   }
 
-  function subscribeToRealtime(table: string, onChange: () => void) {
-    let channel: ReturnType<typeof supabase.channel> | null = null
-    onMounted(() => {
-      channel = supabase
-        .channel(`${table}_realtime`)
-        .on('postgres_changes', { event: '*', schema: 'public', table }, onChange)
-        .subscribe()
-    })
-    onUnmounted(() => {
-      if (channel) supabase.removeChannel(channel as any)
-    })
+  function subscribeToRealtime(table: string, onChange: () => void): () => void {
+    const channel = supabase
+      .channel(`${table}_realtime`)
+      .on('postgres_changes', { event: '*', schema: 'public', table }, onChange)
+      .subscribe()
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }
 
   return {

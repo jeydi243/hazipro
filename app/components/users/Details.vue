@@ -4,7 +4,7 @@
         <template #body>
             <!-- Design Information Utilisateur -->
             <div
-                class="p-4 mx-4 mb-4 rounded-lg border border-(--ui-border) bg-(--ui-bg-elevated)/20 flex items-center justify-between transition-all hover:bg-(--ui-bg-elevated)/30">
+                class="p-4 mx-4 mb-4 rounded-lg border border-(--ui-border) bg-(--ui-bg-elevated)/20 flex items-center justify-between transition-colors hover:bg-(--ui-bg-elevated)/30">
                 <div class="flex items-center gap-4">
                     <UAvatar :alt="props.user?.prenom?.[0]" size="xl"
                         class="bg-(--ui-primary)/10 text-(--ui-primary) font-bold ring-2 ring-(--ui-primary)/20" />
@@ -29,7 +29,7 @@
                 <template #affectations>
                     <div class="flex flex-row justify-between">
                         <UButton icon="iconoir:refresh-double" color="primary" variant="ghost"
-                            @click="refreshAffectations" />
+                            aria-label="Actualiser" @click="refreshAffectations" />
                         <UsersAddAffectation :user_id="props.user?.user_id || null"
                             @affectation-added="refreshAffectations" />
                     </div>
@@ -50,7 +50,7 @@
                 </template>
                 <template #roles>
                     <div class="flex flex-row justify-between">
-                        <UButton icon="iconoir:refresh-double" color="primary" variant="ghost" @click="refreshRoles" />
+                        <UButton icon="iconoir:refresh-double" color="primary" variant="ghost" aria-label="Actualiser" @click="refreshRoles" />
                         <UsersAddRole :user="props.user" @role-added="refreshRoles" />
                     </div>
                     <UTable ref="table_roles" v-model:column-visibility="columnVisibility"
@@ -148,7 +148,7 @@ const { data: affectations, refresh: refreshAffectations, status: affectationsSt
     `affectations-${props.user?.id}`,
     async () => {
         if (!props.user?.id) return []
-        const { data, error } = await supabase.from('affectations').select("id, date_debut, date_fin, lookup:lookups!inner(*), organisation:organisations!inner(*)").eq('user_id', props.user?.user_id)
+        const { data, error } = await supabase.from('affectations').select("id, date_debut, date_fin, lookup:lookups!inner(id, nom, code), organisation:organisations!inner(id, nom, code)").eq('user_id', props.user?.user_id)
         if (error) {
             toast.add({
                 title: 'Error',
@@ -157,7 +157,6 @@ const { data: affectations, refresh: refreshAffectations, status: affectationsSt
             })
             throw error
         }
-        console.log(data)
         return data as Affectation[]
     },
     {
@@ -169,7 +168,7 @@ const { data: roles, refresh: refreshRoles, status: rolesStatus } = useAsyncData
     `roles-${props.user?.id}`,
     async () => {
         if (!props.user?.id) return []
-        const { data, error } = await supabase.from('user_roles').select("id, role:roles!inner(*), date_debut, date_fin").eq('user_id', props.user?.user_id)
+        const { data, error } = await supabase.from('user_roles').select("id, role:roles!inner(id, code, nom, description, entite), date_debut, date_fin").eq('user_id', props.user?.user_id)
         if (error) {
             toast.add({
                 title: 'Error',
@@ -178,7 +177,6 @@ const { data: roles, refresh: refreshRoles, status: rolesStatus } = useAsyncData
             })
             throw error
         }
-        console.log(data)
         return data as UserRole[]
     },
     {
@@ -311,6 +309,7 @@ const columnsAffectations: TableColumn<Affectation>[] = [
                     () =>
                         h(UButton, {
                             icon: 'i-lucide-ellipsis-vertical',
+                            'aria-label': "Plus d'actions",
                             color: 'neutral',
                             variant: 'ghost',
                             class: 'ml-auto'
@@ -388,6 +387,7 @@ const columnsRoles: TableColumn<UserRole>[] = [
                     () =>
                         h(UButton, {
                             icon: 'i-lucide-ellipsis-vertical',
+                            'aria-label': "Plus d'actions",
                             color: 'neutral',
                             variant: 'ghost',
                             class: 'ml-auto'

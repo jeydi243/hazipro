@@ -6,7 +6,7 @@
                 <UInput v-model="editState.email" type="email" placeholder="Nouvel email" />
             </UFormField>
             <UFormField label="Téléphone" name="phone">
-                <UInput v-model="editState.phone" type="tel" placeholder="+33..." />
+                <UInput v-model="editState.phone" type="tel" placeholder="+33…" />
             </UFormField>
             <UFormField label="Mot de passe" name="password">
                 <UInput v-model="editState.password" type="password" placeholder="Nouveau mot de passe" />

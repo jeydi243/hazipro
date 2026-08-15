@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import type { Article, ArticleAffectation } from '~/types'
 
 export const useArticlesStore = defineStore('articles', () => {
+  const supabase = useSupabaseClient()
   const items = ref<Article[]>([])
   const loading = ref(false)
 
   async function fetchAll(ownerId?: string | null) {
-    const supabase = useSupabaseClient()
     loading.value = true
-    let query = supabase.from('articles').select('*, lookup:type_article_id(*), unite_conso:unite_conso_id(*), unite_stock:unite_stock_id(*)')
+    let query = supabase.from('articles').select('id, nom, code, description, owner_id, type_article_id, unite_conso_id, unite_stock_id, lookup:type_article_id(id, nom), unite_conso:unite_conso_id(id, nom), unite_stock:unite_stock_id(id, nom)')
     if (ownerId) query = query.eq('owner_id', ownerId)
     const { data, error } = await query
     if (error) throw error
@@ -18,14 +18,14 @@ export const useArticlesStore = defineStore('articles', () => {
   }
 
   async function create(data: Partial<Article>) {
-    const { data: created, error } = await supabase.from('articles').insert(data).select()
+    const { data: created, error } = await supabase.from('articles').insert(data).select('id, nom, code, description, owner_id, type_article_id, unite_conso_id, unite_stock_id')
     if (error) throw error
     if (created) items.value.unshift(created[0] as unknown as Article)
     return created[0]
   }
 
   async function update(id: string, data: Partial<Article>) {
-    const { data: updated, error } = await supabase.from('articles').update(data).eq('id', id).select()
+    const { data: updated, error } = await supabase.from('articles').update(data).eq('id', id).select('id, nom, code, description, owner_id, type_article_id, unite_conso_id, unite_stock_id')
     if (error) throw error
     if (updated) {
       const idx = items.value.findIndex(a => a.id === id)
@@ -43,7 +43,7 @@ export const useArticlesStore = defineStore('articles', () => {
   async function fetchArticleOrgs(articleId: string) {
     const { data, error } = await supabase
       .from('article_organisations')
-      .select('*, organisation:organisations(*)')
+      .select('id, article_id, organisation_id, organisation:organisations(id, nom, code)')
       .eq('article_id', articleId)
     if (error) throw error
     return data as unknown as ArticleAffectation[]

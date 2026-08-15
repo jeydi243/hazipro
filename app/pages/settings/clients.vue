@@ -10,7 +10,7 @@
                     <template #right>
                         <div class="flex flex-wrap items-center justify-between gap-1.5">
                             <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                                    placeholder="Rechercher un article..." />
+                                    placeholder="Rechercher un article…" />
                         </div>
                         <ClientsAddModal @client-added="refreshClients" />
                     </template>
@@ -102,6 +102,7 @@ const columns: TableColumn<Client>[] = [
             color: 'primary',
             variant: 'ghost',
             icon: 'material-symbols:edit-outline-sharp',
+            'aria-label': 'Modifier',
             onClick: () => {
                 selectedClient.value = row.original
                 openDetailsClient.value = !openDetailsClient.value
@@ -178,6 +179,7 @@ const columns: TableColumn<Client>[] = [
                     },
                     () => h(UButton, {
                         icon: 'i-lucide-ellipsis-vertical',
+                        'aria-label': "Plus d'actions",
                         color: 'neutral',
                         variant: 'ghost',
                         class: 'ml-auto'
@@ -244,7 +246,7 @@ function getRowItems(row: Row<Client>) {
 }
 
 const { data: clients, pending, refresh: refreshClients } = useAsyncData('clients', async () => {
-    const { data, error } = await supabase.from('clients').select('*, type:type_id(*)')
+    const { data, error } = await supabase.from('clients').select('id, nom, code, description, nif, owner_id, type_id, type:type_id(id, nom, code)')
     if (error) {
         throw error
     }

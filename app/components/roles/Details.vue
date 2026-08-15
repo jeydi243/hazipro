@@ -52,6 +52,7 @@ const columns: TableColumn<UserRole>[] = [
                 color: 'neutral',
                 variant: 'solid',
                 icon: 'i-lucide-eye',
+                'aria-label': 'Voir les détails',
                 onClick: () => {
 
                 }
@@ -66,6 +67,7 @@ const columns: TableColumn<UserRole>[] = [
                 color: 'neutral',
                 variant: 'soft',
                 icon: 'i-lucide-trash-2',
+                'aria-label': 'Supprimer',
                 onClick: () => {
 
                 }
@@ -86,7 +88,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     const { data, error } = await supabase
         .from('articles')
         .insert(event?.data as any)
-        .select()
+        .select('id')
 
     if (error) {
         toast.add({ title: 'Error', description: `Can't add new role ${error.message}`, color: 'error' })
@@ -139,7 +141,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     <div class="flex-1">
                         <UFormField name="organisation">
                             <USelectMenu v-model="selectedUserID" value-key="id" :items="userItems"
-                                placeholder="Choisir un utilisateur..." class="w-full" />
+                                placeholder="Choisir un utilisateur…" class="w-full" />
                         </UFormField>
                     </div>
                     <UButton label="Ajouter" icon="i-lucide-link" :disabled="!selectedUserID" type="submit" />

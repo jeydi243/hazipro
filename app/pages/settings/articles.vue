@@ -10,7 +10,7 @@
                     <template #right>
                         <div class="flex flex-wrap items-center justify-between gap-1.5">
                             <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                                placeholder="Rechercher un article..." />
+                                placeholder="Rechercher un article…" />
                         </div>
                         <ArticlesAddModal @article-added="refreshArticles" />
                     </template>
@@ -145,6 +145,7 @@ const columns: TableColumn<Article>[] = [
             color: 'primary',
             variant: 'ghost',
             icon: 'i-lucide-eye',
+            'aria-label': 'Voir les détails',
             onClick: () => {
                 selectedArticle.value = row.original
                 openDetailsArticle.value = !openDetailsArticle.value
@@ -197,6 +198,7 @@ const columns: TableColumn<Article>[] = [
                     ui: { content: 'min-w-40' }
                 }, () => h(UButton, {
                     icon: 'i-lucide-filter',
+                    'aria-label': 'Filtrer',
                     variant: 'ghost',
                     color: isFiltered ? 'primary' : 'neutral',
                     size: 'xs',
@@ -256,6 +258,7 @@ const columns: TableColumn<Article>[] = [
                     },
                     () => h(UButton, {
                         icon: 'i-lucide-ellipsis-vertical',
+                        'aria-label': "Plus d'actions",
                         color: 'neutral',
                         variant: 'ghost',
                         class: 'ml-auto'
@@ -330,11 +333,10 @@ function getRowItems(row: Row<Article>) {
 }
 
 const { data: Articles, pending, refresh: refreshArticles } = useLazyAsyncData('articles', async () => {
-    const { data, error } = await supabase.from('articles').select('*, lookup:type_article_id(*), unite_conso:unite_conso_id(*), unite_stock:unite_stock_id(*)')
+    const { data, error } = await supabase.from('articles').select('id, nom, code, description, owner_id, type_article_id, unite_conso_id, unite_stock_id, lookup:type_article_id(id, nom), unite_conso:unite_conso_id(id, nom), unite_stock:unite_stock_id(id, nom)')
     if (error) {
         throw error
     }
-    console.log('Data', data);
     return data
 })
 </script>

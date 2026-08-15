@@ -31,7 +31,7 @@ const state = reactive<Partial<Schema>>({
     lookup_id: undefined,
     organisation_parent_id: undefined
 })
-const { data: lookups } = await useAsyncData(`lookups-emplacement-${props.parent?.id}`, async () => {
+const { data: lookups } = useAsyncData(`lookups-emplacement-${props.parent?.id}`, async () => {
     const { data } = await supabase.from('lookups').select('id, nom, description').eq('description', 'Emplacement')
     return data
 })
@@ -48,7 +48,6 @@ const itemsMagasin = computed<SelectMenuItem[]>(() => getAffectationsMagasin.map
 })) || [])
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    console.log(props.parent)
     if (!props.parent) return
     const { error } = await supabase.from('organisations')
         .insert({
@@ -95,7 +94,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     <UInput v-model="state.nom" class="w-full" placeholder="Nom de l'emplacement" />
                 </UFormField>
                 <UFormField label="Description" name="description">
-                    <UTextarea v-model="state.description" class="w-full" placeholder="Description courte..." />
+                    <UTextarea v-model="state.description" class="w-full" placeholder="Description courte…" />
                 </UFormField>
 
                 <div class="flex justify-end gap-2">

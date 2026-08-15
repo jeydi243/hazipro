@@ -90,7 +90,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     <UInput v-model="state.nom" class="w-full" placeholder="Nom du service" />
                 </UFormField>
                 <UFormField label="Description" name="description">
-                    <UTextarea v-model="state.description" class="w-full" placeholder="Description courte..." />
+                    <UTextarea v-model="state.description" class="w-full" placeholder="Description courte…" />
                 </UFormField>
         
                 <div class="flex justify-end gap-2">
