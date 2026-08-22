@@ -1,4 +1,7 @@
 <script setup lang="ts">
+
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 import type { SelectMenuItem, TableColumn } from '@nuxt/ui'
 import type { Article, Organisation, ArticleAffectation } from '~/types'
 
@@ -184,7 +187,7 @@ async function deleteAffectation(id: number) {
                     </div>
 
                     <!-- Liste des affectations -->
-                    <UTable :data="affectations || []" :columns="columns" :loading="loadingAffectations"
+                    <UTable :data="affectations ?? EMPTY_ROWS" :columns="columns" :loading="loadingAffectations"
                             class="border border-(--ui-border) rounded-md overflow-hidden"
                             :ui="{
                                 base: 'table-fixed border-separate border-spacing-0',

@@ -30,12 +30,24 @@ export function useAuth() {
 
     if (!data.user) return null;
 
-    // 2. Verify tenant membership AFTER authentication
-    const { data: profil } = await supabase
+    // 2. Navigation immédiate — la vérification tenant se fait en arrière-plan
+    //    pour ne pas retarder l'affichage de la page d'accueil
+    toast.add({
+      title: "Connexion réussie",
+      description: `Bienvenue ${data.user.email || ""} !`,
+      color: "success",
+    });
+    await navigateTo("/");
+
+    // 3. Verify tenant membership AFTER authentication (non bloquant)
+    // Cast : les types générés supabase-database.d.ts sont périmés pour la table profils
+    const { data: profil } = (await supabase
       .from("profils")
-      .select("owner_id")
-      .eq("user_id", data.user.id)
-      .single();
+      .select("owner_id, owner:owner_id(nom)")
+      .eq("id", data.user.id)
+      .single()) as unknown as {
+      data: { owner_id: string | null; owner: { nom: string } | null } | null;
+    };
 
     if (!profil?.owner_id) {
       // User authenticated but has no tenant — sign out
@@ -45,36 +57,25 @@ export function useAuth() {
         description: "Votre compte n'est associé à aucune organisation. Contactez un administrateur.",
         color: "error",
       });
+      await navigateTo("/auth");
       return null;
     }
 
-    // 3. Verify the tenant name matches (if provided)
-    if (tenant) {
-      const { data: owner } = await supabase
-        .from("organisations")
-        .select("id")
-        .eq("id", profil.owner_id)
-        .eq("nom", tenant)
-        .single();
-
-      if (!owner) {
-        await supabase.auth.signOut();
-        toast.add({
-          title: "Erreur de connexion",
-          description: `L'espace de travail "${tenant}" est introuvable.`,
-          color: "error",
-        });
-        return null;
-      }
+    // 4. Verify the tenant name matches (if provided)
+    if (tenant && profil.owner && profil.owner.nom !== tenant) {
+      await supabase.auth.signOut();
+      toast.add({
+        title: "Erreur de connexion",
+        description: `L'espace de travail "${tenant}" est introuvable.`,
+        color: "error",
+      });
+      await navigateTo("/auth");
+      return null;
     }
 
     parametresStore.setOwnerID(profil.owner_id);
-    await navigateTo("/");
-    toast.add({
-      title: "Connexion réussie",
-      description: `Bienvenue ${data.user.email || ""} !`,
-      color: "success",
-    });
+    // Charge les données du tenant en arrière-plan (ne bloque pas le rendu)
+    void parametresStore.init();
 
     return data.user;
   }
@@ -92,12 +93,23 @@ export function useAuth() {
     }
 
     if (data?.user) {
+      // Navigation immédiate, vérification en arrière-plan
+      toast.add({
+        title: "Connexion réussie",
+        description: "Bienvenue via Passkey !",
+        color: "success",
+      });
+      await navigateTo("/");
+
       // Verify user has a profil/tenant
-      const { data: profil } = await supabase
+      // Cast : types générés périmés pour la table profils
+      const { data: profil } = (await supabase
         .from("profils")
         .select("owner_id")
-        .eq("user_id", data.user.id)
-        .single();
+        .eq("id", data.user.id)
+        .single()) as unknown as {
+        data: { owner_id: string | null } | null;
+      };
 
       if (!profil?.owner_id) {
         await supabase.auth.signOut();
@@ -106,16 +118,12 @@ export function useAuth() {
           description: "Votre compte n'est associé à aucune organisation.",
           color: "error",
         });
+        await navigateTo("/auth");
         return null;
       }
 
       parametresStore.setOwnerID(profil.owner_id);
-      await navigateTo("/");
-      toast.add({
-        title: "Connexion réussie",
-        description: "Bienvenue via Passkey !",
-        color: "success",
-      });
+      void parametresStore.init();
     }
 
     return data?.user ?? null;

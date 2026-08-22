@@ -15,7 +15,7 @@
         },
         {
             label: 'Note de frais',
-            icon: 'i-lucide-file-text',
+            icon: 'duo-icons:id-card',
             to: '/nf',
             onSelect: () => {
                 open.value = false
@@ -40,7 +40,7 @@
         {
             label: 'Workflow & Task',
             to: '/workflow',
-            icon: 'i-lucide-settings',
+            icon: 'hugeicons:workflow-circle-05',
             defaultOpen: true,
             children: [{
                 label: 'Workflow & Task',
@@ -172,7 +172,7 @@
     <UDashboardGroup as="div">
         <UDashboardSearch :groups="groups" />
 
-        <UDashboardSidebar v-model:open="open" :min-size="20" mode="modal" collapsible resizable
+        <UDashboardSidebar v-model:open="open" :default-size="15" :min-size="15" mode="modal" collapsible resizable
             class="bg-(--ui-bg-elevated)/25" :ui="{ footer: 'lg:border-t lg:border-(--ui-border)' }">
             <template #header="{ collapsed }">
                 <TeamsMenu :collapsed="collapsed" />

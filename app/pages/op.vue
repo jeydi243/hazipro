@@ -15,7 +15,7 @@
         <template #body>
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination"
-                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="nfs || []" :columns="columns" :ui="{
+                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="nfs ?? EMPTY_ROWS" :columns="columns" :ui="{
                     base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -53,6 +53,9 @@
 </template>
 
 <script setup lang="ts">
+
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
     import type { TableColumn } from '@nuxt/ui'
     import type { Row } from '@tanstack/table-core'
     import type { NF } from '~/types/organisation'

@@ -39,7 +39,7 @@
                             getPaginationRowModel: getPaginationRowModel()
                         }"
                         class="shrink-0 m-2 bg-white dark:bg-(--ui-bg) bg-white dark:bg-(--ui-bg) bg-white dark:bg-(--ui-bg) bg-white dark:bg-(--ui-bg)"
-                        :data="affectations || []" :columns="columnsAffectations"
+                        :data="affectations ?? EMPTY_ROWS" :columns="columnsAffectations"
                         :loading="affectationsStatus === 'pending'" :ui="{
                             base: 'table-fixed border-separate border-spacing-0',
                             thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -57,7 +57,7 @@
                         v-model:row-selection="rowSelection" v-model:pagination="pagination" empty="Aucun rôle ajouté"
                         :pagination-options="{
                             getPaginationRowModel: getPaginationRowModel()
-                        }" class="shrink-0 m-2" :data="roles || []" :columns="columnsRoles"
+                        }" class="shrink-0 m-2" :data="roles ?? EMPTY_ROWS" :columns="columnsRoles"
                         :loading="rolesStatus === 'pending'" :ui="{
                             base: 'table-fixed border-separate border-spacing-0',
                             thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -109,6 +109,9 @@
     </USlideover>
 </template>
 <script setup lang="ts">
+
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 import type { PropType } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'

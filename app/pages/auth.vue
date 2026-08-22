@@ -12,7 +12,16 @@
 
         <!-- Form -->
         <UAuthForm :schema="schema" :fields="fields" :providers="providers" icon="i-lucide-user" :validate-on="[]"
-            @submit="onSubmit" />
+            :loading="loading" @submit="onSubmit">
+            <template #submit="{ loading: isSubmitting }">
+                <UButton type="submit" block :disabled="isSubmitting" color="primary">
+                    <span v-if="isSubmitting" class="flex items-center justify-center gap-2">
+                        <span class="loader loader--sm" aria-hidden="true"></span>
+                    </span>
+                    <span v-else>Continue</span>
+                </UButton>
+            </template>
+        </UAuthForm>
     </div>
 </template>
 
@@ -77,7 +86,14 @@
 
     const toast = useToast()
 
+    const loading = ref(false)
+
     async function onSubmit(event: FormSubmitEvent<Schema>) {
-        await auth.login(event.data.tenant, event.data.email, event.data.password)
+        loading.value = true
+        try {
+            await auth.login(event.data.tenant, event.data.email, event.data.password)
+        } finally {
+            loading.value = false
+        }
     }
 </script>

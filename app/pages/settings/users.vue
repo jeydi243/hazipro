@@ -60,7 +60,7 @@
                 <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                     v-model:row-selection="rowSelection" v-model:pagination="pagination" :pagination-options="{
                         getPaginationRowModel: getPaginationRowModel()
-                    }" class="shrink-0 m-2 bg-(--ui-bg)" :data="Users || []" :columns="columns" :loading="pending" :ui="{
+                    }" class="shrink-0 m-2 bg-(--ui-bg)" :data="Users ?? EMPTY_ROWS" :columns="columns" :loading="pending" :ui="{
                         base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                         thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                         tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -88,6 +88,9 @@
     </div>
 </template>
 <script setup lang="ts">
+
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
 import * as z from 'zod'

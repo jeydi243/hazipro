@@ -1,4 +1,7 @@
 <script setup lang="ts">
+
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 import * as z from 'zod'
 import type { FormSubmitEvent, SelectMenuItem, TableColumn } from '@nuxt/ui'
 import type { Lookup, Profil, Role, UserRole } from '~/types'
@@ -150,7 +153,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
 
             <!-- Liste des affectations -->
-            <UTable :data="usersRoles || []" :columns="columns"
+            <UTable :data="usersRoles ?? EMPTY_ROWS" :columns="columns"
                 class="border border-(--ui-border) rounded-md overflow-hidden" :ui="{
                     base: 'table-fixed border-separate border-spacing-0',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',

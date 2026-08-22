@@ -34,7 +34,7 @@
         <template #body>
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination"
-                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="organisations || []"
+                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="organisations ?? emptyRows"
                 :columns="columns" :loading="pending" :ui="{
                     base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -74,6 +74,9 @@ useHead({
 })
 
 const supabase = useSupabaseClient()
+// Tableau vide STABLE : évite une nouvelle identité [] à chaque render
+// (boucle infinie du watch data de UTable pendant le chargement)
+const emptyRows: Organisation[] = []
 const toast = useToast()
 const parametresStore = useParametresStore()
 const { lookups } = storeToRefs(parametresStore)

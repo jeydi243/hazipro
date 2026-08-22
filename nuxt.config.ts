@@ -17,7 +17,7 @@ export default defineNuxtConfig({
                 { name: "color-scheme", content: "dark light" },
             ],
             link: [
-                { rel: "preconnect", href: "https://api.supabase.com" },
+                { rel: "preconnect", href: process.env.SUPABASE_URL || "https://zcskhtwiihvtaaeuogwq.supabase.co" },
             ],
         },
         // pageTransition: { name: "page", mode: "out-in" },

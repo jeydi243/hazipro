@@ -1,4 +1,7 @@
 <script setup lang="ts">
+
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 const open = defineModel<boolean>('open', { default: false })
 import type { TableColumn } from '@nuxt/ui'
 import type { Organisation } from '~/types'
@@ -171,7 +174,7 @@ const tokenColumns: TableColumn<any>[] = [
                                 <div class="flex justify-end">
                                     <PointFacturationAttachUserModal :parent="props.organisation" @user-added="refresh" />
                                 </div>
-                                <UTable :data="services || []" :columns="columns" :loading="pending"
+                                <UTable :data="services ?? EMPTY_ROWS" :columns="columns" :loading="pending"
                                         class="border border-(--ui-border) rounded-md overflow-hidden flex-1" :ui="{
                                             base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                                             thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -193,7 +196,7 @@ const tokenColumns: TableColumn<any>[] = [
                                 <div class="flex justify-end">
                                     <OrganisationsAddEmplacementModal :parent="props.organisation" @emplacement-added="refresh" />
                                 </div>
-                                <UTable :data="emplacements || []" :columns="columns" :loading="pending"
+                                <UTable :data="emplacements ?? EMPTY_ROWS" :columns="columns" :loading="pending"
                                         class="border border-(--ui-border) rounded-md overflow-hidden flex-1" :ui="{
                                             base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                                             thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -216,7 +219,7 @@ const tokenColumns: TableColumn<any>[] = [
                                 <div class="flex justify-end">
                                     <PointFacturationAddTokenModal v-if="props.organisation" :organisation="props.organisation" @token-added="refreshTokens" />
                                 </div>
-                                <UTable :data="tokens || []" :columns="tokenColumns" :loading="pendingTokens"
+                                <UTable :data="tokens ?? EMPTY_ROWS" :columns="tokenColumns" :loading="pendingTokens"
                                         class="border border-(--ui-border) rounded-md overflow-hidden flex-1" :ui="{
                                             base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                                             thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
