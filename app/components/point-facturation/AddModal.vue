@@ -7,8 +7,7 @@ const schema = z.object({
     nom: z.string().min(3, 'Too short'),
     description: z.string(),
     code: z.string(),
-    type_id: z.string(),
-    nid: z.string().optional(),
+    type_id: z.string()
 })
 const open = ref(false)
 const toast = useToast()
@@ -16,14 +15,14 @@ type Schema = z.output<typeof schema>
 const supabase = useSupabaseClient()
 const organisationsStore = useOrganisationsStore()
 const parametresStore = useParametresStore()
+const lookupsStore = useLookupsStore()
 const state = reactive<Partial<Schema>>({
     nom: undefined,
     description: undefined,
     code: undefined,
-    type_id: undefined,
-    nid: undefined
+    type_id: undefined
 })
-const getTypeOrganisations = computed(() => parametresStore.getTypeOrganisations)
+const getTypeOrganisations = computed(() => lookupsStore.getTypeOrganisations)
 const itemsOrganisation = computed<SelectMenuItem[]>(() => getTypeOrganisations.value?.map((org: any) => ({
     label: org.nom,
     id: org.id
@@ -37,8 +36,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             nom: event.data.nom,
             description: event.data.description,
             code: event.data.code,
-            type_id: event.data.type_id,
-            nid: event.data.nid
+            type_id: event.data.type_id
         } as any)
         toast.add({ title: 'Success', description: `New point-facturation ${event.data.nom} added`, color: 'success' })
         emit('point-facturation-added')

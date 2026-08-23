@@ -39,7 +39,7 @@ const { data: services, pending, refresh } = useAsyncData<Organisation[]>(
         if (!props.organisation?.id) return []
         const { data, error } = await supabase
             .from('organisations')
-            .select('id, nom, code, description, nid, status, owner_id, organisation_parent_id')
+            .select('id, nom, code, description, status, owner_id, organisation_parent_id')
             .eq('organisation_parent_id', props.organisation.id)
         if (error) {
             toast.add({ title: 'Erreur', description: error.message, color: 'error' })
@@ -55,7 +55,7 @@ const { data: emplacements, pending: pendingEmplacements, refresh: refreshEmplac
         if (!props.organisation?.id) return []
         const { data, error } = await supabase
             .from('organisations')
-            .select('id, nom, code, description, nid, status, owner_id, organisation_parent_id, lookup:lookup_id!inner(id, nom, code, description)')
+            .select('id, nom, code, description, status, owner_id, organisation_parent_id, type:type_organisation_id!inner(id, nom, code, description)')
             .eq('organisation_parent_id', props.organisation.id)
             .eq('lookup.description', 'Emplacement')
         if (error) {

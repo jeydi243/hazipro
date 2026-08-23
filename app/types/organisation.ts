@@ -37,8 +37,8 @@ export interface Organisation {
     code?: string
     type?: Lookup
     status?: string
-    nid?: string
     prefixe?: string
+    type_organisation_id: Lookup | string
     organisation_parent?: Organisation
     organisation_parent_id?: string
 }

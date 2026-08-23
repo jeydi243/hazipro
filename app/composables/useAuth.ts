@@ -46,15 +46,16 @@ export function useAuth() {
       .select("owner_id, owner:owner_id(nom)")
       .eq("id", data.user.id)
       .single()) as unknown as {
-      data: { owner_id: string | null; owner: { nom: string } | null } | null;
-    };
+        data: { owner_id: string | null; owner: { nom: string } | null } | null;
+      };
 
     if (!profil?.owner_id) {
       // User authenticated but has no tenant — sign out
       await supabase.auth.signOut();
       toast.add({
         title: "Erreur de connexion",
-        description: "Votre compte n'est associé à aucune organisation. Contactez un administrateur.",
+        description:
+          "Votre compte n'est associé à aucune organisation. Contactez un administrateur.",
         color: "error",
       });
       await navigateTo("/auth");
@@ -108,8 +109,8 @@ export function useAuth() {
         .select("owner_id")
         .eq("id", data.user.id)
         .single()) as unknown as {
-        data: { owner_id: string | null } | null;
-      };
+          data: { owner_id: string | null } | null;
+        };
 
       if (!profil?.owner_id) {
         await supabase.auth.signOut();

@@ -94,6 +94,8 @@ const EMPTY_ROWS: any[] = []
     const selectedNf = ref<NF | null>(null)
     const searchInput = ref('')
 
+    
+
     const debouncedSearch = useDebounceFn((val: string) => {
         tableNfs.value?.tableApi?.getColumn('nom')?.setFilterValue(val)
     }, 300)

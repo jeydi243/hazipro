@@ -24,7 +24,7 @@ const { data: lookups } = useAsyncData('org-lookups', async () => {
     if (error) throw error
     return data
 })
-const typeOrganisation: Lookup[] = useParametresStore().getTypeOrganisations
+const typeOrganisation: Lookup[] = useLookupsStore().getTypeOrganisations
 const items = computed<SelectMenuItem[]>(() => typeOrganisation?.map((lookup: Lookup) => ({
     label: lookup.nom,
     id: lookup.id

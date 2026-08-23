@@ -48,11 +48,11 @@ export const useParametresStore = defineStore("parametres", () => {
 
   const lookups = computed(() => lookupsStore.lookups);
   const classes = computed(() => lookupsStore.classes);
-  const organisations = computed(() => organisationsStore.items);
-  const articles = computed(() => articlesStore.items);
-  const clients = computed(() => clientsStore.items);
-  const invoiceHeaders = computed(() => facturesStore.items);
   const profils = computed(() => profilsStore.items);
+  const clients = computed(() => clientsStore.items);
+  const articles = computed(() => articlesStore.items);
+  const invoiceHeaders = computed(() => facturesStore.items);
+  const organisations = computed(() => organisationsStore.items);
 
   const getClasseById = computed(() => (id: string) =>
     classes.value.find((c) => c.id === id)?.nom
