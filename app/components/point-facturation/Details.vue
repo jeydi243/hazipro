@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
+import type { Organisation } from '~/types'
 
 // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
 const EMPTY_ROWS: any[] = []
 const open = defineModel<boolean>('open', { default: false })
-import type { TableColumn } from '@nuxt/ui'
-import type { Organisation } from '~/types'
 
 const props = defineProps<{
     organisation: Organisation | null
@@ -13,7 +13,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:open', 'select-organisation'])
 
 const isOpen = computed({
-    get: () => props.open,
+    get: () => open.value,
     set: (value) => emit('update:open', value)
 })
 
@@ -99,12 +99,12 @@ const columns: TableColumn<Organisation>[] = [
         id: 'actions',
         header: '',
         cell: ({ row }) => h('div', { class: 'flex justify-end' }, h(UButton, {
-            color: 'neutral',
-            variant: 'ghost',
-            icon: 'i-lucide-arrow-right',
+            'color': 'neutral',
+            'variant': 'ghost',
+            'icon': 'i-lucide-arrow-right',
             'aria-label': 'Aller à',
-            size: 'xs',
-            onClick: () => {
+            'size': 'xs',
+            'onClick': () => {
                 // If the user wants to navigate to this organization's details
                 // This would require more logic, but for now we could emit something or update props
                 emit('select-organisation', row.original)
@@ -143,12 +143,12 @@ const tokenColumns: TableColumn<any>[] = [
         <template #content>
             <div class="p-4 flex flex-col h-full gap-4">
                 <div>
-                    <p v-if="props.organisation" class="text-xl font-semibold text-(--ui-text-highlighted)">
+                    <p v-if="props.organisation" class="text-xl font-semibold text-highlighted">
                         {{
                             props.organisation.nom }}
                     </p>
-                    <p class="text-sm text-(--ui-text-muted) flex items-center gap-2 mt-1">
-                        <span class="font-mono bg-(--ui-bg-elevated) px-1.5 py-0.5 rounded">{{ props.organisation?.code
+                    <p class="text-sm text-muted flex items-center gap-2 mt-1">
+                        <span class="font-mono bg-elevated px-1.5 py-0.5 rounded">{{ props.organisation?.code
                             || 'N/A' }}</span>
                         <UBadge v-if="props.organisation?.status" :label="props.organisation.status" variant="subtle"
                                 class="capitalize" />
@@ -160,8 +160,8 @@ const tokenColumns: TableColumn<any>[] = [
                         <template #infos>
                             <div class="space-y-4 pt-4">
                                 <div>
-                                    <p class="text-sm font-medium text-(--ui-text-muted) mb-1">Description</p>
-                                    <p class="text-sm text-(--ui-text-highlighted)">
+                                    <p class="text-sm font-medium text-muted mb-1">Description</p>
+                                    <p class="text-sm text-highlighted">
                                         {{ props.organisation.description ||
                                             'Aucune description.' }}
                                     </p>
@@ -175,7 +175,7 @@ const tokenColumns: TableColumn<any>[] = [
                                     <PointFacturationAttachUserModal :parent="props.organisation" @user-added="refresh" />
                                 </div>
                                 <UTable :data="services ?? EMPTY_ROWS" :columns="columns" :loading="pending"
-                                        class="border border-(--ui-border) rounded-md overflow-hidden flex-1" :ui="{
+                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="{
                                             base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                                             thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                                             tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -184,7 +184,7 @@ const tokenColumns: TableColumn<any>[] = [
                                         }">
                                     <template #empty-state>
                                         <div
-                                            class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
+                                            class="flex flex-col items-center justify-center py-6 text-muted text-sm">
                                             <p>Aucun service trouvé pour cette organisation.</p>
                                         </div>
                                     </template>
@@ -197,7 +197,7 @@ const tokenColumns: TableColumn<any>[] = [
                                     <OrganisationsAddEmplacementModal :parent="props.organisation" @emplacement-added="refresh" />
                                 </div>
                                 <UTable :data="emplacements ?? EMPTY_ROWS" :columns="columns" :loading="pending"
-                                        class="border border-(--ui-border) rounded-md overflow-hidden flex-1" :ui="{
+                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="{
                                             base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                                             thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                                             tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -206,7 +206,7 @@ const tokenColumns: TableColumn<any>[] = [
                                         }">
                                     <template #empty-state>
                                         <div
-                                            class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
+                                            class="flex flex-col items-center justify-center py-6 text-muted text-sm">
                                             <p>Aucun emplacement trouvé pour cette organisation.</p>
                                         </div>
                                     </template>
@@ -220,7 +220,7 @@ const tokenColumns: TableColumn<any>[] = [
                                     <PointFacturationAddTokenModal v-if="props.organisation" :organisation="props.organisation" @token-added="refreshTokens" />
                                 </div>
                                 <UTable :data="tokens ?? EMPTY_ROWS" :columns="tokenColumns" :loading="pendingTokens"
-                                        class="border border-(--ui-border) rounded-md overflow-hidden flex-1" :ui="{
+                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="{
                                             base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
                                             thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                                             tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -229,7 +229,7 @@ const tokenColumns: TableColumn<any>[] = [
                                         }">
                                     <template #empty-state>
                                         <div
-                                            class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
+                                            class="flex flex-col items-center justify-center py-6 text-muted text-sm">
                                             <p>Aucun token trouvé pour cette organisation.</p>
                                         </div>
                                     </template>

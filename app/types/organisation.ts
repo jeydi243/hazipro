@@ -26,8 +26,17 @@ export interface Lookup {
     id: string
     nom: string
     classe: Classe
+    classe_id: string
     code: string
     description: string
+}
+export interface Matrice {
+    id: string
+    nom: string
+    classe: Classe
+    code: string
+    description: string
+    type_document_id: string
 }
 
 export interface Organisation {

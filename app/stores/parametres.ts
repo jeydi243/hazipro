@@ -1,7 +1,10 @@
 import { defineStore } from "pinia";
+import type { Matrice } from "~/types/organisation";
 
 export const useParametresStore = defineStore("parametres", () => {
   const owner_id = ref<string | null>(null);
+  const supabase = useSupabaseClient();
+  const items = ref<Matrice[]>([]);
 
   const lookupsStore = useLookupsStore();
   const clientsStore = useClientsStore();
@@ -53,7 +56,15 @@ export const useParametresStore = defineStore("parametres", () => {
   const articles = computed(() => articlesStore.items);
   const invoiceHeaders = computed(() => facturesStore.items);
   const organisations = computed(() => organisationsStore.items);
-
+  async function createMatrice(data: Partial<Matrice>) {
+    const { data: created, error } = await supabase.from("matrices")
+      .insert(data as never).select(
+        "id, nom, code, description, status, owner_id, organisation_parent_id",
+      );
+    if (error) throw error;
+    if (created) items.value.unshift(created[0] as unknown as Organisation);
+    return created[0];
+  }
   const getClasseById = computed(() => (id: string) =>
     classes.value.find((c) => c.id === id)?.nom
   );
@@ -75,7 +86,7 @@ export const useParametresStore = defineStore("parametres", () => {
     invoiceHeaders,
     profils,
     init,
-    setOwnerID,
+    setOwnerID,createMatrice,
     getClasseById,
     getLookupsById,
     getClasseItems,

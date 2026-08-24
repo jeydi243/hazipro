@@ -10,7 +10,9 @@ export const useLookupsStore = defineStore("lookups", () => {
     const supabase = useSupabaseClient();
     loading.value = true;
     const [lookupsRes, classesRes] = await Promise.allSettled([
-      supabase.from("lookups").select("id, nom, code, description, classe_id, classe:classe_id(id, code, nom, description, table_name)"),
+      supabase.from("lookups").select(
+        "id, nom, code, description, classe_id, classe:classe_id(id, code, nom, description, table_name)",
+      ),
       supabase.from("classes").select("id, nom, code, description, table_name"),
     ]);
 
@@ -27,7 +29,9 @@ export const useLookupsStore = defineStore("lookups", () => {
     const supabase = useSupabaseClient();
     const { data, error } = await supabase
       .from("lookups")
-      .select("id, nom, code, description, classe_id, classe:classe_id(id, code, nom, description, table_name)")
+      .select(
+        "id, nom, code, description, classe_id, classe:classe_id(id, code, nom, description, table_name)",
+      )
       .eq("classe_id", classId);
     if (error) throw error;
     return data as unknown as Lookup[];
@@ -35,7 +39,9 @@ export const useLookupsStore = defineStore("lookups", () => {
 
   async function createLookup(data: Partial<Lookup>) {
     const supabase = useSupabaseClient();
-    const { data: created, error } = await supabase.from("lookups").insert(data)
+    const { data: created, error } = await supabase.from("lookups").insert(
+      [data] as never,
+    )
       .select("id, nom, code, description, classe_id");
     if (error) throw error;
     if (created) lookups.value.push(created[0] as unknown as Lookup);
@@ -44,7 +50,9 @@ export const useLookupsStore = defineStore("lookups", () => {
 
   async function updateLookup(id: string, data: Partial<Lookup>) {
     const supabase = useSupabaseClient();
-    const { data: updated, error } = await supabase.from("lookups").update(data)
+    const { data: updated, error } = await supabase.from("lookups").update(
+      data as never,
+    )
       .eq("id", id).select("id, nom, code, description, classe_id");
     if (error) throw error;
     if (updated) {
@@ -63,7 +71,9 @@ export const useLookupsStore = defineStore("lookups", () => {
 
   async function createClasse(data: Partial<Classe>) {
     const supabase = useSupabaseClient();
-    const { data: created, error } = await supabase.from("classes").insert(data)
+    const { data: created, error } = await supabase.from("classes").insert(
+      [data] as never,
+    )
       .select("id, nom, code, description, table_name");
     if (error) throw error;
     if (created) classes.value.push(created[0] as unknown as Classe);
@@ -72,7 +82,9 @@ export const useLookupsStore = defineStore("lookups", () => {
 
   async function updateClasse(id: string, data: Partial<Classe>) {
     const supabase = useSupabaseClient();
-    const { data: updated, error } = await supabase.from("classes").update(data)
+    const { data: updated, error } = await supabase.from("classes").update(
+      data as never,
+    )
       .eq("id", id).select("id, nom, code, description, table_name");
     if (error) throw error;
     if (updated) {
@@ -84,6 +96,11 @@ export const useLookupsStore = defineStore("lookups", () => {
 
   const getTypeBudget = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "type_budget")
+  );
+  const getTypeDocumentMatrice = computed(() =>
+    lookups.value.filter((l) =>
+      l.classe?.table_name === "type_document_matrice"
+    )
   );
   const getTypeAvoirs = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "type_avoirs")
@@ -106,6 +123,7 @@ export const useLookupsStore = defineStore("lookups", () => {
   const getTypeOrganisations = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "type_organisations")
   );
+
   const getGroupeTaxation = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "groupe_taxation")
   );
@@ -125,6 +143,7 @@ export const useLookupsStore = defineStore("lookups", () => {
     getTypeAvoirs,
     getModePaiement,
     getConditionPaiement,
+    getTypeDocumentMatrice,
     getDevise,
     getTypeClient,
     getTypeArticles,

@@ -20,6 +20,11 @@ const links = [{
     to: '/settings/organisations'
 },
 {
+    label: 'Matrices',
+    icon: 'octicon:organization-16',
+    to: '/settings/matrices'
+},
+{
     label: 'Articles',
     icon: 'icon-park-outline:ad-product',
     to: '/settings/articles'

@@ -1,7 +1,7 @@
 <template>
-    <UDashboardPanel id="organisations" :ui-pro="{ body: 'p-0' }">
+    <UDashboardPanel id="matrices" :ui-pro="{ body: 'p-0' }">
         <template #header>
-            <UDashboardNavbar title="Organisations">
+            <UDashboardNavbar title="Matrices" description="Gérer les matrices d'approbation">
                 <template #leading>
                     <!-- <UDashboardSidebarCollapse /> -->
                 </template>
@@ -9,7 +9,7 @@
                 <template #right>
                     <div class="flex flex-wrap items-center justify-between gap-1.5">
                         <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
-                            placeholder="Rechercher une organisation…" />
+                            placeholder="Rechercher une Matrices" />
 
                         <div class="flex flex-wrap items-center gap-1.5">
                             <USelect v-model="statusFilter" :items="[
@@ -27,7 +27,7 @@
                             </UDropdownMenu>
                         </div>
                     </div>
-                    <OrganisationsAddModal @organisation-added="refreshOrganisations" />
+                    <MatricesAddModal @matrice-added="refreshMatrices" />
                 </template>
             </UDashboardNavbar>
         </template>
@@ -58,7 +58,7 @@
 
     <PointFacturationDetails v-model:open="openSlideOver" :organisation="selectedOrganisation" />
     <PointFacturationEditModal v-model:open="openEditModal" :organisation="selectedOrganisationToEdit"
-        @point-facturation-updated="refreshOrganisations" />
+        @point-facturation-updated="refreshMatrices" />
 </template>
 
 <script setup lang="ts">
@@ -68,9 +68,9 @@
     import { storeToRefs } from 'pinia'
 
     useHead({
-        title: 'Organisations',
+        title: 'Matrices',
         meta: [
-            { name: 'description', content: 'Gérer les organisations.' }
+            { name: 'description', content: 'Gérer les matrices.' }
         ]
     })
 
@@ -281,8 +281,8 @@
         ]]
     }
 
-    const { data: organisations, pending, refresh: refreshOrganisations } = useAsyncData('organisations', async () => {
-        const { data, error } = await supabase.from('organisations').select('id, nom, code, description, status, owner_id, organisation_parent_id, type:type_organisation_id(id, nom, code)')
+    const { data: organisations, pending, refresh: refreshMatrices } = useAsyncData('matrices', async () => {
+        const { data, error } = await supabase.from('matrices').select('id, nom, code, description, status, owner_id, type:type_document_id(id, nom, code)')
         if (error) {
             throw error
         }

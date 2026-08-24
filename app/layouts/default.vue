@@ -99,6 +99,14 @@
                 }
             },
             {
+                label: 'Matrices',
+                to: '/settings/matrices',
+                icon: 'solar:card-transfer-bold-duotone',
+                onSelect: () => {
+                    open.value = false
+                }
+            },
+            {
                 label: 'Grille tarifaire',
                 to: '/settings/tarifaire',
                 icon: 'solar:tag-price-bold-duotone',
@@ -169,6 +177,7 @@
 </script>
 
 <template>
+    <!-- <div class="h-5 w-full bg-amber-200 block mb-5"></div> -->
     <UDashboardGroup as="div">
         <UDashboardSearch :groups="groups" />
 

@@ -18,7 +18,7 @@
     const emit = defineEmits(['update:open', 'point-facturation-updated'])
 
     const isOpen = computed({
-        get: () => props.open,
+        get: () => open.value,
         set: (value) => emit('update:open', value)
     })
 

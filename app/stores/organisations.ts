@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { Organisation } from "~/types";
+import type { Matrice } from "~/types/organisation";
 
 export const useOrganisationsStore = defineStore("organisations", () => {
   const supabase = useSupabaseClient();
@@ -63,13 +64,14 @@ export const useOrganisationsStore = defineStore("organisations", () => {
 
   async function create(data: Partial<Organisation>) {
     const { data: created, error } = await supabase.from("organisations")
-      .insert(data).select(
+      .insert(data as never).select(
         "id, nom, code, description, status, owner_id, organisation_parent_id",
       );
     if (error) throw error;
     if (created) items.value.unshift(created[0] as unknown as Organisation);
     return created[0];
   }
+  
 
   async function update(id: string, data: Partial<Organisation>) {
     const { data: updated, error } = await supabase.from("organisations")

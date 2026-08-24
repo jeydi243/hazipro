@@ -1,78 +1,3 @@
-<script setup lang="ts">
-    import * as z from 'zod'
-    import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
-    import { generateRandomCode } from '~/utils'
-import type { Organisation } from '~/types/organisation'
-
-    const schema = z.object({
-        nom: z.string().min(3, 'Too short'),
-        description: z.string(),
-        code: z.string(),
-        matrice_id: z.string(),
-        approbateur_id: z.string(),
-        organisation_id: z.string({ message: 'Organisation is required' }),
-        taux: z.number().optional(),
-        type_nf: z.string(),
-        groupe_paiement_id: z.string().optional(),
-        nature_nf: z.string(),
-        beneficiaire_id: z.string(),
-        date_document: z.string()
-    })
-    const open = ref(false)
-    const isLoading = ref(false)
-    const toast = useToast()
-    const nfStore = useNFStore()
-    type Schema = z.output<typeof schema>
-    const supabase = useSupabaseClient<any>()
-    const state = reactive<Partial<Schema>>({
-        nom: undefined,
-        description: undefined,
-        code: undefined,
-        matrice_id: undefined,
-        approbateur_id: undefined,
-        organisation_id: undefined,
-        type_nf: undefined,
-        nature_nf: undefined,
-        groupe_paiement_id: undefined,
-        taux: undefined,
-        date_document: undefined
-    })
-    
-    const Organisations = useParametresStore().organisations;
-
-    const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
-        label: org.nom,
-        id: org.id
-    })) || [])
-    const { data: beneficiaires, execute } = useLazyFetch('https://jsonplaceholder.typicode.com/users', {
-        key: 'typicode-users-email',
-        transform: (data: { id: number, name: string, email: string }[]) => {
-            return data?.map(user => ({
-                label: user.name,
-                email: user.email,
-                value: String(user.id),
-                avatar: { src: `https://i.pravatar.cc/120?img=${user.id}`, loading: 'lazy' as const }
-            }))
-        },
-        immediate: false
-    })
-    function onOpen() {
-        if (!beneficiaires.value?.length) {
-            execute()
-        }
-    }
-    async function onSubmit(event: FormSubmitEvent<Schema>) {
-        isLoading.value = true
-        try {
-            await nfStore.create(event.data)
-            toast.add({ title: 'Succès', description: `Nouvelle note de frais ajoutée`, color: 'success' })
-            open.value = false
-        } catch (err: any) {
-            toast.add({ title: 'Erreur', description: err.message, color: 'error' })
-        }
-    }
-</script>
-
 <template>
     <USlideover v-model:open="open" :ui="{ content: 'min-w-5xl' }" title="Note de frais"
         description="Add a new note de frais to the database">
@@ -89,22 +14,18 @@ import type { Organisation } from '~/types/organisation'
                         <UInput v-model="state.type_nf" class="w-full" />
                     </UFormField>
                     <UFormField label="Nature de la note" placeholder="" name="nature_nf">
-                        <UInput v-model="state.nature_nf" class="w-full" />
+                        <USelectMenu v-model="state.nature_id" value-key="id" :items="itemsNaturesOrganisation"
+                            class="w-full" />
                     </UFormField>
 
                     <UFormField label="Code" name="code">
-                        <UInput v-model="state.code" class="w-full" placeholder="Code de l'article">
-                            <template #trailing>
-                                <UButton icon="i-lucide-refresh-cw" color="neutral" variant="ghost" size="xs"
-                                    aria-label="Régénérer le code" @click="state.code = generateRandomCode()" />
-                            </template>
-                        </UInput>
+                        <UInput v-model="state.code" class="w-full" placeholder="Code de l'article" />
                     </UFormField>
                     <UFormField label="Type budget" placeholder="John Doe" name="nom">
-                        <UInput v-model="state.nom" class="w-full" />
+                        <USelectMenu v-model="state.type_budget" value-key="id" :items="itemsBudget" class="w-full" />
                     </UFormField>
                     <UFormField label="Matrice" placeholder="" name="description">
-                        <UInput v-model="state.matrice_id" class="w-full" />
+                        <USelectMenu v-model="state.matrice_id" value-key="id" :items="itemsMatriceNF" class="w-full" />
                     </UFormField>
                     <UFormField label="1er Approbateur" placeholder="_" name="aprobateur">
                         <UInput v-model="state.approbateur_id" class="w-full" />
@@ -112,11 +33,22 @@ import type { Organisation } from '~/types/organisation'
                     <UFormField label="Approbateur" placeholder="_" name="aprobateur">
                         <UInput v-model="state.approbateur_id" class="w-full" />
                     </UFormField>
-                    <UFormField label="Date de la note" placeholder="_" name="aprobateur">
-                        <UInput v-model="state.date_document" class="w-full" />
+                    <UFormField label="Date de la note" name="date_document">
+                        <UInputDate ref="inputDate" v-model="dateDocument">
+                            <template #trailing>
+                                <UPopover :reference="inputDate?.inputsRef[3]?.$el">
+                                    <UButton color="neutral" variant="link" size="sm" icon="i-lucide-calendar"
+                                        aria-label="Select a date" class="px-0" />
+
+                                    <template #content>
+                                        <UCalendar v-model="dateDocument" class="p-2" />
+                                    </template>
+                                </UPopover>
+                            </template>
+                        </UInputDate>
                     </UFormField>
                     <UFormField label="Devise" placeholder="_" name="aprobateur">
-                        <UInput v-model="state.approbateur_id" class="w-full" />
+                        <USelectMenu v-model="state.devise_id" value-key="id" :items="itemsDevises" class="w-full" />
                     </UFormField>
                     <UFormField label="Taux" placeholder="_" name="aprobateur">
                         <UInput v-model="state.taux" class="w-full" />
@@ -127,7 +59,7 @@ import type { Organisation } from '~/types/organisation'
                 </div>
                 <div class="mt-auto">
                     <UFormField label="Bénéficiaire" placeholder="_" name="beneficiaire_id">
-                        <USelectMenu v-model="state.beneficiaire_id" :value-key="value" :items="beneficiaires"
+                        <USelectMenu v-model="state.beneficiaire_id" value-key="value" :items="beneficiaires"
                             icon="i-lucide-user" placeholder="Select user" :ui="{ content: 'min-w-fit' }" class="w-full"
                             @update:open="onOpen">
                             <template #item-label="{ item }">
@@ -157,3 +89,111 @@ import type { Organisation } from '~/types/organisation'
         </template>
     </USlideover>
 </template>
+<script setup lang="ts">
+    import * as z from 'zod'
+    import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
+    import type { DateValue } from '@internationalized/date'
+    import { generateRandomCode } from '~/utils'
+    import type { Lookup, Organisation } from '~/types/organisation'
+
+    const schema = z.object({
+        nom: z.string().min(3, 'Too short'),
+        description: z.string(),
+        code: z.string(),
+        matrice_id: z.string(),
+        approbateur_id: z.string(),
+        organisation_id: z.string({ message: 'Organisation is required' }),
+        taux: z.number().optional(),
+        type_nf: z.string(),
+        type_budget: z.string(),
+        groupe_paiement_id: z.string().optional(),
+        nature_id: z.string(),
+        beneficiaire_id: z.string(),
+        devise_id: z.string(),
+        date_document: z.string()
+    })
+    const open = ref(false)
+    const isLoading = ref(false)
+    const toast = useToast()
+    const nfStore = useNFStore()
+    type Schema = z.output<typeof schema>
+    const supabase = useSupabaseClient<any>()
+    const state = reactive<Partial<Schema>>({
+        nom: undefined,
+        description: undefined,
+        code: undefined,
+        matrice_id: undefined,
+        approbateur_id: undefined,
+        organisation_id: undefined,
+        type_nf: undefined,
+        nature_id: undefined,
+        groupe_paiement_id: undefined,
+        taux: undefined,
+        devise_id: undefined,
+        date_document: undefined
+    })
+    const dateDocument = ref<DateValue | null>(null)
+    const inputDate = useTemplateRef<{ inputsRef: Array<{ $el: HTMLElement }> }>('inputDate')
+
+    watch(dateDocument, (date) => {
+        state.date_document = date?.toString()
+    })
+
+    const Organisations = useParametresStore().organisations;
+    const TypeBudget = useLookupsStore().getTypeBudget;
+    const Devises = useLookupsStore().getDevise;
+
+    const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
+        label: org.nom,
+        id: org.id
+    })) || [])
+
+    const itemsNaturesOrganisation = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
+        label: org.nom,
+        id: org.id
+    })) || [])
+
+    const itemsBudget = computed<SelectMenuItem[]>(() => TypeBudget?.map((org: Lookup) => ({
+        label: org.nom,
+        id: org.id
+    })) || [])
+
+    const itemsMatriceNF = computed<SelectMenuItem[]>(() => TypeBudget?.map((org: Lookup) => ({
+        label: org.nom,
+        id: org.id
+    })) || [])
+
+    const itemsDevises = computed<SelectMenuItem[]>(() => Devises?.map((org: Lookup) => ({
+        label: org.nom,
+        id: org.id
+    })) || [])
+
+
+    const { data: beneficiaires, execute } = useLazyFetch('https://jsonplaceholder.typicode.com/users', {
+        key: 'typicode-users-email',
+        transform: (data: { id: number, name: string, email: string }[]) => {
+            return data?.map(user => ({
+                label: user.name,
+                email: user.email,
+                value: String(user.id),
+                avatar: { src: `https://i.pravatar.cc/120?img=${user.id}`, loading: 'lazy' as const }
+            }))
+        },
+        immediate: false
+    })
+    function onOpen() {
+        if (!beneficiaires.value?.length) {
+            execute()
+        }
+    }
+    async function onSubmit(event: FormSubmitEvent<Schema>) {
+        isLoading.value = true
+        try {
+            await nfStore.create(event.data)
+            toast.add({ title: 'Succès', description: `Nouvelle note de frais ajoutée`, color: 'success' })
+            open.value = false
+        } catch (err: any) {
+            toast.add({ title: 'Erreur', description: err.message, color: 'error' })
+        }
+    }
+</script>
