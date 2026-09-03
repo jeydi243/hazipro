@@ -141,6 +141,7 @@
 
     const Organisations = useParametresStore().organisations;
     const TypeBudget = useLookupsStore().getTypeBudget;
+    const MatriceNF = useParametresStore().getMatriceNF;
     const Devises = useLookupsStore().getDevise;
 
     const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
@@ -158,7 +159,7 @@
         id: org.id
     })) || [])
 
-    const itemsMatriceNF = computed<SelectMenuItem[]>(() => TypeBudget?.map((org: Lookup) => ({
+    const itemsMatriceNF = computed<SelectMenuItem[]>(() => MatriceNF?.map((org: Lookup) => ({
         label: org.nom,
         id: org.id
     })) || [])

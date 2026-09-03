@@ -41,7 +41,7 @@
                 nom: event.data.nom,
                 description: event.data.description,
                 code: event.data.code,
-                type_matrice_id: event.data.type_matrice_id
+                type_document_id: event.data.type_document_id
             } as any)
             toast.add({ title: 'Succès', description: `Nouvelle matrice ${event.data.nom} ajoutée`, color: 'success' })
             emit('matrice-added')
