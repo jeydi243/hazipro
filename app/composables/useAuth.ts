@@ -30,16 +30,7 @@ export function useAuth() {
 
     if (!data.user) return null;
 
-    // 2. Navigation immédiate — la vérification tenant se fait en arrière-plan
-    //    pour ne pas retarder l'affichage de la page d'accueil
-    toast.add({
-      title: "Connexion réussie",
-      description: `Bienvenue ${data.user.email || ""} !`,
-      color: "success",
-    });
-    await navigateTo("/");
-
-    // 3. Verify tenant membership AFTER authentication (non bloquant)
+    // 2. Verify tenant membership before entering protected routes
     // Cast : les types générés supabase-database.d.ts sont périmés pour la table profils
     const { data: profil } = (await supabase
       .from("profils")
@@ -78,6 +69,13 @@ export function useAuth() {
     // Charge les données du tenant en arrière-plan (ne bloque pas le rendu)
     void parametresStore.init();
 
+    toast.add({
+      title: "Connexion réussie",
+      description: `Bienvenue ${data.user.email || ""} !`,
+      color: "success",
+    });
+    await navigateTo("/");
+
     return data.user;
   }
 
@@ -94,15 +92,7 @@ export function useAuth() {
     }
 
     if (data?.user) {
-      // Navigation immédiate, vérification en arrière-plan
-      toast.add({
-        title: "Connexion réussie",
-        description: "Bienvenue via Passkey !",
-        color: "success",
-      });
-      await navigateTo("/");
-
-      // Verify user has a profil/tenant
+      // Verify user has a profil/tenant before entering protected routes
       // Cast : types générés périmés pour la table profils
       const { data: profil } = (await supabase
         .from("profils")
@@ -125,6 +115,13 @@ export function useAuth() {
 
       parametresStore.setOwnerID(profil.owner_id);
       void parametresStore.init();
+
+      toast.add({
+        title: "Connexion réussie",
+        description: "Bienvenue via Passkey !",
+        color: "success",
+      });
+      await navigateTo("/");
     }
 
     return data?.user ?? null;

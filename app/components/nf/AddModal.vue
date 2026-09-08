@@ -6,7 +6,7 @@
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <div class="grid grid-cols-4 gap-4">
-                    <UFormField label="Direction" name="code">
+                    <UFormField label="Direction" name="organisation_id">
                         <USelectMenu v-model="state.organisation_id" value-key="id" :items="itemsOrganisations"
                             class="w-full" />
                     </UFormField>

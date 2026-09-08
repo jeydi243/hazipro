@@ -57,8 +57,7 @@
     </UDashboardPanel>
 
     <PointFacturationDetails v-model:open="openSlideOver" :organisation="selectedOrganisation" />
-    <PointFacturationEditModal v-model:open="openEditModal" :organisation="selectedOrganisationToEdit"
-        @point-facturation-updated="refreshOrganisations" />
+    <!-- <PointFacturationEditModal v-model:open="openEditModal" :organisation="selectedOrganisationToEdit"  @point-facturation-updated="refreshOrganisations" /> -->
 </template>
 
 <script setup lang="ts">
@@ -280,12 +279,14 @@
             }
         ]]
     }
+    
+    const organisations = useParametresStore().organisations;
 
-    const { data: organisations, pending, refresh: refreshOrganisations } = useAsyncData('organisations', async () => {
-        const { data, error } = await supabase.from('organisations').select('id, nom, code, description, status, owner_id, organisation_parent_id, type:type_organisation_id(id, nom, code)')
-        if (error) {
-            throw error
-        }
-        return data as Organisation[]
-    })
+    // const { data: organisations, pending, refresh: refreshOrganisations } = useAsyncData('organisations', async () => {
+    //     const { data, error } = await supabase.from('organisations').select('id, nom, code, description, status, owner_id, organisation_parent_id, type:type_organisation_id(id, nom, code)')
+    //     if (error) {
+    //         throw error
+    //     }
+    //     return data as Organisation[]
+    // })
 </script>
