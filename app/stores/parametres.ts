@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
+import type { Taux } from "~/types";
 import type { Matrice } from "~/types/organisation";
 
 export const useParametresStore = defineStore("parametres", () => {
   const owner_id = ref<string | null>(null);
   const supabase = useSupabaseClient();
   const itemsMatrice = ref<Matrice[]>([]);
+  const itemsTaux = ref<Taux[]>([]);
 
   const lookupsStore = useLookupsStore();
   const clientsStore = useClientsStore();
@@ -66,6 +68,15 @@ export const useParametresStore = defineStore("parametres", () => {
     if (created) itemsMatrice.value.unshift(created[0] as unknown as Matrice);
     return created[0];
   }
+  async function createTaux(data: Partial<Taux>) {
+    const { data: created, error } = await supabase.from("taux")
+      .insert(data as never).select(
+        "id, from_currency, to_currency, valeur, date_taux"
+      );
+    if (error) throw error;
+    if (created) itemsTaux.value.unshift(created[0] as unknown as Taux);
+    return created[0];
+  }
   const getClasseById = computed(() => (id: string) =>
     classes.value.find((c) => c.id === id)?.nom
   );
@@ -78,6 +89,9 @@ export const useParametresStore = defineStore("parametres", () => {
   );
   const getMatriceNF = computed(() =>
     itemsMatrice.value.map((c) => ({ label: c.nom, id: c.id }))
+  );
+  const getTauxItems = computed(() =>
+    itemsTaux.value.map((c) => ({ label: c.from_currency, id: c.id }))
   );
 
   return {
@@ -95,6 +109,9 @@ export const useParametresStore = defineStore("parametres", () => {
     getClasseById,
     getLookupsById,
     getClasseItems,
-    getMatriceNF
+    getMatriceNF,
+    getTauxItems,
+    itemsTaux,
+    createTaux
   };
 });

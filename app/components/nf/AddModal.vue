@@ -21,10 +21,10 @@
                     <UFormField label="Code" name="code">
                         <UInput v-model="state.code" class="w-full" placeholder="Code de l'article" />
                     </UFormField>
-                    <UFormField label="Type budget" placeholder="John Doe" name="nom">
+                    <UFormField label="Type budget" placeholder="" name="type_budet">
                         <USelectMenu v-model="state.type_budget" value-key="id" :items="itemsBudget" class="w-full" />
                     </UFormField>
-                    <UFormField label="Matrice" placeholder="" name="description">
+                    <UFormField label="Matrice" placeholder="" name="matrice_id">
                         <USelectMenu v-model="state.matrice_id" value-key="id" :items="itemsMatriceNF" class="w-full" />
                     </UFormField>
                     <UFormField label="1er Approbateur" placeholder="_" name="aprobateur">
@@ -58,7 +58,7 @@
                     </UFormField>
                 </div>
                 <div class="mt-auto">
-                    <UFormField label="Bénéficiaire" placeholder="_" name="beneficiaire_id">
+                    <UFormField label="Bénéficiaire" placeholder="_" name="beneficiaire_id" class="mb-2">
                         <USelectMenu v-model="state.beneficiaire_id" value-key="value" :items="beneficiaires"
                             icon="i-lucide-user" placeholder="Select user" :ui="{ content: 'min-w-fit' }" class="w-full"
                             @update:open="onOpen">
@@ -73,6 +73,23 @@
                     </UFormField>
                     <UFormField label="Description" placeholder="_" name="aprobateur">
                         <UTextarea v-model="state.description" class="w-full" />
+                    </UFormField>
+                </div>
+                <div class="grid grid-cols-4 gap-4 statuts_nf">
+                    <UFormField label="Statut document" placeholder="_" name="statut_document">
+                        <UInput v-model="state.statut_document" class="w-full" disabled  />
+                    </UFormField>
+                    <UFormField label="Statut approbation" placeholder="_" name="statut_approbation">
+                        <UInput v-model="state.statut_approbation" class="w-full" disabled  />
+                    </UFormField>
+                    <UFormField label="Statut paiement" placeholder="_" name="statut_paiement">
+                        <UInput v-model="state.statut_paiement" class="w-full" disabled  />
+                    </UFormField>
+                    <UFormField label="Statut planification" placeholder="_" name="statut_planification">
+                        <UInput v-model="state.statut_planification" class="w-full" disabled  />
+                    </UFormField>
+                    <UFormField label="Statut programmation" placeholder="_" name="statut_programmation">
+                        <UInput v-model="state.statut_programmation" class="w-full" disabled  />
                     </UFormField>
                 </div>
                 <!-- <div class="flex justify-end gap-2">
@@ -110,6 +127,11 @@
         nature_id: z.string(),
         beneficiaire_id: z.string(),
         devise_id: z.string(),
+        statut_document: z.string(),
+        statut_approbation: z.string(),
+        statut_paiement: z.string(),
+        statut_planification: z.string(),
+        statut_programmation: z.string(),
         date_document: z.string()
     })
     const open = ref(false)
@@ -130,7 +152,12 @@
         groupe_paiement_id: undefined,
         taux: undefined,
         devise_id: undefined,
-        date_document: undefined
+        date_document: undefined,
+        statut_document: 'Brouillon',
+        statut_approbation: 'Non soumis',
+        statut_paiement: 'Non payé',
+        statut_planification: 'Non planifié',
+        statut_programmation: 'Non programmé'
     })
     const dateDocument = ref<DateValue | null>(null)
     const inputDate = useTemplateRef<{ inputsRef: Array<{ $el: HTMLElement }> }>('inputDate')

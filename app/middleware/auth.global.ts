@@ -10,10 +10,10 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo('/auth')
   }
 
-  if (!parametresStore.owner_id) {
-    return showError({
-      statusCode: 409,
-      statusMessage: "Le paramètre owner n'est pas défini.",
-    })
-  }
+  // if (!parametresStore.owner_id) {
+  //   return showError({
+  //     statusCode: 409,
+  //     statusMessage: "Le paramètre owner n'est pas défini.",
+  //   })
+  // }
 })

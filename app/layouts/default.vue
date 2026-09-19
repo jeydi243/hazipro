@@ -107,6 +107,14 @@
                 }
             },
             {
+                label: 'Taux',
+                to: '/settings/taux',
+                icon: 'solar:card-transfer-bold-duotone',
+                onSelect: () => {
+                    open.value = false
+                }
+            },
+            {
                 label: 'Grille tarifaire',
                 to: '/settings/tarifaire',
                 icon: 'solar:tag-price-bold-duotone',

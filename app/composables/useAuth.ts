@@ -30,15 +30,43 @@ export function useAuth() {
 
     if (!data.user) return null;
 
+    const userId = data.user.id;
+    const uuidPattern =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+    if (!uuidPattern.test(userId)) {
+      await supabase.auth.signOut();
+      toast.add({
+        title: "Erreur de connexion",
+        description: "L'identifiant utilisateur reçu n'est pas un UUID valide.",
+        color: "error",
+      });
+      return null;
+    }
+
     // 2. Verify tenant membership before entering protected routes
-    // Cast : les types générés supabase-database.d.ts sont périmés pour la table profils
-    const { data: profil } = (await supabase
-      .from("profils")
-      .select("owner_id, owner:owner_id(nom)")
-      .eq("id", data.user.id)
-      .single()) as unknown as {
-        data: { owner_id: string | null; owner: { nom: string } | null } | null;
-      };
+    const { data: profil, error: errorProfil } = await supabase
+      .from("profils_owner")
+      .select(
+        "owner_id, profil_id, owner:owner_id!inner(nom), profil:profil_id(email)",
+      )
+      .eq("profil_id", userId)
+      .eq("owner.nom", tenant)
+      .single();
+    
+    console.log({profil});
+    console.log(tenant);
+    
+    if (errorProfil) {
+      await supabase.auth.signOut();
+      toast.add({
+        title: "Erreur de connexion",
+        description: "Impossible de vérifier votre organisation. " +
+          errorProfil.message,
+        color: "error",
+      });
+      return null;
+    }
 
     if (!profil?.owner_id) {
       // User authenticated but has no tenant — sign out
@@ -46,7 +74,7 @@ export function useAuth() {
       toast.add({
         title: "Erreur de connexion",
         description:
-          "Votre compte n'est associé à aucune organisation. Contactez un administrateur.",
+          `Votre compte n'est pas associé à organisation ${tenant}. Contactez un administrateur.`,
         color: "error",
       });
       await navigateTo("/auth");
@@ -54,16 +82,16 @@ export function useAuth() {
     }
 
     // 4. Verify the tenant name matches (if provided)
-    if (tenant && profil.owner && profil.owner.nom !== tenant) {
-      await supabase.auth.signOut();
-      toast.add({
-        title: "Erreur de connexion",
-        description: `L'espace de travail "${tenant}" est introuvable.`,
-        color: "error",
-      });
-      await navigateTo("/auth");
-      return null;
-    }
+    // if (!profil) {
+    //   await supabase.auth.signOut();
+    //   toast.add({
+    //     title: "Erreur de connexion",
+    //     description: `L'espace de travail "${tenant}" est introuvable.`,
+    //     color: "error",
+    //   });
+    //   await navigateTo("/auth");
+    //   return null;
+    // }
 
     parametresStore.setOwnerID(profil.owner_id);
     // Charge les données du tenant en arrière-plan (ne bloque pas le rendu)

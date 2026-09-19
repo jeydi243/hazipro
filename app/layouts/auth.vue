@@ -29,17 +29,17 @@
       <!-- Middle: tagline -->
       <div class="relative z-10 px-10 pb-16">
         <p class="max-w-xs text-3xl leading-tight font-light tracking-tight text-white/90">
-          Votre facturation,
+          Votre depenses,
           <span class="font-medium text-white">simplifiée</span>.
         </p>
         <p class="mt-4 max-w-xs text-sm leading-relaxed text-indigo-200/80">
-          Gérez vos factures, clients et paiements depuis un tableau de bord pensé pour les indépendants et PME.
+          Gérez vos notes de frais Employés & Tiers depuis un tableau de bord pensé pour les indépendants et PME.
         </p>
 
         <!-- Trust micro-signal -->
         <div class="mt-10 flex items-center gap-2 text-xs text-indigo-300/60">
           <UIcon name="i-lucide-shield" class="size-3.5" />
-          <span>Connexion chiffrée · Données hébergées en Europe</span>
+          <span>Connexion chiffrée · Données hébergées en Irelande</span>
         </div>
       </div>
     </div>

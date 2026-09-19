@@ -35,6 +35,13 @@ export interface Beneficiaire {
     code: string;
     categorie_id: string | Lookup;
 }
+export interface Taux {
+    id: string;
+    from_currency: string;
+    to_currency: string;
+    valeur: number;
+    date_taux: string;
+}
 export interface NF {
     id: string;
     organisation_id: string | Organisation;

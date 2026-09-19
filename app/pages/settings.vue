@@ -29,6 +29,11 @@ const links = [{
     icon: 'icon-park-outline:ad-product',
     to: '/settings/articles'
 },
+{
+    label: 'Taux',
+    icon: 'icon-park-outline:ad-product',
+    to: '/settings/taux'
+},
 
 {
     label: 'Grille Tarifaire',

@@ -6,7 +6,7 @@
                 Connectez-vous
             </h1>
             <p class="mt-1.5 text-sm text-(--ui-text-muted)">
-                Accédez à votre espace de facturation Hazipro
+                Accédez à votre espace Hazipro
             </p>
         </div>
 
@@ -31,7 +31,7 @@
 
     useHead({
         title: 'Connexion — Hazipro',
-        meta: [{ name: 'description', content: 'Connectez-vous à votre espace de facturation Hazipro.' }],
+        meta: [{ name: 'description', content: 'Connectez-vous à votre espace Hazipro.' }],
     })
 
     const auth = useAuth()
