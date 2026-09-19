@@ -7,7 +7,7 @@ const schema = z.object({
     from_currency: z.string().min(3, 'Too short'),
     to_currency: z.string().min(3, 'Too short'),
     description: z.string(),
-    valeur: z.string(),
+    valeur: z.number().positive('Valeur must be a positive number'),
     date_taux: z.string(),
 })
 const open = ref(false)
@@ -67,7 +67,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                     <USelectMenu v-model="state.to_currency" value-key="id" :items="items" class="w-full" />
                 </UFormField>
                 <UFormField label="Valeur" placeholder="Valeur du taux" name="valeur">
-                    <UInput v-model="state.valeur" class="w-full" />
+                    <UInputNumber v-model="state.valeur" class="w-full" />
                 </UFormField>
                 <UFormField label="Date du taux" placeholder="Date du taux" name="date_taux">
                     <UInput v-model="state.date_taux" class="w-full" />
