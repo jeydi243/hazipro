@@ -9,7 +9,7 @@ export default withNuxt({
         'vue/max-attributes-per-line': 'off',
         'vue/html-closing-bracket-newline': 'off',
         '@stylistic/indent': 'off',
-        
+        '@stylistic/no-tabs': 'off',
         'vue/html-indent': 'off',
         'vue/script-indent': 'off',
         '@stylistic/member-delimiter-style': 'off',

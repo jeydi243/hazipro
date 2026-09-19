@@ -56,30 +56,27 @@
         </template>
     </UDashboardPanel>
 
-    <PointFacturationDetails v-model:open="openSlideOver" :organisation="selectedOrganisation" />
-    <!-- <PointFacturationEditModal v-model:open="openEditModal" :organisation="selectedOrganisationToEdit"  @point-facturation-updated="refreshOrganisations" /> -->
 </template>
 
 <script setup lang="ts">
     import type { Row } from '@tanstack/table-core'
     import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
-    import type { Organisation } from '~/types'
+    import type { Taux } from '~/types'
     import { storeToRefs } from 'pinia'
 
     useHead({
-        title: 'Organisations',
+        title: 'Taux',
         meta: [
-            { name: 'description', content: 'Gérer les organisations.' }
+            { name: 'description', content: 'Gérer les taux.' }
         ]
     })
 
     const supabase = useSupabaseClient()
     // Tableau vide STABLE : évite une nouvelle identité [] à chaque render
-    // (boucle infinie du watch data de UTable pendant le chargement)
-    const emptyRows: Organisation[] = []
+    const emptyRows: Taux[] = []
     const toast = useToast()
     const parametresStore = useParametresStore()
-    const { lookups } = storeToRefs(parametresStore)
+    const { lookups, getTaux : taux} = storeToRefs(parametresStore)
 
     // Utilisation du composable centralisé
     const {
@@ -105,11 +102,10 @@
 
     // IDs des colonnes cachables — liste STATIQUE, sans jamais toucher à tableApi
     const columnDisplayItems = buildColumnDisplayItems(['select', 'details', 'code', 'nom', 'description', 'type', 'status', 'actions'])
-
     const openSlideOver = ref(false)
-    const selectedOrganisation = ref<Organisation | null>(null)
+    const selectedTaux = ref<Taux | null>(null)
     const openEditModal = ref(false)
-    const selectedOrganisationToEdit = ref<Organisation | null>(null)
+    const selectedTauxToEdit = ref<Taux | null>(null)
 
     const { copy } = useClipboard()
     const searchInput = ref('')
@@ -122,7 +118,7 @@
         debouncedSearch(val)
     })
 
-    const columns: TableColumn<Organisation>[] = [
+    const columns: TableColumn<Taux>[] = [
         {
             id: 'select',
             header: ({ table }) =>
@@ -139,70 +135,40 @@
                     'aria-label': 'Sélectionner ligne'
                 }))
         },
+        // {
+        //     id: 'details',
+        //     header: () => h('div', { class: 'flex items-center justify-center' }, 'Détails'),
+        //     cell: ({ row }) => h('div', { class: 'flex items-center justify-center' }, h(UButton, {
+        //         'color': 'neutral',
+        //         'variant': 'ghost',
+        //         'icon': 'i-lucide-maximize-2',
+        //         'aria-label': 'Agrandir',
+        //         'class': '-mx-2.5',
+        //         'onClick': () => {
+        //             selectedTaux.value = row.original
+        //             openSlideOver.value = true
+        //         }
+        //     })),
+        // },
         {
-            id: 'details',
-            header: () => h('div', { class: 'flex items-center justify-center' }, 'Détails'),
-            cell: ({ row }) => h('div', { class: 'flex items-center justify-center' }, h(UButton, {
-                'color': 'neutral',
-                'variant': 'ghost',
-                'icon': 'i-lucide-maximize-2',
-                'aria-label': 'Agrandir',
-                'class': '-mx-2.5',
-                'onClick': () => {
-                    selectedOrganisation.value = row.original
-                    openSlideOver.value = true
-                }
-            })),
+            accessorKey: 'from_currency',
+            header: 'Devise Source',
+            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.from_currency)
         },
         {
-            accessorKey: 'code',
-            header: 'Code',
-            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.code)
+            accessorKey: 'to_currency',
+            header: 'Devise Cible',
+            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.to_currency)
         },
         {
-            accessorKey: 'nom',
-            header: 'Nom',
-            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.nom)
-        },
-
-        {
-            accessorKey: 'description',
-            header: ({ column }) => {
-                const isSorted = column.getIsSorted()
-                return h(UButton, {
-                    color: 'neutral',
-                    variant: 'ghost',
-                    label: 'Description',
-                    icon: isSorted
-                        ? isSorted === 'asc'
-                            ? 'i-lucide-arrow-up-narrow-wide'
-                            : 'i-lucide-arrow-down-wide-narrow'
-                        : 'i-lucide-arrow-up-down',
-                    class: '-mx-2.5',
-                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
-                })
-            }
+            accessorKey: 'valeur',
+            header: 'Valeur',
+            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.valeur)
         },
         {
-            accessorKey: 'type_organisation_id',
-            header: "Type d'organisation",
-            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.type?.nom || 'N/A')
-        },
-        {
-            accessorKey: 'status',
-            header: 'Statut',
-            filterFn: 'equals',
-            cell: ({ row }) => {
-                const statusStr = row.original.status || 'actif'
-                const color = {
-                    subscribed: 'success' as const,
-                    actif: 'success' as const,
-                    unsubscribed: 'error' as const,
-                    bounced: 'warning' as const
-                }[statusStr] || 'neutral'
-
-                return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => statusStr)
-            }
+            accessorKey: 'date_taux',
+            header: 'Date du taux',
+            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.date_taux)
         },
         {
             header: () => h('div', { class: 'text-center' }, 'Actions'),
@@ -231,14 +197,14 @@
         }
     ]
 
-    function getRowItems(row: Row<Organisation>): DropdownMenuItem[][] {
+    function getRowItems(row: Row<Taux>): DropdownMenuItem[][] {
         return [[
             {
                 type: 'label' as const,
                 label: 'Actions'
             },
             {
-                label: 'Copie ID Organisation',
+                label: 'Copie ID Taux',
                 icon: 'i-lucide-copy',
                 onSelect() {
                     copy(row.original.id.toString())
@@ -253,7 +219,7 @@
                 label: 'Détails',
                 icon: 'i-lucide-maximize-2',
                 onSelect() {
-                    selectedOrganisation.value = row.original
+                    selectedTaux.value = row.original
                     openSlideOver.value = true
                 }
             },
@@ -261,7 +227,7 @@
                 label: 'Modifier',
                 icon: 'i-lucide-pencil',
                 onSelect() {
-                    selectedOrganisationToEdit.value = row.original
+                    selectedTauxToEdit.value = row.original
                     openEditModal.value = true
                 }
             },
@@ -280,13 +246,4 @@
         ]]
     }
 
-    const organisations = useParametresStore().organisations;
-
-    // const { data: organisations, pending, refresh: refreshOrganisations } = useAsyncData('organisations', async () => {
-    //     const { data, error } = await supabase.from('organisations').select('id, nom, code, description, status, owner_id, organisation_parent_id, type:type_organisation_id(id, nom, code)')
-    //     if (error) {
-    //         throw error
-    //     }
-    //     return data as Organisation[]
-    // })
 </script>

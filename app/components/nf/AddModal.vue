@@ -19,7 +19,7 @@
                     </UFormField>
 
                     <UFormField label="Code" name="code">
-                        <UInput v-model="state.code" class="w-full" placeholder="Code de l'article" />
+                        <UInput v-model="state.code" class="w-full" placeholder="" />
                     </UFormField>
                     <UFormField label="Type budget" placeholder="" name="type_budet">
                         <USelectMenu v-model="state.type_budget" value-key="id" :items="itemsBudget" class="w-full" />
@@ -34,14 +34,14 @@
                         <UInput v-model="state.approbateur_id" class="w-full" />
                     </UFormField>
                     <UFormField label="Date de la note" name="date_document">
-                        <UInputDate ref="inputDate" v-model="dateDocument">
+                        <UInputDate ref="inputDate" v-model="dateDocument" :max-value="maxDate">
                             <template #trailing>
                                 <UPopover :reference="inputDate?.inputsRef[3]?.$el">
                                     <UButton color="neutral" variant="link" size="sm" icon="i-lucide-calendar"
                                         aria-label="Select a date" class="px-0" />
 
                                     <template #content>
-                                        <UCalendar v-model="dateDocument" class="p-2" />
+                                        <UCalendar v-model="dateDocument" :max-value="maxDate" class="p-2" />
                                     </template>
                                 </UPopover>
                             </template>
@@ -51,7 +51,7 @@
                         <USelectMenu v-model="state.devise_id" value-key="id" :items="itemsDevises" class="w-full" />
                     </UFormField>
                     <UFormField label="Taux" placeholder="_" name="aprobateur">
-                        <UInput v-model="state.taux" class="w-full" />
+                        <UInput v-model="state.taux" class="w-full" disabled />
                     </UFormField>
                     <UFormField label="Groupe de paiement" placeholder="_" name="aprobateur">
                         <UInput v-model="state.groupe_paiement_id" class="w-full" />
@@ -77,19 +77,19 @@
                 </div>
                 <div class="grid grid-cols-4 gap-4 statuts_nf">
                     <UFormField label="Statut document" placeholder="_" name="statut_document">
-                        <UInput v-model="state.statut_document" class="w-full" disabled  />
+                        <UInput v-model="state.statut_document" class="w-full" disabled />
                     </UFormField>
                     <UFormField label="Statut approbation" placeholder="_" name="statut_approbation">
-                        <UInput v-model="state.statut_approbation" class="w-full" disabled  />
+                        <UInput v-model="state.statut_approbation" class="w-full" disabled />
                     </UFormField>
                     <UFormField label="Statut paiement" placeholder="_" name="statut_paiement">
-                        <UInput v-model="state.statut_paiement" class="w-full" disabled  />
+                        <UInput v-model="state.statut_paiement" class="w-full" disabled />
                     </UFormField>
                     <UFormField label="Statut planification" placeholder="_" name="statut_planification">
-                        <UInput v-model="state.statut_planification" class="w-full" disabled  />
+                        <UInput v-model="state.statut_planification" class="w-full" disabled />
                     </UFormField>
                     <UFormField label="Statut programmation" placeholder="_" name="statut_programmation">
-                        <UInput v-model="state.statut_programmation" class="w-full" disabled  />
+                        <UInput v-model="state.statut_programmation" class="w-full" disabled />
                     </UFormField>
                 </div>
                 <!-- <div class="flex justify-end gap-2">
@@ -109,9 +109,12 @@
 <script setup lang="ts">
     import * as z from 'zod'
     import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
+    import { getLocalTimeZone, today } from '@internationalized/date'
     import type { DateValue } from '@internationalized/date'
     import { generateRandomCode } from '~/utils'
     import type { Lookup, Organisation } from '~/types/organisation'
+
+    const maxDate = today(getLocalTimeZone())
 
     const schema = z.object({
         nom: z.string().min(3, 'Too short'),
@@ -132,7 +135,10 @@
         statut_paiement: z.string(),
         statut_planification: z.string(),
         statut_programmation: z.string(),
-        date_document: z.string()
+        date_document: z.string().min(1, 'Date is required').refine(
+            (value) => value <= maxDate.toString(),
+            'La date ne peut pas être dans le futur',
+        )
     })
     const open = ref(false)
     const isLoading = ref(false)
@@ -159,16 +165,33 @@
         statut_planification: 'Non planifié',
         statut_programmation: 'Non programmé'
     })
-    const dateDocument = ref<DateValue | null>(null)
+    const parametresStore = useParametresStore()
+    const dateDocument = shallowRef<DateValue | null>(null)
     const inputDate = useTemplateRef<{ inputsRef: Array<{ $el: HTMLElement }> }>('inputDate')
 
     watch(dateDocument, (date) => {
         state.date_document = date?.toString()
     })
 
-    const Organisations = useParametresStore().organisations;
+    watch(
+        [() => state.devise_id, () => state.date_document],
+        ([deviseId, selectedDate]) => {
+            if (!deviseId) {
+                state.taux = undefined
+                return
+            }
+
+            const taux = parametresStore.getTauxForDevise(deviseId, selectedDate ?? null)
+            if (taux !== null && taux !== undefined) {
+                state.taux = taux
+            }
+        },
+        { immediate: true }
+    )
+
+    const Organisations = parametresStore.organisations;
     const TypeBudget = useLookupsStore().getTypeBudget;
-    const MatriceNF = useParametresStore().getMatriceNF;
+    const MatriceNF = parametresStore.getMatriceNF;
     const Devises = useLookupsStore().getDevise;
 
     const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
@@ -186,9 +209,9 @@
         id: org.id
     })) || [])
 
-    const itemsMatriceNF = computed<SelectMenuItem[]>(() => MatriceNF?.map((org: Lookup) => ({
-        label: org.nom,
-        id: org.id
+    const itemsMatriceNF = computed<SelectMenuItem[]>(() => MatriceNF?.map((matrice: any) => ({
+        label: matrice.nom,
+        id: matrice.id
     })) || [])
 
     const itemsDevises = computed<SelectMenuItem[]>(() => Devises?.map((org: Lookup) => ({

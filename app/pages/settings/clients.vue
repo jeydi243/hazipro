@@ -46,12 +46,12 @@
     </div>
 </template>
 <script setup lang="ts">
-
-// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-const EMPTY_ROWS: any[] = []
 import type { Row } from '@tanstack/table-core'
 import type { TableColumn } from '@nuxt/ui'
 import type { Client } from '~/types'
+
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 
 useHead({
     title: 'Clients',

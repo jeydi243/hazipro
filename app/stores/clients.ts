@@ -1,3 +1,4 @@
+/* eslint-disable @stylistic/no-tabs */
 import { defineStore } from "pinia";
 import type { Client, Fournisseur } from "~/types";
 
@@ -8,7 +9,9 @@ export const useClientsStore = defineStore("clients", () => {
 
 	async function fetchAll(ownerId?: string | null) {
 		loading.value = true;
-		let query = supabase.from("clients").select("id, nom, code, description, nif, owner_id, type_id, type:type_id(id, nom, code)");
+		let query = supabase.from("clients").select(
+			"id, nom, code, description, nif, owner_id, type_id, type:type_id(id, nom, code)",
+		);
 		if (ownerId) query = query.eq("owner_id", ownerId);
 		const { data, error } = await query;
 		if (error) throw error;
@@ -30,7 +33,7 @@ export const useClientsStore = defineStore("clients", () => {
 	async function create(data: Partial<Client>) {
 		const { data: created, error } = await supabase
 			.from("clients")
-			.insert(data)
+			.insert(data as never)
 			.select("id, nom, code, description, nif, owner_id, type_id");
 		if (error) throw error;
 		if (created) items.value.unshift(created[0] as unknown as Client);
@@ -40,7 +43,7 @@ export const useClientsStore = defineStore("clients", () => {
 	async function update(id: string, data: Partial<Client>) {
 		const { data: updated, error } = await supabase
 			.from("clients")
-			.update(data)
+			.update(data as never)
 			.eq("id", id)
 			.select("id, nom, code, description, nif, owner_id, type_id");
 		if (error) throw error;
