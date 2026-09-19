@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 const colorMode = useColorMode()
-const { idle } = useIdle(2 * 60 * 1000) // 2 minutes
+const { idle } = useIdle(5 * 60 * 1000) // 5 minutes
 const { isOnline } = useNetwork()
 
 const color = computed(() => colorMode.value === 'dark' ? '#020617' : 'white')
@@ -44,10 +44,11 @@ const toast = useToast()
 
 async function initializeAuthState(authUser: typeof user.value) {
     if (!authUser) {
+        parametresStore.clearOwnerID()
         return
     }
 
-    const { error: initError } = await parametresStore.init()
+    const { error: initError } = await parametresStore.init(authUser.id)
 
     if (initError) {
         console.error('[Store] Erreur init parametres:', initError)
@@ -59,15 +60,15 @@ async function initializeAuthState(authUser: typeof user.value) {
     }
 }
 
-onMounted(() => {
-    void initializeAuthState(user.value)
-})
+watch(user, (authUser) => {
+    void initializeAuthState(authUser)
+}, { immediate: true })
 
 watch(idle, (isIdle) => {
     if (isIdle && user.value) {
         toast.add({
             title: 'Session inactive',
-            description: 'Vous êtes inactif depuis 2 minutes. Vos données sont protégées.',
+            description: 'Vous êtes inactif depuis 5 minutes. Vos données sont protégées.',
             color: 'warning',
             icon: 'i-lucide-shield-alert'
         })

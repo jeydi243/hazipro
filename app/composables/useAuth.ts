@@ -45,14 +45,17 @@ export function useAuth() {
     }
 
     // 2. Verify tenant membership before entering protected routes
-    const { data: profil, error: errorProfil } = await supabase
+    const { data: profil, error: errorProfil } = (await supabase
       .from("profils_owner")
       .select(
         "owner_id, profil_id, owner:owner_id!inner(nom), profil:profil_id(email)",
       )
       .eq("profil_id", userId)
       .eq("owner.nom", tenant)
-      .single();
+      .single()) as unknown as {
+        data: { owner_id: string | null } | null;
+        error: { message: string } | null;
+      };
     
     console.log({profil});
     console.log(tenant);
@@ -95,7 +98,7 @@ export function useAuth() {
 
     parametresStore.setOwnerID(profil.owner_id);
     // Charge les données du tenant en arrière-plan (ne bloque pas le rendu)
-    void parametresStore.init();
+    void parametresStore.init(data.user.id);
 
     toast.add({
       title: "Connexion réussie",
@@ -142,7 +145,7 @@ export function useAuth() {
       }
 
       parametresStore.setOwnerID(profil.owner_id);
-      void parametresStore.init();
+      void parametresStore.init(data.user.id);
 
       toast.add({
         title: "Connexion réussie",
@@ -168,6 +171,7 @@ export function useAuth() {
       return;
     }
 
+    parametresStore.clearOwnerID();
     await navigateTo("/auth");
     toast.add({
       title: `Au revoir ${currentUser?.email || ""} !`,

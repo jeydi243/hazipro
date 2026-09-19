@@ -4,6 +4,7 @@ import type { Matrice } from "~/types/organisation";
 
 export const useParametresStore = defineStore("parametres", () => {
   const owner_id = ref<string | null>(null);
+  const ownerStorageKey = "hazipro-owner-id";
   const supabase = useSupabaseClient();
   const itemsMatrice = ref<Matrice[]>([]);
   const itemsTaux = ref<Taux[]>([]);
@@ -18,9 +19,49 @@ export const useParametresStore = defineStore("parametres", () => {
 
   function setOwnerID(id: string) {
     owner_id.value = id;
+    if (import.meta.client) {
+      localStorage.setItem(ownerStorageKey, id);
+    }
   }
 
-  async function init() {
+  function clearOwnerID() {
+    owner_id.value = null;
+    if (import.meta.client) {
+      localStorage.removeItem(ownerStorageKey);
+    }
+  }
+
+  async function restoreOwnerID(userId: string | undefined) {
+    if (!userId) {
+      clearOwnerID();
+      return null;
+    }
+
+    if (import.meta.client) {
+      const cachedOwnerID = localStorage.getItem(ownerStorageKey);
+      if (cachedOwnerID) {
+        owner_id.value = cachedOwnerID;
+      }
+    }
+
+    const { data: profil, error } = await supabase
+      .from("profils")
+      .select("owner_id")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error || !profil?.owner_id) {
+      clearOwnerID();
+      return null;
+    }
+
+    setOwnerID(profil.owner_id);
+    return profil.owner_id;
+  }
+
+  async function init(userId?: string) {
+    await restoreOwnerID(userId ?? useSupabaseUser().value?.id);
+
     const results = await Promise.allSettled([
       lookupsStore.fetchAll(),
       owner_id.value
@@ -61,17 +102,22 @@ export const useParametresStore = defineStore("parametres", () => {
 
   async function createMatrice(data: Partial<Matrice>) {
     const { data: created, error } = await supabase.from("matrices")
-      .insert(data as never).select(
-        "id, nom, code, description, status, owner_id, type_document_id"
+      .insert({ ...data, owner_id: owner_id.value } as never).select(
+        "id, nom, code, description, status, owner_id, type_document_id",
       );
     if (error) throw error;
     if (created) itemsMatrice.value.unshift(created[0] as unknown as Matrice);
     return created[0];
   }
   async function createTaux(data: Partial<Taux>) {
+    const today = new Date().toISOString().slice(0, 10);
+    if (data.date_taux && data.date_taux > today) {
+      throw new Error("La date du taux ne peut pas être dans le futur.");
+    }
+
     const { data: created, error } = await supabase.from("taux")
       .insert(data as never).select(
-        "id, from_currency, to_currency, valeur, date_taux"
+        "id, from_currency, to_currency, valeur, date_taux",
       );
     if (error) throw error;
     if (created) itemsTaux.value.unshift(created[0] as unknown as Taux);
@@ -105,6 +151,7 @@ export const useParametresStore = defineStore("parametres", () => {
     profils,
     init,
     setOwnerID,
+    clearOwnerID,
     createMatrice,
     getClasseById,
     getLookupsById,
@@ -112,6 +159,6 @@ export const useParametresStore = defineStore("parametres", () => {
     getMatriceNF,
     getTauxItems,
     itemsTaux,
-    createTaux
+    createTaux,
   };
 });

@@ -35,7 +35,7 @@
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination"
                 :pagination-options="paginationOptions" class="shrink-0 m-2" :data="taux ?? emptyRows"
-                :columns="columns" :loading="pending" :ui="{
+                :columns="columns" :ui="{
                     base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',

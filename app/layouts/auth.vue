@@ -29,7 +29,7 @@
       <!-- Middle: tagline -->
       <div class="relative z-10 px-10 pb-16">
         <p class="max-w-xs text-3xl leading-tight font-light tracking-tight text-white/90">
-          Votre depenses,
+          Vos notes de frais,
           <span class="font-medium text-white">simplifiée</span>.
         </p>
         <p class="mt-4 max-w-xs text-sm leading-relaxed text-indigo-200/80">
