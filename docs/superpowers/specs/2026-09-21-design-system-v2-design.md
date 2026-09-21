@@ -85,7 +85,7 @@ ui: {
 | hazi-700 | `#122556` | texte sur fonds clairs (contraste) |
 | hazi-800 | `#0D1B42` | textes bleus foncés |
 | hazi-900 | `#09122E` | fonds brand |
-| hazi-950 | `#050B1D` | réservé |
+| hazi-950 | `#050B1D` | non utilisé pour l'instant (réservé à de futurs fonds brand très sombres) |
 
 ### Rôles sémantiques
 
@@ -142,7 +142,7 @@ Règles : texte ≥ 4.5:1 (clair et sombre), bordures/icônes ≥ 3:1, `#000000`
 
 ### `app/components/TeamsMenu.vue`
 
-- Remplacer les teams fictives (Nuxt, NuxtHub, NuxtLabs) par les **organisations réelles** de l'utilisateur : même source de données que `app/pages/settings/organisations.vue` (table Supabase `organisations`, en lecture).
+- Remplacer les teams fictives (Nuxt, NuxtHub, NuxtLabs) par les **organisations réelles** : lecture via `useParametresStore().organisations` (store Pinia, même source que `app/pages/settings/organisations.vue`, table Supabase `organisations`).
 - « Create team » : supprimé (la création reste dans la page Paramètres → Organisations).
 - « Manage teams » : renommé « Gérer les organisations », lien vers `/settings/organisations`.
 
