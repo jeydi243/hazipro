@@ -11,7 +11,8 @@
                             class="w-full" />
                     </UFormField>
                     <UFormField label="Type NF" placeholder="Employé" name="type_nf">
-                        <UInput v-model="state.type_nf" class="w-full" />
+                        <USelectMenu v-model="state.type_nf" value-key="id" :items="itemsBeneficiaires"
+                            class="w-full" />
                     </UFormField>
                     <UFormField label="Nature de la note" placeholder="" name="nature_nf">
                         <USelectMenu v-model="state.nature_id" value-key="id" :items="itemsNaturesOrganisation"
@@ -28,11 +29,11 @@
                         <USelectMenu v-model="state.matrice_id" value-key="id" :items="itemsMatriceNF" class="w-full" />
                     </UFormField>
                     <UFormField label="1er Approbateur" placeholder="_" name="aprobateur">
-                        <UInput v-model="state.approbateur_id" class="w-full" />
+                        <UInput :model-value="state.approbateur_id" class="w-full" readonly />
                     </UFormField>
-                    <UFormField label="Approbateur" placeholder="_" name="aprobateur">
+                    <!-- <UFormField label="Approbateur" placeholder="_" name="aprobateur">
                         <UInput v-model="state.approbateur_id" class="w-full" />
-                    </UFormField>
+                    </UFormField> -->
                     <UFormField label="Date de la note" name="date_document">
                         <UInputDate ref="inputDate" v-model="dateDocument" :max-value="maxDate">
                             <template #trailing>
@@ -53,9 +54,9 @@
                     <UFormField label="Taux" placeholder="_" name="aprobateur">
                         <UInput v-model="state.taux" class="w-full" disabled />
                     </UFormField>
-                    <UFormField label="Groupe de paiement" placeholder="_" name="aprobateur">
+                    <!-- <UFormField label="Groupe de paiement" placeholder="_" name="aprobateur">
                         <UInput v-model="state.groupe_paiement_id" class="w-full" />
-                    </UFormField>
+                    </UFormField> -->
                 </div>
                 <div class="mt-auto">
                     <UFormField label="Bénéficiaire" placeholder="_" name="beneficiaire_id" class="mb-2">
@@ -90,6 +91,9 @@
                     </UFormField>
                     <UFormField label="Statut programmation" placeholder="_" name="statut_programmation">
                         <UInput v-model="state.statut_programmation" class="w-full" disabled />
+                    </UFormField>
+                    <UFormField label="Numéro de document" placeholder="_" name="numero_document">
+                        <UInput v-model="state.numero_document" class="w-full" disabled />
                     </UFormField>
                 </div>
                 <!-- <div class="flex justify-end gap-2">
@@ -130,6 +134,7 @@
         nature_id: z.string(),
         beneficiaire_id: z.string(),
         devise_id: z.string(),
+        numero_document: z.string().optional(),
         statut_document: z.string(),
         statut_approbation: z.string(),
         statut_paiement: z.string(),
@@ -189,14 +194,40 @@
         { immediate: true }
     )
 
+    watch(
+        [() => state.matrice_id, () => state.organisation_id],
+        ([matriceId, organisationId]) => {
+            if (!matriceId || !organisationId) {
+                state.approbateur_id = undefined
+                return
+            }
+
+            const approbateurId = parametresStore.getFirstApprobateurID(
+                matriceId,
+                organisationId,
+            )
+
+            if (approbateurId) {
+                state.approbateur_id = approbateurId
+            }
+        },
+        { immediate: true }
+    )
+
     const Organisations = parametresStore.organisations;
     const TypeBudget = useLookupsStore().getTypeBudget;
+    const TypeBeneficiaires = useLookupsStore().getTypeBeneficiaires;
     const MatriceNF = parametresStore.getMatriceNF;
     const Devises = useLookupsStore().getDevise;
 
     const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
         label: org.nom,
         id: org.id
+    })) || [])
+
+    const itemsBeneficiaires = computed<SelectMenuItem[]>(() => TypeBeneficiaires?.map((beneficiaire: Lookup) => ({
+        label: beneficiaire.nom,
+        id: beneficiaire.id
     })) || [])
 
     const itemsNaturesOrganisation = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({

@@ -1,6 +1,6 @@
 import { items } from "happy-dom/lib/PropertySymbol.js";
 import { defineStore } from "pinia";
-import type { Taux } from "~/types";
+import type { Approbateur, Taux } from "~/types";
 import type { Matrice } from "~/types/organisation";
 
 export const useParametresStore = defineStore("parametres", () => {
@@ -9,6 +9,7 @@ export const useParametresStore = defineStore("parametres", () => {
   const supabase = useSupabaseClient();
   const itemsMatrice = ref<Matrice[]>([]);
   const itemsTaux = ref<Taux[]>([]);
+  const itemsApprobateurs = ref<Approbateur[]>([]);
 
   const lookupsStore = useLookupsStore();
   const clientsStore = useClientsStore();
@@ -148,6 +149,12 @@ export const useParametresStore = defineStore("parametres", () => {
   const getClasseById = computed(() => (id: string) =>
     classes.value.find((c) => c.id === id)?.nom
   );
+  const getFirstApprobateurID = computed(
+    () => (matrice_id: string, org_id: string) =>
+      itemsApprobateurs.value.find((a) =>
+        a.matrice_id === matrice_id && a.org_id === org_id
+      )?.user_id,
+  );
   const getLookupsById = computed(() => (id: string) =>
     lookups.value.find((l) => l.id == id)?.nom
   );
@@ -155,7 +162,7 @@ export const useParametresStore = defineStore("parametres", () => {
     classes.value.map((c) => ({ label: c.nom, id: c.id }))
   );
   const getMatriceNF = computed(() =>
-    itemsMatrice.value.map((c) => ({ label: c.nom, id: c.id }))
+    itemsMatrice.value.map((c) => ({ nom: c.nom, id: c.id }))
   );
   const getTaux = computed(() =>
     itemsTaux.value.map((c) => {
@@ -175,7 +182,10 @@ export const useParametresStore = defineStore("parametres", () => {
     })
   );
 
-  function getTauxForDevise(destinationCurrencyId: string, date?: string | null) {
+  function getTauxForDevise(
+    destinationCurrencyId: string,
+    date?: string | null,
+  ) {
     if (!destinationCurrencyId) return null;
 
     const usdLookup = lookups.value.find((lookup) =>
@@ -188,7 +198,8 @@ export const useParametresStore = defineStore("parametres", () => {
     }
 
     const matchingTaux = itemsTaux.value.filter((taux) =>
-      taux.from_currency === usdLookup.id && taux.to_currency === destinationCurrencyId
+      taux.from_currency === usdLookup.id &&
+      taux.to_currency === destinationCurrencyId
     );
 
     if (!matchingTaux.length) return null;
@@ -231,5 +242,7 @@ export const useParametresStore = defineStore("parametres", () => {
     getTauxForDevise,
     createTaux,
     itemsTaux,
+    itemsApprobateurs,
+    getFirstApprobateurID,
   };
 });

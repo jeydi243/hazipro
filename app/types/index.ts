@@ -42,6 +42,14 @@ export interface Taux {
     valeur: number;
     date_taux: string;
 }
+export interface Approbateur {
+    id: string;
+    matrice_id: string;
+    user_id: string;
+    org_id: string | Organisation;
+    type_beneficiaire: string | Lookup;
+    date_taux: string;
+}
 export interface NF {
     id: string;
     organisation_id: string | Organisation;

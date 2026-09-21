@@ -8,8 +8,8 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     async function fetchAll(_ownerId?: string | null) {
         const supabase = useSupabaseClient();
         loading.value = true;
-        const { data, error } = await supabase.from("nf").select(
-            "id, code, nom, description, organisation_id, client:owner_id(id, nom, code)",
+        const { data, error } = await supabase.from("beneficiaires").select(
+            "id, code, nom,postnom, prenom genre, organisation_id, client:owner_id(id, nom)",
         );
         if (error) throw error;
         if (data) items.value = data as unknown as Beneficiaire[];
@@ -19,17 +19,33 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
 
     async function create(data: Partial<Beneficiaire>) {
         const supabase = useSupabaseClient();
-        const { data: created, error } = await supabase.from("nf").insert(
-            data,
-        ).select("id, code, nom, description, organisation_id");
+        const ownerId = useParametresStore().owner_id;
+
+        if (!ownerId) {
+            throw new Error("ownerId introuvable");
+        }
+
+        const { data: created, error } = await supabase
+            .from("beneficiaires")
+            .insert({
+                ...data,
+                owner_id: ownerId,
+            } as never)
+            .select()
+            .single();
+
         if (error) throw error;
-        if (created) items.value.unshift(created[0] as unknown as Beneficiaire);
-        return created[0];
+
+        items.value.unshift(created as Beneficiaire);
+        return created;
     }
 
     async function remove(id: string) {
         const supabase = useSupabaseClient();
-        const { error } = await supabase.from("nf").delete().eq("id", id);
+        const { error } = await supabase.from("beneficiaires").delete().eq(
+            "id",
+            id,
+        );
         if (error) throw error;
         items.value = items.value.filter((f) => f.id !== id);
     }
@@ -38,7 +54,9 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
         const supabase = useSupabaseClient();
         const { data, error } = await supabase
             .from("nf_lines")
-            .select("id, nf_header_id, article_id, article:article_id(id, nom, code)")
+            .select(
+                "id, nf_header_id, article_id, article:article_id(id, nom, code)",
+            )
             .eq("nf_header_id", headerId);
         if (error) throw error;
         return data;

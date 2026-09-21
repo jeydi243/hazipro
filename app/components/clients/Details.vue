@@ -1,17 +1,14 @@
 <script setup lang="ts">
-
-// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-const EMPTY_ROWS: any[] = []
 import type { SelectMenuItem, TableColumn } from '@nuxt/ui'
 import type { Client, Organisation, ArticleAffectation } from '~/types'
 
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 const props = defineProps<{ client: Client | null }>()
 const open = defineModel<boolean>('open', { default: false })
-
 const supabase = useSupabaseClient()
 const toast = useToast()
 const clientsStore = useClientsStore()
-
 const selectedOrgId = ref<string | undefined>(undefined)
 const isAddingRecord = ref(false)
 
@@ -78,12 +75,12 @@ const columns: TableColumn<any>[] = [
         id: 'actions',
         header: '',
         cell: ({ row }) => h('div', { class: 'flex justify-end' }, h(resolveComponent('UButton'), {
-            color: 'error',
-            variant: 'ghost',
-            icon: 'i-lucide-trash',
+            "color": 'error',
+            "variant": 'ghost',
+            "icon": 'i-lucide-trash',
             'aria-label': 'Supprimer',
-            size: 'xs',
-            onClick: () => deleteAffectation(row.original.id)
+            "size": 'xs',
+            "onClick": () => deleteAffectation(row.original.id)
         }))
     }
 ]
@@ -125,22 +122,22 @@ async function deleteAffectation(id: number) {
             <div v-if="props.client" class="space-y-6">
                 <!-- Détails de l'article -->
                 <div
-                    class="grid grid-cols-2 gap-4 text-sm p-4 bg-(--ui-bg-elevated) rounded-lg border border-(--ui-border)">
+                    class="grid grid-cols-2 gap-4 text-sm p-4 bg-elevated rounded-lg border border-default">
                     <div>
-                        <p class="text-(--ui-text-muted) mb-1">Nom</p>
-                        <p class="font-medium text-(--ui-text-highlighted)">{{ props.client.nom }}</p>
+                        <p class="text-muted mb-1">Nom</p>
+                        <p class="font-medium text-highlighted">{{ props.client.nom }}</p>
                     </div>
                     <div>
-                        <p class="text-(--ui-text-muted) mb-1">Code</p>
-                        <p class="font-mono text-(--ui-text-highlighted)">{{ props.client.code }}</p>
+                        <p class="text-muted mb-1">Code</p>
+                        <p class="font-mono text-highlighted">{{ props.client.code }}</p>
                     </div>
                     <div class="col-span-2">
-                        <p class="text-(--ui-text-muted) mb-1">Description</p>
+                        <p class="text-muted mb-1">Description</p>
                         <p>{{ props.client.description }}</p>
                     </div>
                     <div v-if="props.client.type_id" class="col-span-2">
-                        <p class="text-(--ui-text-muted) mb-1">Type de client</p>
-                        <p class="font-medium text-(--ui-text-highlighted)">
+                        <p class="text-muted mb-1">Type de client</p>
+                        <p class="font-medium text-highlighted">
                             {{ (props.client.type_id as any)?.nom }}
                         </p>
                     </div>
@@ -149,7 +146,7 @@ async function deleteAffectation(id: number) {
                 <!-- Affectations -->
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-(--ui-text-muted)">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-muted">
                             Organisations Affectées
                         </h3>
                     </div>
@@ -168,7 +165,7 @@ async function deleteAffectation(id: number) {
 
                     <!-- Liste des affectations -->
                     <UTable :data="affectations ?? EMPTY_ROWS" :columns="columns" :loading="loadingAffectations"
-                            class="border border-(--ui-border) rounded-md overflow-hidden" :ui="{
+                            class="border border-default rounded-md overflow-hidden" :ui="{
                                 base: 'table-fixed border-separate border-spacing-0',
                                 thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                                 tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -176,7 +173,7 @@ async function deleteAffectation(id: number) {
                                 td: 'py-2 px-3 border-b border-(--ui-border)'
                             }">
                         <template #empty-state>
-                            <div class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
+                            <div class="flex flex-col items-center justify-center py-6 text-muted text-sm">
                                 <p>Aucune affectation trouvée pour cet article.</p>
                             </div>
                         </template>
@@ -184,7 +181,7 @@ async function deleteAffectation(id: number) {
                 </div>
             </div>
             <div v-else class="py-12 flex justify-center">
-                <UIcon name="i-lucide-loader-2" class="animate-spin h-8 w-8 text-(--ui-primary)" />
+                <UIcon name="i-lucide-loader-2" class="animate-spin h-8 w-8 text-primary" />
             </div>
         </template>
     </UModal>

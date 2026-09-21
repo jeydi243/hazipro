@@ -123,6 +123,9 @@ export const useLookupsStore = defineStore("lookups", () => {
   const getTypeOrganisations = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "type_organisations")
   );
+  const getTypeBeneficiaires = computed(() =>
+    lookups.value.filter((l) => l.classe?.table_name === "type_beneficiaires")
+  );
 
   const getGroupeTaxation = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "groupe_taxation")
@@ -149,5 +152,6 @@ export const useLookupsStore = defineStore("lookups", () => {
     getTypeArticles,
     getTypeOrganisations,
     getGroupeTaxation,
+    getTypeBeneficiaires
   };
 });
