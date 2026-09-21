@@ -73,32 +73,39 @@ export const useParametresStore = defineStore("parametres", () => {
   async function init(userId?: string) {
     await restoreOwnerID(userId ?? useSupabaseUser().value?.id);
 
-    const results = await Promise.allSettled([
-      lookupsStore.fetchAll(),
-      owner_id.value
+    const tasks = [
+      { name: "lookups", promise: lookupsStore.fetchAll() },
+      { name: "organisations", promise: owner_id.value
         ? organisationsStore.fetchAll(owner_id.value)
-        : Promise.resolve(),
-      owner_id.value
+        : Promise.resolve() },
+      { name: "articles", promise: owner_id.value
         ? articlesStore.fetchAll(owner_id.value)
-        : Promise.resolve(),
-      owner_id.value
+        : Promise.resolve() },
+      { name: "clients", promise: owner_id.value
         ? clientsStore.fetchAll(owner_id.value)
-        : Promise.resolve(),
-      owner_id.value
+        : Promise.resolve() },
+      { name: "factures", promise: owner_id.value
         ? facturesStore.fetchAll(owner_id.value)
-        : Promise.resolve(),
-      owner_id.value
+        : Promise.resolve() },
+      { name: "profils", promise: owner_id.value
         ? profilsStore.fetchAll(owner_id.value)
-        : Promise.resolve(),
-      owner_id.value
+        : Promise.resolve() },
+      { name: "beneficiaires", promise: owner_id.value
         ? beneficiairesStore.fetchAll(owner_id.value)
-        : Promise.resolve(),
-      owner_id.value ? fetchTaux(owner_id.value) : Promise.resolve(),
-      owner_id.value ? fetchMatrices(owner_id.value) : Promise.resolve(),
-    ]);
+        : Promise.resolve() },
+      { name: "taux", promise: owner_id.value
+        ? fetchTaux(owner_id.value)
+        : Promise.resolve() },
+      { name: "matrices", promise: owner_id.value
+        ? fetchMatrices(owner_id.value)
+        : Promise.resolve() },
+    ];
+    const results = await Promise.allSettled(tasks.map((task) => task.promise));
 
-    const errors = results.filter((r) => r.status === "rejected").map((r) =>
-      (r as PromiseRejectedResult).reason
+    const errors = results.flatMap((result, index) =>
+      result.status === "rejected"
+        ? [{ name: tasks[index].name, reason: result.reason }]
+        : []
     );
     if (errors.length > 0) console.error("[Store] Erreurs init:", errors);
 
@@ -198,8 +205,8 @@ export const useParametresStore = defineStore("parametres", () => {
     }
 
     const matchingTaux = itemsTaux.value.filter((taux) =>
-      taux.from_currency === usdLookup.id &&
-      taux.to_currency === destinationCurrencyId
+      taux.from_currency === usdLookup.id
+      && taux.to_currency === destinationCurrencyId
     );
 
     if (!matchingTaux.length) return null;
@@ -242,6 +249,7 @@ export const useParametresStore = defineStore("parametres", () => {
     getTauxForDevise,
     createTaux,
     itemsTaux,
+    itemsMatrice,
     itemsApprobateurs,
     getFirstApprobateurID,
   };

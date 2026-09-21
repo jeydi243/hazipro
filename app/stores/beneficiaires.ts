@@ -9,7 +9,7 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
         const supabase = useSupabaseClient();
         loading.value = true;
         const { data, error } = await supabase.from("beneficiaires").select(
-            "id, code, nom,postnom, prenom genre, organisation_id, client:owner_id(id, nom)",
+            "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur, owner_id",
         );
         if (error) throw error;
         if (data) items.value = data as unknown as Beneficiaire[];

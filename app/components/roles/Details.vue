@@ -79,7 +79,7 @@
         }
     ]
 
-    const { profils, usersRoles } = storeToRefs(parametresStore)
+    const { profils } = storeToRefs(parametresStore)
 
     const userItems = computed<SelectMenuItem[]>(() => profils.value?.map((item: any) => ({
         label: item.nom,
@@ -112,14 +112,14 @@
             <div v-if="props.role" class="space-y-6 mb-4">
                 <!-- Détails de l'article -->
                 <div
-                    class="grid grid-cols-2 gap-4 text-sm p-4 bg-(--ui-bg-elevated) rounded-lg border border-(--ui-border)">
+                    class="grid grid-cols-2 gap-4 text-sm p-4 bg-elevated rounded-lg border border-default">
                     <div>
-                        <p class="text-(--ui-text-muted) mb-1">Nom</p>
-                        <p class="font-medium text-(--ui-text-highlighted)">{{ props.role.nom }}</p>
+                        <p class="text-muted mb-1">Nom</p>
+                        <p class="font-medium text-highlighted">{{ props.role.nom }}</p>
                     </div>
                     <div>
-                        <p class="text-(--ui-text-muted) mb-1">Code</p>
-                        <p class="font-mono text-(--ui-text-highlighted)">{{ props.role.code }}</p>
+                        <p class="text-muted mb-1">Code</p>
+                        <p class="font-mono text-highlighted">{{ props.role.code }}</p>
                     </div>
                     <div class="col-span-2">
                         <p class="text-muted mb-1">Description</p>
@@ -152,7 +152,7 @@
 
             <!-- Liste des affectations -->
             <UTable :data="usersRoles ?? EMPTY_ROWS" :columns="columns"
-                class="border border-(--ui-border) rounded-md overflow-hidden" :ui="{
+                class="border border-default rounded-md overflow-hidden" :ui="{
                     base: 'table-fixed border-separate border-spacing-0',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -160,7 +160,7 @@
                     td: 'py-2 px-3 border-b border-(--ui-border)'
                 }">
                 <template #empty-state>
-                    <div class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
+                    <div class="flex flex-col items-center justify-center py-6 text-muted text-sm">
                         <p>Aucun utilisateur n'est affecté à ce rôle.</p>
                     </div>
                 </template>

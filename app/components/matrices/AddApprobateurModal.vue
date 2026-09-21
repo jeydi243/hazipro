@@ -3,9 +3,10 @@ import * as z from 'zod'
 import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
 import { CalendarDate, getLocalTimeZone } from '@internationalized/date'
 import type { Organisation, Profil } from '~/types'
+import type { Matrice } from '~/types/organisation';
 
 const props = defineProps<{
-    parent: Organisation | null
+    parent: Matrice | null
 }>()
 
 const emit = defineEmits(['user-added'])

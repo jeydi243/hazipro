@@ -129,8 +129,8 @@ async function uploadAvatar() {
               </div>
             </div>
             <div class="text-center">
-              <h2 class="text-xl font-bold text-(--ui-text-highlighted)">{{ fullName }}</h2>
-              <p class="text-sm text-(--ui-text-muted)">{{ authUser?.email }}</p>
+              <h2 class="text-xl font-bold text-highlighted">{{ fullName }}</h2>
+              <p class="text-sm text-muted">{{ authUser?.email }}</p>
             </div>
             <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileSelect" />
             <UButton
@@ -145,7 +145,7 @@ async function uploadAvatar() {
 
         <!-- Formulaire Informations -->
         <UCard title="Informations personnelles" description="Mettez à jour vos informations personnelles.">
-          <UForm :schema="schema" :state="state" @submit="onSubmit" class="space-y-4">
+          <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <UFormField label="Nom" name="nom" required>
                 <UInput v-model="state.nom" placeholder="Votre nom" autocomplete="family-name" />

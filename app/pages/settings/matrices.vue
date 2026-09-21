@@ -27,15 +27,15 @@
                             </UDropdownMenu>
                         </div>
                     </div>
-                    <MatricesAddModal @matrice-added="refreshMatrices" />
+                    <MatricesAddModal />
                 </template>
             </UDashboardNavbar>
         </template>
         <template #body>
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination"
-                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="organisations ?? emptyRows"
-                :columns="columns" :loading="pending" :ui="{
+                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="matrices ?? emptyRows"
+                :columns="columns" :ui="{
                     base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -56,16 +56,15 @@
         </template>
     </UDashboardPanel>
 
-    <PointFacturationDetails v-model:open="openSlideOver" :organisation="selectedOrganisation" />
-    <PointFacturationEditModal v-model:open="openEditModal" :organisation="selectedOrganisationToEdit"
-        @point-facturation-updated="refreshMatrices" />
+    <MatricesDetails v-model:open="openSlideOver" :matrice="selectedMatrice" />
+    <MatricesEditModal v-model:open="openEditModal" :matrice="selectedMatriceToEdit" />
 </template>
 
 <script setup lang="ts">
     import type { Row } from '@tanstack/table-core'
     import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
-    import type { Organisation } from '~/types'
     import { storeToRefs } from 'pinia'
+    import type { Matrice } from '~/types/organisation'
 
     useHead({
         title: 'Matrices',
@@ -77,10 +76,10 @@
     const supabase = useSupabaseClient()
     // Tableau vide STABLE : évite une nouvelle identité [] à chaque render
     // (boucle infinie du watch data de UTable pendant le chargement)
-    const emptyRows: Organisation[] = []
+    const emptyRows: Matrice[] = []
     const toast = useToast()
     const parametresStore = useParametresStore()
-    const { lookups } = storeToRefs(parametresStore)
+    const { lookups, itemsMatrices: matrices } = storeToRefs(parametresStore)
 
     // Utilisation du composable centralisé
     const {
@@ -108,9 +107,9 @@
     const columnDisplayItems = buildColumnDisplayItems(['select', 'details', 'code', 'nom', 'description', 'type', 'status', 'actions'])
 
     const openSlideOver = ref(false)
-    const selectedOrganisation = ref<Organisation | null>(null)
+    const selectedMatrice = ref<Matrice | null>(null)
     const openEditModal = ref(false)
-    const selectedOrganisationToEdit = ref<Organisation | null>(null)
+    const selectedMatriceToEdit = ref<Matrice | null>(null)
 
     const { copy } = useClipboard()
     const searchInput = ref('')
@@ -123,7 +122,7 @@
         debouncedSearch(val)
     })
 
-    const columns: TableColumn<Organisation>[] = [
+    const columns: TableColumn<Matrice>[] = [
         {
             id: 'select',
             header: ({ table }) =>
@@ -150,7 +149,7 @@
                 'aria-label': 'Agrandir',
                 'class': '-mx-2.5',
                 'onClick': () => {
-                    selectedOrganisation.value = row.original
+                    selectedMatrice.value = row.original
                     openSlideOver.value = true
                 }
             })),
@@ -196,10 +195,10 @@
             cell: ({ row }) => {
                 const statusStr = row.original.status || 'actif'
                 const color = {
-                    subscribed: 'success' as const,
-                    actif: 'success' as const,
-                    unsubscribed: 'error' as const,
-                    bounced: 'warning' as const
+                    "subscribed": 'success' as const,
+                    "actif": 'success' as const,
+                    "unsubscribed": 'error' as const,
+                    "bounced": 'warning' as const
                 }[statusStr] || 'neutral'
 
                 return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => statusStr)
@@ -232,14 +231,14 @@
         }
     ]
 
-    function getRowItems(row: Row<Organisation>): DropdownMenuItem[][] {
+    function getRowItems(row: Row<Matrice>): DropdownMenuItem[][] {
         return [[
             {
                 type: 'label' as const,
                 label: 'Actions'
             },
             {
-                label: 'Copie ID Organisation',
+                label: 'Copie ID Matrice',
                 icon: 'i-lucide-copy',
                 onSelect() {
                     copy(row.original.id.toString())
@@ -254,7 +253,7 @@
                 label: 'Détails',
                 icon: 'i-lucide-maximize-2',
                 onSelect() {
-                    selectedOrganisation.value = row.original
+                    selectedMatrice.value = row.original
                     openSlideOver.value = true
                 }
             },
@@ -262,7 +261,7 @@
                 label: 'Modifier',
                 icon: 'i-lucide-pencil',
                 onSelect() {
-                    selectedOrganisationToEdit.value = row.original
+                    selectedMatriceToEdit.value = row.original
                     openEditModal.value = true
                 }
             },
@@ -281,11 +280,4 @@
         ]]
     }
 
-    const { data: organisations, pending, refresh: refreshMatrices } = useAsyncData('matrices', async () => {
-        const { data, error } = await supabase.from('matrices').select('id, nom, code, description, status, owner_id, type:type_document_id(id, nom, code)')
-        if (error) {
-            throw error
-        }
-        return data as Organisation[]
-    })
 </script>

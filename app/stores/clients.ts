@@ -10,7 +10,7 @@ export const useClientsStore = defineStore("clients", () => {
 	async function fetchAll(ownerId?: string | null) {
 		loading.value = true;
 		let query = supabase.from("clients").select(
-			"id, nom, code, description, nif, owner_id, type_id, type:type_id(id, nom, code)",
+			"id, nom, code, raison_sociale, nif, owner_id, type_id, type:type_id(id, nom, code)",
 		);
 		if (ownerId) query = query.eq("owner_id", ownerId);
 		const { data, error } = await query;
@@ -23,7 +23,7 @@ export const useClientsStore = defineStore("clients", () => {
 	async function fetchById(id: string) {
 		const { data, error } = await supabase
 			.from("clients")
-			.select("id, nom, code, description, nif, owner_id, type_id")
+			.select("id, nom, code, raison_sociale, nif, owner_id, type_id")
 			.eq("id", id)
 			.single();
 		if (error) throw error;
@@ -34,7 +34,7 @@ export const useClientsStore = defineStore("clients", () => {
 		const { data: created, error } = await supabase
 			.from("clients")
 			.insert(data as never)
-			.select("id, nom, code, description, nif, owner_id, type_id");
+			.select("id, nom, code, raison_sociale, nif, owner_id, type_id");
 		if (error) throw error;
 		if (created) items.value.unshift(created[0] as unknown as Client);
 		return created[0];
@@ -45,7 +45,7 @@ export const useClientsStore = defineStore("clients", () => {
 			.from("clients")
 			.update(data as never)
 			.eq("id", id)
-			.select("id, nom, code, description, nif, owner_id, type_id");
+			.select("id, nom, code, raison_sociale, nif, owner_id, type_id");
 		if (error) throw error;
 		if (updated) {
 			const idx = items.value.findIndex((c) => c.id === id);

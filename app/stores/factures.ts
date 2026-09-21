@@ -8,7 +8,7 @@ export const useFacturesStore = defineStore('factures', () => {
 
   async function fetchAll(_ownerId?: string | null) {
     loading.value = true
-    const { data, error } = await supabase.from('invoices').select('id, numero, date, owner_id, client_id, client:client_id(id, nom, code)')
+    const { data, error } = await supabase.from('invoices').select('id, numero, date, owner_id, client_id')
     if (error) throw error
     if (data) items.value = data as unknown as Facture[]
     loading.value = false
@@ -16,7 +16,7 @@ export const useFacturesStore = defineStore('factures', () => {
   }
 
   async function create(data: Partial<Facture>) {
-    const { data: created, error } = await supabase.from('invoices').insert(data).select('id, numero, date, owner_id, client_id')
+    const { data: created, error } = await supabase.from('invoices').insert(data as never).select('id, numero, date, owner_id, client_id')
     if (error) throw error
     if (created) items.value.unshift(created[0] as unknown as Facture)
     return created[0]
