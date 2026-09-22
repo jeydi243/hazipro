@@ -24,18 +24,23 @@ const sections = [
 
 <template>
     <UDashboardPanel>
-        <UDashboardSection title="Paramètres" description="Configuration générale de votre espace Hazipro.">
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                <UCard v-for="section in sections" :key="section.to" :to="section.to">
-                    <div class="flex items-start gap-3">
-                        <UIcon :name="section.icon" class="size-5 shrink-0 text-(--ui-text-highlighted)" />
-                        <div>
-                            <p class="font-medium text-(--ui-text-highlighted)">{{ section.label }}</p>
-                            <p class="text-xs text-(--ui-text-muted)">{{ section.description }}</p>
+        <template #header>
+            <UDashboardNavbar title="Paramètres" description="Configuration générale de votre espace Hazipro." />
+        </template>
+        <template #body>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 m-2">
+                <UCard v-for="section in sections" :key="section.to">
+                    <NuxtLink :to="section.to" block>
+                        <div class="flex items-start gap-3">
+                            <UIcon :name="section.icon" class="size-5 shrink-0 text-(--ui-text-highlighted)" />
+                            <div>
+                                <p class="font-medium text-(--ui-text-highlighted)">{{ section.label }}</p>
+                                <p class="text-xs text-(--ui-text-muted)">{{ section.description }}</p>
+                            </div>
                         </div>
-                    </div>
+                    </NuxtLink>
                 </UCard>
             </div>
-        </UDashboardSection>
+        </template>
     </UDashboardPanel>
 </template>

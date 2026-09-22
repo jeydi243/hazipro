@@ -4,33 +4,21 @@ useSeoMeta({
     description: 'Tableau de bord Hazipro.',
 })
 
-const links = [{
-    label: 'Note de frais',
-    description: 'Créer et suivre les notes de frais',
-    icon: 'i-lucide-id-card',
-    to: '/nf',
-}, {
-    label: 'OP - Fournisseur',
-    description: 'Gérer les opérations fournisseurs',
-    icon: 'i-lucide-file-text',
-    to: '/op',
-}, {
-    label: 'Bénéficiaires',
-    description: 'Gérer les bénéficiaires',
-    icon: 'i-lucide-users',
-    to: '/beneficiaires',
-}, {
-    label: 'Paramètres',
-    description: 'Configurer clients, organisations, taux, matrices…',
-    icon: 'i-lucide-settings',
-    to: '/settings',
-}]
+const links = [
+    { label: 'Note de frais', description: 'Créer et suivre les notes de frais', icon: 'i-lucide-id-card', to: '/nf' },
+    { label: 'OP - Fournisseur', description: 'Gérer les opérations fournisseurs', icon: 'i-lucide-file-text', to: '/op' },
+    { label: 'Bénéficiaires', description: 'Gérer les bénéficiaires', icon: 'i-lucide-users', to: '/beneficiaires' },
+    { label: 'Paramètres', description: 'Configurer clients, organisations, taux, matrices…', icon: 'i-lucide-settings', to: '/settings' },
+]
 </script>
 
 <template>
     <UDashboardPanel>
-        <UDashboardSection title="Tableau de bord">
-            <UDashboardCard>
+        <template #header>
+            <UDashboardNavbar title="Tableau de bord" />
+        </template>
+        <template #body>
+            <UCard class="m-2">
                 <template #header>
                     <h2 class="text-lg font-semibold">Bienvenue sur Hazipro</h2>
                 </template>
@@ -49,7 +37,7 @@ const links = [{
                         </span>
                     </UButton>
                 </div>
-            </UDashboardCard>
-        </UDashboardSection>
+            </UCard>
+        </template>
     </UDashboardPanel>
 </template>
