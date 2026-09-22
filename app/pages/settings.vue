@@ -16,22 +16,22 @@ const links = [{
     to: '/settings/lookups'
 }, {
     label: 'Organisations',
-    icon: 'octicon:organization-16',
+    icon: 'i-lucide-building-2',
     to: '/settings/organisations'
 },
 {
     label: 'Matrices',
-    icon: 'octicon:organization-16',
+    icon: 'i-lucide-building-2',
     to: '/settings/matrices'
 },
 {
     label: 'Articles',
-    icon: 'icon-park-outline:ad-product',
+    icon: 'i-lucide-package',
     to: '/settings/articles'
 },
 {
     label: 'Taux',
-    icon: 'icon-park-outline:ad-product',
+    icon: 'i-lucide-package',
     to: '/settings/taux'
 },
 
@@ -53,7 +53,7 @@ const links = [{
 
 {
     label: 'Clients',
-    icon: 'icon-park-outline:ad-product',
+    icon: 'i-lucide-package',
     to: '/settings/clients'
 },
 {
