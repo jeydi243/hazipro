@@ -120,7 +120,7 @@
                                     <MatricesAddApprobateurModal :parent="props.matrice" />
                                 </div>
                                 <UTable :data="approbateurs ?? EMPTY_ROWS" :columns="columns"
-                                    class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
+                                    class="overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
                                         <div class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
                                             <p>Aucun service trouvé pour cette matrice.</p>

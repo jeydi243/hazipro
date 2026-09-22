@@ -153,7 +153,7 @@
 
             <!-- Liste des affectations -->
             <UTable :data="usersRoles ?? EMPTY_ROWS" :columns="columns"
-                class="border border-default rounded-md overflow-hidden" :ui="haziTableUiEmbedded">
+                class="overflow-hidden" :ui="haziTableUiEmbedded">
                 <template #empty-state>
                     <div class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
                         <p>Aucun utilisateur n'est affecté à ce rôle.</p>

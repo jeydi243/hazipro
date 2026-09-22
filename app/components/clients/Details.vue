@@ -166,7 +166,7 @@ async function deleteAffectation(id: number) {
 
                     <!-- Liste des affectations -->
                     <UTable :data="affectations ?? EMPTY_ROWS" :columns="columns" :loading="loadingAffectations"
-                            class="border border-default rounded-md overflow-hidden" :ui="haziTableUiEmbedded">
+                            class="overflow-hidden" :ui="haziTableUiEmbedded">
                         <template #empty-state>
                             <div class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
                                 <p>Aucune affectation trouvée pour cet article.</p>

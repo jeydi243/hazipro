@@ -25,12 +25,13 @@ const sections = [
 <template>
     <UDashboardPanel>
         <template #header>
-            <UDashboardNavbar title="Paramètres" description="Configuration générale de votre espace Hazipro." />
+            <UDashboardNavbar title="Paramètres" />
         </template>
         <template #body>
+            <p class="text-sm text-(--ui-text-muted) m-2">Configuration générale de votre espace Hazipro.</p>
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 m-2">
                 <UCard v-for="section in sections" :key="section.to">
-                    <NuxtLink :to="section.to" block>
+                    <NuxtLink :to="section.to" class="block">
                         <div class="flex items-start gap-3">
                             <UIcon :name="section.icon" class="size-5 shrink-0 text-(--ui-text-highlighted)" />
                             <div>

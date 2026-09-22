@@ -73,7 +73,7 @@ Règles : texte ≥ 4.5:1 (clair et sombre) ; bordures/icônes ≥ 3:1 ; jamais 
 - **Font unique :** Plus Jakarta Sans Variable (self-hosted via `@fontsource-variable/plus-jakarta-sans`).
 - **Chiffres tabulaires :** toute colonne numérique (montants, taux, codes, NIF) utilise `tabular-nums`.
 - **Hiérarchie :** titre de page semibold ; libellé principal (nom/code) en `text-(--ui-text-highlighted)` ; reste du corps de table en `text-(--ui-text-muted)`.
-- **Densité 9/10 :** corps de table 13px, cellules `px-2 py-1.5` ; formulaires 16px ; cibles interactives ≥ 40px (44 recommandé).
+- **Densité 9/10 :** corps de table 13px, cellules `p-2` (header `py-1`) ; formulaires 16px ; cibles interactives ≥ 40px (44 recommandé).
 - Interdits : corps < 12px, uppercase hors badges.
 
 ## Icons

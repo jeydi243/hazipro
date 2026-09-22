@@ -154,7 +154,7 @@ const tokenColumns: TableColumn<any>[] = [
                                     <PointFacturationAttachUserModal :parent="props.organisation" @user-added="refresh" />
                                 </div>
                                 <UTable :data="services ?? EMPTY_ROWS" :columns="columns" :loading="pending"
-                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
+                                        class="overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
                                         <div
                                             class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
@@ -170,7 +170,7 @@ const tokenColumns: TableColumn<any>[] = [
                                     <OrganisationsAddEmplacementModal :parent="props.organisation" @emplacement-added="refresh" />
                                 </div>
                                 <UTable :data="emplacements ?? EMPTY_ROWS" :columns="columns" :loading="pending"
-                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
+                                        class="overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
                                         <div
                                             class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
