@@ -1,42 +1,38 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from '@nuxt/ui'
+
 defineProps<{
     collapsed?: boolean
 }>()
 
-const teams = ref([{
-    label: 'Nuxt',
-    avatar: {
-        src: 'https://github.com/nuxt.png',
-        alt: 'Nuxt'
-    }
-}, {
-    label: 'NuxtHub',
-    avatar: {
-        src: 'https://github.com/nuxt-hub.png',
-        alt: 'NuxtHub'
-    }
-}, {
-    label: 'NuxtLabs',
-    avatar: {
-        src: 'https://github.com/nuxtlabs.png',
-        alt: 'NuxtLabs'
-    }
-}])
-const selectedTeam = ref(teams.value[0])
+const parametresStore = useParametresStore()
+const organisations = computed(() => parametresStore.organisations)
+const selectedOrganisation = ref<string | null>(null)
 
-const items = computed(() => {
-    return [teams.value.map(team => ({
-        ...team,
+const items = computed<DropdownMenuItem[][]>(() => {
+    const orgs: DropdownMenuItem[] = organisations.value.map(org => ({
+        label: org.nom,
+        avatar: { src: undefined, alt: org.nom },
         onSelect() {
-            selectedTeam.value = team
-        }
-    })), [{
-        label: 'Create team',
-        icon: 'i-lucide-circle-plus'
-    }, {
-        label: 'Manage teams',
-        icon: 'i-lucide-cog'
-    }]]
+            selectedOrganisation.value = org.id
+        },
+    }))
+
+    return [
+        orgs.length ? orgs : [{ type: 'label', label: 'Aucune organisation' }],
+        [{
+            label: 'Gérer les organisations',
+            icon: 'i-lucide-cog',
+            to: '/settings/organisations',
+        }],
+    ]
+})
+
+const selected = computed(() => {
+    const org = organisations.value.find(o => o.id === selectedOrganisation.value) ?? organisations.value[0]
+    return org
+        ? { label: org.nom, avatar: { src: undefined, alt: org.nom } }
+        : { label: 'Hazipro', avatar: { src: undefined, alt: 'Hazipro' } }
 })
 </script>
 
@@ -44,8 +40,8 @@ const items = computed(() => {
     <UDropdownMenu :items="items" :content="{ align: 'center', collisionPadding: 12 }"
                    :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }">
         <UButton v-bind="{
-                     ...selectedTeam,
-                     label: collapsed ? undefined : selectedTeam?.label,
+                     ...selected,
+                     label: collapsed ? undefined : selected.label,
                      trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
                  }" color="neutral" variant="ghost" block :square="collapsed" class="data-[state=open]:bg-(--ui-bg-elevated)"
                  :class="[!collapsed && 'py-2']" :ui="{
