@@ -191,7 +191,7 @@
             { type: 'separator' },
             {
                 label: 'Details',
-                icon: 'material-symbols:open-in-full-rounded',
+                icon: 'i-lucide-maximize-2',
                 onSelect() {
                     selectedBenef.value = row.original
                     openDetailsClasse.value = true

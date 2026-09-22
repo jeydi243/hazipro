@@ -231,7 +231,7 @@ function getRowItems(row: Row<Profil>) {
         },
         {
             label: 'Details',
-            icon: 'material-symbols:open-in-full-rounded',
+            icon: 'i-lucide-maximize-2',
             onSelect() {
                 openDetailsUser.value = !openDetailsUser.value
             }

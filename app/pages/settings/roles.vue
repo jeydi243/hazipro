@@ -232,7 +232,7 @@ const EMPTY_ROWS: any[] = []
             },
             {
                 label: 'Details',
-                icon: 'material-symbols:open-in-full-rounded',
+                icon: 'i-lucide-maximize-2',
                 onSelect() {
                     openDetailsRole.value = !openDetailsRole.value
                 }

@@ -100,7 +100,7 @@
             cell: ({ row }) => h(UButton, {
                 "color": 'primary',
                 "variant": 'ghost',
-                "icon": 'material-symbols:edit-outline-sharp',
+                "icon": 'i-lucide-pencil',
                 "aria-label": 'Modifier',
                 "onClick": () => {
                     selectedClient.value = row.original
@@ -212,7 +212,7 @@
             },
             {
                 label: 'Voir les détails',
-                icon: 'material-symbols:open-in-full-rounded',
+                icon: 'i-lucide-maximize-2',
                 onSelect() {
                     selectedClient.value = row.original
                     openDetailsClient.value = true
@@ -220,7 +220,7 @@
             },
             {
                 label: 'Voir les affectations',
-                icon: 'material-symbols-light:add-link',
+                icon: 'i-lucide-link',
                 onSelect() {
                     // openDetailsAffectation.value = !openDetailsAffectation.value
                 }

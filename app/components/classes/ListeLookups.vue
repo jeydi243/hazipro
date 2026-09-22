@@ -109,7 +109,7 @@ const columnsLookups: TableColumn<Lookup>[] = [
             h(UButton, {
                 color: 'neutral',
                 variant: 'ghost',
-                icon: 'material-symbols:edit-outline-rounded',
+                icon: 'i-lucide-pencil',
                 'aria-label': 'Modifier',
                 onClick: () => {
                     selectedLookup.value = row.original

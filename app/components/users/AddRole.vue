@@ -126,7 +126,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
                 <div class="flex justify-end gap-2 pt-2">
                     <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
-                    <UButton label="Attribuer un role" color="primary" icon="material-symbols:add" variant="solid"
+                    <UButton label="Attribuer un role" color="primary" icon="i-lucide-plus" variant="solid"
                              type="submit" />
                 </div>
             </UForm>

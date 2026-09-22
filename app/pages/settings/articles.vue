@@ -289,7 +289,7 @@ function getRowItems(row: Row<Article>) {
         },
         {
             label: 'Voir les détails',
-            icon: 'material-symbols:open-in-full-rounded',
+            icon: 'i-lucide-maximize-2',
             onSelect() {
                 selectedArticle.value = row.original
                 openDetailsArticle.value = true
@@ -297,7 +297,7 @@ function getRowItems(row: Row<Article>) {
         },
         {
             label: 'Voir les affectations',
-            icon: 'material-symbols-light:add-link',
+            icon: 'i-lucide-link',
             onSelect() {
                 openDetailsAffectation.value = !openDetailsAffectation.value
             }

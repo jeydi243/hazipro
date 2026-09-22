@@ -198,7 +198,7 @@ const EMPTY_ROWS: any[] = []
             { type: 'separator' },
             {
                 label: 'Details',
-                icon: 'material-symbols:open-in-full-rounded',
+                icon: 'i-lucide-maximize-2',
                 onSelect() {
                     selectedNf.value = row.original
                     openDetailsClasse.value = true

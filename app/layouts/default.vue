@@ -15,7 +15,7 @@
         },
         {
             label: 'Note de frais',
-            icon: 'duo-icons:id-card',
+            icon: 'i-lucide-id-card',
             to: '/nf',
             onSelect: () => {
                 open.value = false
@@ -31,7 +31,7 @@
         },
         {
             label: 'Bénéficiaires',
-            icon: 'duo-icons:user',
+            icon: 'i-lucide-users',
             to: '/beneficiaires',
             onSelect: () => {
                 open.value = false
@@ -40,30 +40,13 @@
         {
             label: 'Workflow & Task',
             to: '/workflow',
-            icon: 'hugeicons:workflow-circle-05',
+            icon: 'i-lucide-workflow',
             defaultOpen: true,
             children: [{
                 label: 'Workflow & Task',
-                icon: 'solar:settings-bold-duotone',
+                icon: 'i-lucide-workflow',
                 to: '/workflow',
                 exact: true,
-                onSelect: () => {
-                    open.value = false
-                }
-            },
-            {
-                label: 'Tiers',
-                to: '/settings/tiers',
-                icon: 'solar:card-transfer-bold-duotone',
-                onSelect: () => {
-                    open.value = false
-                }
-            },
-           
-            {
-                label: 'Fournisseurs',
-                to: '/settings/fournisseurs',
-                icon: 'solar:users-group-two-rounded-line-duotone',
                 onSelect: () => {
                     open.value = false
                 }
@@ -77,7 +60,7 @@
             defaultOpen: true,
             children: [{
                 label: 'Parametres',
-                icon: 'solar:settings-bold-duotone',
+                icon: 'i-lucide-settings',
                 to: '/settings',
                 exact: true,
                 onSelect: () => {
@@ -86,14 +69,14 @@
             }, {
                 label: 'Classes & Lookups',
                 to: '/settings/lookups',
-                icon: 'solar:card-transfer-bold-duotone',
+                icon: 'i-lucide-list-tree',
                 onSelect: () => {
                     open.value = false
                 }
             }, {
                 label: 'Organisations',
                 to: '/settings/organisations',
-                icon: 'solar:card-transfer-bold-duotone',
+                icon: 'i-lucide-building-2',
                 onSelect: () => {
                     open.value = false
                 }
@@ -101,7 +84,7 @@
             {
                 label: 'Matrices',
                 to: '/settings/matrices',
-                icon: 'solar:card-transfer-bold-duotone',
+                icon: 'i-lucide-grid-2x2',
                 onSelect: () => {
                     open.value = false
                 }
@@ -109,7 +92,7 @@
             {
                 label: 'Taux',
                 to: '/settings/taux',
-                icon: 'solar:card-transfer-bold-duotone',
+                icon: 'i-lucide-percent',
                 onSelect: () => {
                     open.value = false
                 }
@@ -117,7 +100,7 @@
             {
                 label: 'Grille tarifaire',
                 to: '/settings/tarifaire',
-                icon: 'solar:tag-price-bold-duotone',
+                icon: 'i-lucide-tags',
                 onSelect: () => {
                     open.value = false
                 }
@@ -125,7 +108,7 @@
             {
                 label: 'Utilisateurs',
                 to: '/settings/users',
-                icon: 'solar:users-group-two-rounded-line-duotone',
+                icon: 'i-lucide-users',
                 onSelect: () => {
                     open.value = false
                 }
@@ -133,7 +116,7 @@
             {
                 label: 'Roles',
                 to: '/settings/roles',
-                icon: 'solar:user-id-bold-duotone',
+                icon: 'i-lucide-shield',
                 onSelect: () => {
                     open.value = false
                 }
@@ -141,7 +124,7 @@
             {
                 label: 'Articles',
                 to: '/settings/articles',
-                icon: 'solar:layers-minimalistic-bold-duotone',
+                icon: 'i-lucide-package',
                 onSelect: () => {
                     open.value = false
                 }
@@ -149,7 +132,7 @@
             {
                 label: 'Clients',
                 to: '/settings/clients',
-                icon: 'solar:users-group-two-rounded-bold-duotone',
+                icon: 'i-lucide-handshake',
                 onSelect: () => {
                     open.value = false
                 }

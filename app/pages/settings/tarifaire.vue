@@ -118,7 +118,7 @@ const columns: TableColumn<Tarifaire>[] = [
         cell: ({ row }) => h('div', { class: 'flex items-center justify-center' }, h(UButton, {
             color: 'neutral',
             variant: 'ghost',
-            icon: 'solar:pen-new-square-line-duotone',
+            icon: 'i-lucide-square-pen',
             'aria-label': 'Modifier',
             class: '-mx-2.5',
             onClick: () => {
