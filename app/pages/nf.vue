@@ -18,7 +18,7 @@
                 :pagination-options="paginationOptions" class="shrink-0 m-2" :data="nfs ?? EMPTY_ROWS" :columns="columns" :ui="haziTableUi" />
 
             <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-                <div class="text-sm text-muted">
+                <div class="text-sm text-(--ui-text-muted)">
                     {{ selectedRowCount }} of {{ totalFilteredRows }} row(s) selected.
                 </div>
 
@@ -34,7 +34,7 @@
         <template #body>
             <div class="p-4 text-center">
                 <p v-if="selectedNf" class="font-medium">{{ selectedNf.organisation_id }}</p>
-                <p v-if="selectedNf" class="text-sm text-muted">{{ selectedNf.description }}</p>
+                <p v-if="selectedNf" class="text-sm text-(--ui-text-muted)">{{ selectedNf.description }}</p>
                 <p v-else>Sélectionnez une note de frais pour voir les détails.</p>
             </div>
         </template>

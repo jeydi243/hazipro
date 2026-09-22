@@ -115,19 +115,19 @@
                 <div
                     class="grid grid-cols-2 gap-4 text-sm p-4 bg-elevated rounded-lg border border-default">
                     <div>
-                        <p class="text-muted mb-1">Nom</p>
+                        <p class="text-(--ui-text-muted) mb-1">Nom</p>
                         <p class="font-medium text-highlighted">{{ props.role.nom }}</p>
                     </div>
                     <div>
-                        <p class="text-muted mb-1">Code</p>
+                        <p class="text-(--ui-text-muted) mb-1">Code</p>
                         <p class="font-mono text-highlighted">{{ props.role.code }}</p>
                     </div>
                     <div class="col-span-2">
-                        <p class="text-muted mb-1">Description</p>
+                        <p class="text-(--ui-text-muted) mb-1">Description</p>
                         <p>{{ props.role.description }}</p>
                     </div>
                     <div v-if="props.role.entite" class="col-span-2">
-                        <p class="text-muted mb-1">Entité</p>
+                        <p class="text-(--ui-text-muted) mb-1">Entité</p>
                         <p class="font-medium text-highlighted">
                             {{ (props.role.entite as any)?.nom }}
                         </p>
@@ -155,7 +155,7 @@
             <UTable :data="usersRoles ?? EMPTY_ROWS" :columns="columns"
                 class="border border-default rounded-md overflow-hidden" :ui="haziTableUiEmbedded">
                 <template #empty-state>
-                    <div class="flex flex-col items-center justify-center py-6 text-muted text-sm">
+                    <div class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
                         <p>Aucun utilisateur n'est affecté à ce rôle.</p>
                     </div>
                 </template>

@@ -130,7 +130,7 @@ async function uploadAvatar() {
             </div>
             <div class="text-center">
               <h2 class="text-xl font-bold text-highlighted">{{ fullName }}</h2>
-              <p class="text-sm text-muted">{{ authUser?.email }}</p>
+              <p class="text-sm text-(--ui-text-muted)">{{ authUser?.email }}</p>
             </div>
             <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileSelect" />
             <UButton

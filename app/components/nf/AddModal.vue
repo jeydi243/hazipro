@@ -66,7 +66,7 @@
                             <template #item-label="{ item }">
                                 {{ item.label }}
 
-                                <span class="text-muted">
+                                <span class="text-(--ui-text-muted)">
                                     {{ item.email }}
                                 </span>
                             </template>

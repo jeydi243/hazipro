@@ -92,7 +92,7 @@
                         {{
                             props.matrice.nom }}
                     </p>
-                    <p class="text-sm text-muted flex items-center gap-2 mt-1">
+                    <p class="text-sm text-(--ui-text-muted) flex items-center gap-2 mt-1">
                         <span class="font-mono bg-elevated px-1.5 py-0.5 rounded">{{ props.matrice?.code
                             || 'N/A' }}</span>
                         <UBadge v-if="props.matrice?.status" :label="props.matrice.status" variant="subtle"
@@ -105,7 +105,7 @@
                         <template #infos>
                             <div class="space-y-4 pt-4">
                                 <div>
-                                    <p class="text-sm font-medium text-muted mb-1">Description</p>
+                                    <p class="text-sm font-medium text-(--ui-text-muted) mb-1">Description</p>
                                     <p class="text-sm text-highlighted">
                                         {{ props.matrice.description ||
                                             'Aucune description.' }}
@@ -122,7 +122,7 @@
                                 <UTable :data="approbateurs ?? EMPTY_ROWS" :columns="columns"
                                     class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
-                                        <div class="flex flex-col items-center justify-center py-6 text-muted text-sm">
+                                        <div class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
                                             <p>Aucun service trouvé pour cette matrice.</p>
                                         </div>
                                     </template>

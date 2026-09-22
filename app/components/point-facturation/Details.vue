@@ -126,7 +126,7 @@ const tokenColumns: TableColumn<any>[] = [
                         {{
                             props.organisation.nom }}
                     </p>
-                    <p class="text-sm text-muted flex items-center gap-2 mt-1">
+                    <p class="text-sm text-(--ui-text-muted) flex items-center gap-2 mt-1">
                         <span class="font-mono bg-elevated px-1.5 py-0.5 rounded">{{ props.organisation?.code
                             || 'N/A' }}</span>
                         <UBadge v-if="props.organisation?.status" :label="props.organisation.status" variant="subtle"
@@ -139,7 +139,7 @@ const tokenColumns: TableColumn<any>[] = [
                         <template #infos>
                             <div class="space-y-4 pt-4">
                                 <div>
-                                    <p class="text-sm font-medium text-muted mb-1">Description</p>
+                                    <p class="text-sm font-medium text-(--ui-text-muted) mb-1">Description</p>
                                     <p class="text-sm text-highlighted">
                                         {{ props.organisation.description ||
                                             'Aucune description.' }}
@@ -157,7 +157,7 @@ const tokenColumns: TableColumn<any>[] = [
                                         class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
                                         <div
-                                            class="flex flex-col items-center justify-center py-6 text-muted text-sm">
+                                            class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
                                             <p>Aucun service trouvé pour cette organisation.</p>
                                         </div>
                                     </template>
@@ -173,7 +173,7 @@ const tokenColumns: TableColumn<any>[] = [
                                         class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
                                         <div
-                                            class="flex flex-col items-center justify-center py-6 text-muted text-sm">
+                                            class="flex flex-col items-center justify-center py-6 text-(--ui-text-muted) text-sm">
                                             <p>Aucun emplacement trouvé pour cette organisation.</p>
                                         </div>
                                     </template>

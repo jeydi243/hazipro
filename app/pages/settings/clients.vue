@@ -23,7 +23,7 @@
                     :columns="columns" :loading="pending" :ui="haziTableUi" />
 
                 <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-                    <div class="text-sm text-muted">
+                    <div class="text-sm text-(--ui-text-muted)">
                         {{ selectedRowCount }} sur {{ totalFilteredRows }} ligne(s) sélectionnée(s).
                     </div>
 

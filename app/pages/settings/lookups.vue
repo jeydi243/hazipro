@@ -17,7 +17,7 @@
                         class="shrink-0 m-2" :data="classes ?? EMPTY_ROWS" :columns="columns" :ui="haziTableUi" />
 
                 <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-                    <div class="text-sm text-muted">
+                    <div class="text-sm text-(--ui-text-muted)">
                         {{ selectedRowCount }} of {{ totalFilteredRows }} row(s) selected.
                     </div>
 
@@ -33,7 +33,7 @@
             <template #body>
                 <div class="p-4 text-center">
                     <p v-if="selectedClasse" class="font-medium">{{ selectedClasse.nom }}</p>
-                    <p v-if="selectedClasse" class="text-sm text-muted">{{ selectedClasse.description }}</p>
+                    <p v-if="selectedClasse" class="text-sm text-(--ui-text-muted)">{{ selectedClasse.description }}</p>
                     <p v-else>Sélectionnez une classe pour voir les détails.</p>
                 </div>
             </template>

@@ -32,7 +32,7 @@ useHead({
             <UCard class="w-full max-w-lg text-center">
                 <UIcon name="i-lucide-triangle-alert" class="mx-auto mb-4 size-12 text-error" />
                 <h1 class="text-2xl font-semibold">Paramètre owner non défini</h1>
-                <p class="mt-3 text-muted">
+                <p class="mt-3 text-(--ui-text-muted)">
                     Votre espace de travail n'est pas configuré. Déconnectez-vous puis reconnectez-vous avec un compte associé à une organisation.
                 </p>
                 <UButton class="mt-6" color="error" icon="i-lucide-log-out" @click="logout">
