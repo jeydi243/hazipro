@@ -80,7 +80,7 @@
                     <UButton color="neutral" variant="ghost" @click="close">
                         Annuler
                     </UButton>
-                    <UButton color="secondary" variant="solid" @click="stopAffectation">
+                    <UButton color="neutral" variant="solid" @click="stopAffectation">
                         Confirmer
                     </UButton>
                 </template>
@@ -98,7 +98,7 @@
                     <UButton color="neutral" variant="ghost" @click="close">
                         Annuler
                     </UButton>
-                    <UButton color="secondary" variant="solid" @click="stopRole">
+                    <UButton color="neutral" variant="solid" @click="stopRole">
                         Confirmer
                     </UButton>
                 </template>

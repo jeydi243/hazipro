@@ -1,8 +1,7 @@
 export default defineAppConfig({
     ui: {
         colors: {
-            primary: "blue",
-            secondary: "orange",
+            primary: "hazi",
             neutral: "slate",
         },
         dashboardGroup: {
@@ -13,8 +12,6 @@ export default defineAppConfig({
         },
         modal: {
             slots: {
-                header:
-                    "bg-[url(/assets/img/pattern.jpg)] bg-cover bg-center bg-no-repeat dark:bg-none",
                 content: "bg-(--ui-bg) dark:bg-(--ui-bg)",
             },
         },

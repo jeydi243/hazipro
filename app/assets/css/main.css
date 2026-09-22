@@ -15,24 +15,17 @@
 @theme static {
   --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
-}
-
-/* Pattern image on modal/slideover headers — light theme only */
-:root:not(.dark) [data-slot="header"] {
-  background-image: url('/assets/img/pattern.jpg');
-  background-size: cover;
-  background-position: center top;
+  --color-hazi-50: #EFF4FF;
+  --color-hazi-100: #DBEAFE;
+  --color-hazi-200: #BFDBFE;
+  --color-hazi-300: #93C5FD;
+  --color-hazi-400: #3B82F6;
+  --color-hazi-500: #1E40AF;
+  --color-hazi-600: #172E6B;
+  --color-hazi-700: #122556;
+  --color-hazi-800: #0D1B42;
+  --color-hazi-900: #09122E;
+  --color-hazi-950: #050B1D;
 }
 
 /* Respect des préférences de mouvement réduit */
@@ -44,14 +37,14 @@
   }
 }
 
-/* Spinner de chargement (bouton de connexion) */
+/* Spinner de chargement (bouton de connexion) — couleur héritée du contexte */
 .loader {
   width: 50px;
   --b: 8px;
   aspect-ratio: 1;
   border-radius: 50%;
   padding: 1px;
-  background: conic-gradient(#0000 10%, var(--color-spinner, #f03355)) content-box;
+  background: conic-gradient(#0000 10%, currentColor) content-box;
   -webkit-mask:
     repeating-conic-gradient(#0000 0deg, #000 1deg 20deg, #0000 21deg 36deg),
     radial-gradient(farthest-side, #0000 calc(100% - var(--b) - 1px), #000 calc(100% - var(--b)));

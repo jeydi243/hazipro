@@ -34,7 +34,7 @@
                     <UButton color="neutral" variant="ghost" @click="close">
                         Annuler
                     </UButton>
-                    <UButton color="secondary" variant="solid" @click="stopTarrifaireLine">
+                    <UButton color="neutral" variant="solid" @click="stopTarrifaireLine">
                         Confirmer
                     </UButton>
                 </template>
