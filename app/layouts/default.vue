@@ -1,7 +1,4 @@
 <script setup lang="ts">
-    const route = useRoute()
-    const toast = useToast()
-
     const open = useLocalStorage('dashboard-sidebar-open', true)
 
     const links = [
@@ -147,16 +144,6 @@
         id: 'links',
         label: 'Go to',
         items: links.flat()
-    }, {
-        id: 'code',
-        label: 'Code',
-        items: [{
-            id: 'source',
-            label: 'View page source',
-            icon: 'i-simple-icons-github',
-            to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${route.path === '/' ? '/index' : route.path}.vue`,
-            target: '_blank'
-        }]
     }])
 
     onMounted(async () => {
@@ -168,12 +155,11 @@
 </script>
 
 <template>
-    <!-- <div class="h-5 w-full bg-amber-200 block mb-5"></div> -->
     <UDashboardGroup as="div">
         <UDashboardSearch :groups="groups" />
 
         <UDashboardSidebar v-model:open="open" :default-size="15" :min-size="15" mode="modal" collapsible resizable
-            class="bg-(--ui-bg-elevated)/25" :ui="{ footer: 'lg:border-t lg:border-(--ui-border)' }">
+            class="bg-(--ui-bg-elevated)" :ui="{ footer: 'lg:border-t lg:border-(--ui-border)' }">
             <template #header="{ collapsed }">
                 <TeamsMenu :collapsed="collapsed" />
             </template>
