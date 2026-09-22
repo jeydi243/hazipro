@@ -20,13 +20,7 @@
                 <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                     v-model:row-selection="rowSelection" v-model:pagination="pagination"
                     :pagination-options="paginationOptions" class="shrink-0 m-2" :data="clients ?? EMPTY_ROWS"
-                    :columns="columns" :loading="pending" :ui="{
-                        base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-xl',
-                        thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
-                        tbody: '[&>tr]:last:[&>td]:border-b-0',
-                        th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r pl-2',
-                        td: 'border-b border-(--ui-border) p-2'
-                    }" />
+                    :columns="columns" :loading="pending" :ui="haziTableUi" />
 
                 <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
                     <div class="text-sm text-muted">
@@ -50,6 +44,7 @@
     import type { Row } from '@tanstack/table-core'
     import type { TableColumn } from '@nuxt/ui'
     import type { Client, Lookup } from '~/types'
+    import { haziTableUi } from '~/utils/table'
 
     // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
     const EMPTY_ROWS: any[] = []

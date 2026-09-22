@@ -35,13 +35,7 @@
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination"
                 :pagination-options="paginationOptions" class="shrink-0 m-2" :data="matrices ?? emptyRows"
-                :columns="columns" :ui="{
-                    base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
-                    thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
-                    tbody: '[&>tr]:last:[&>td]:border-b-0',
-                    th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r pl-2',
-                    td: 'border-b border-(--ui-border) p-2'
-                }" />
+                :columns="columns" :ui="haziTableUi" />
 
             <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
                 <div class="text-sm text-muted">
@@ -65,6 +59,7 @@
     import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
     import { storeToRefs } from 'pinia'
     import type { Matrice } from '~/types/organisation'
+    import { haziTableUi } from '~/utils/table'
 
     useHead({
         title: 'Matrices',
@@ -74,12 +69,11 @@
     })
 
     const supabase = useSupabaseClient()
-    // Tableau vide STABLE : évite une nouvelle identité [] à chaque render
-    // (boucle infinie du watch data de UTable pendant le chargement)
+
     const emptyRows: Matrice[] = []
     const toast = useToast()
     const parametresStore = useParametresStore()
-    const { lookups, itemsMatrices: matrices } = storeToRefs(parametresStore)
+    const { lookups, itemsMatrice: matrices } = storeToRefs(parametresStore)
 
     // Utilisation du composable centralisé
     const {
@@ -182,28 +176,7 @@
                     onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
                 })
             }
-        },
-        {
-            accessorKey: 'type_organisation_id',
-            header: "Type d'organisation",
-            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.type?.nom || 'N/A')
-        },
-        {
-            accessorKey: 'status',
-            header: 'Statut',
-            filterFn: 'equals',
-            cell: ({ row }) => {
-                const statusStr = row.original.status || 'actif'
-                const color = {
-                    "subscribed": 'success' as const,
-                    "actif": 'success' as const,
-                    "unsubscribed": 'error' as const,
-                    "bounced": 'warning' as const
-                }[statusStr] || 'neutral'
-
-                return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => statusStr)
-            }
-        },
+        },        
         {
             header: () => h('div', { class: 'text-center' }, 'Actions'),
             id: 'actions',
