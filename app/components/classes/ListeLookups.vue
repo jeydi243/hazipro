@@ -16,13 +16,7 @@
                 <UTable ref="table" v-model:column-filters="columnFiltersLookups"
                         v-model:column-visibility="columnVisibilityLookups" v-model:row-selection="rowSelectionLookups"
                         v-model:pagination="paginationLookups" :pagination-options="paginationOptionsLookups" class="shrink-0 m-2"
-                        :data="lookups" :columns="columnsLookups" :loading="loadingLookups" :ui="{
-                            base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg w-full',
-                            thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
-                            tbody: '[&>tr]:last:[&>td]:border-b-0',
-                            th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r pl-2',
-                            td: 'border-b border-(--ui-border) p-2'
-                        }" />
+                        :data="lookups" :columns="columnsLookups" :loading="loadingLookups" :ui="haziTableUi" />
             </div>
 
             <div class="flex items-center justify-between gap-3 border-t border-(--ui-border) p-4 mt-auto">
@@ -40,6 +34,7 @@
 </template>
 
 <script setup lang="ts">
+import { haziTableUi } from '~/utils/table'
 import type { TableColumn } from '@nuxt/ui'
 import type { Row } from '@tanstack/table-core'
 import type { Classe, Lookup } from '~/types'

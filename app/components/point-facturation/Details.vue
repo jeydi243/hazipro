@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { haziTableUiEmbedded } from '~/utils/table'
 import type { TableColumn } from '@nuxt/ui'
 import type { Organisation } from '~/types'
 
@@ -153,13 +154,7 @@ const tokenColumns: TableColumn<any>[] = [
                                     <PointFacturationAttachUserModal :parent="props.organisation" @user-added="refresh" />
                                 </div>
                                 <UTable :data="services ?? EMPTY_ROWS" :columns="columns" :loading="pending"
-                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="{
-                                            base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
-                                            thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
-                                            tbody: '[&>tr]:last:[&>td]:border-b-0',
-                                            th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r',
-                                            td: 'border-b border-(--ui-border) p-2'
-                                        }">
+                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
                                         <div
                                             class="flex flex-col items-center justify-center py-6 text-muted text-sm">
@@ -175,13 +170,7 @@ const tokenColumns: TableColumn<any>[] = [
                                     <OrganisationsAddEmplacementModal :parent="props.organisation" @emplacement-added="refresh" />
                                 </div>
                                 <UTable :data="emplacements ?? EMPTY_ROWS" :columns="columns" :loading="pending"
-                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="{
-                                            base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
-                                            thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
-                                            tbody: '[&>tr]:last:[&>td]:border-b-0',
-                                            th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r',
-                                            td: 'border-b border-(--ui-border) p-2'
-                                        }">
+                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
                                         <div
                                             class="flex flex-col items-center justify-center py-6 text-muted text-sm">

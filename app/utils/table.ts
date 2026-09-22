@@ -12,3 +12,11 @@ export const haziTableUi: TableUi = {
     th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r pl-2',
     td: 'border-b border-(--ui-border) p-2 tabular-nums',
 }
+
+// Table embarquée dans un tiroir de détails : mêmes réglages,
+// coins supérieurs seuls arrondis.
+export const haziTableUiEmbedded: TableUi = {
+    ...haziTableUi,
+    base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
+    th: 'py-1 border-y border-(--ui-border) first:border-l last:border-r pl-2',
+}

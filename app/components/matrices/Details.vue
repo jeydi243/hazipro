@@ -1,84 +1,86 @@
 <script setup lang="ts">
-import type { TableColumn } from '@nuxt/ui'
-import type { Approbateur } from '~/types';
-import type { Matrice } from '~/types/organisation';
+    import { haziTableUiEmbedded } from '~/utils/table'
+    import type { TableColumn } from '@nuxt/ui'
+    import type { Approbateur } from '~/types';
+    import type { Matrice } from '~/types/organisation';
 
-// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-const EMPTY_ROWS: any[] = []
-const open = defineModel<boolean>('open', { default: false })
+    // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+    const EMPTY_ROWS: any[] = []
+    const open = defineModel<boolean>('open', { default: false })
 
-const props = defineProps<{
-    matrice: Matrice | null
-}>()
+    const props = defineProps<{
+        matrice: Matrice | null
+    }>()
 
-const emit = defineEmits(['update:open', 'select-matrice'])
+    const emit = defineEmits(['update:open', 'select-matrice'])
+    const parametresStore = useParametresStore()
+    const { itemsApprobateurs: approbateurs } = storeToRefs(parametresStore)
+    const isOpen = computed({
+        get: () => open.value,
+        set: (value) => emit('update:open', value)
+    })
 
-const isOpen = computed({
-    get: () => open.value,
-    set: (value) => emit('update:open', value)
-})
-
-const items = [
-    {
-        label: 'Approbateurs',
-        icon: 'i-lucide-user',
-        slot: 'users'
-    }
-]
-
-const toast = useToast()
-const UBadge = resolveComponent('UBadge')
-const UButton = resolveComponent('UButton')
-
-const columns: TableColumn<Approbateur>[] = [
-    {
-        accessorKey: 'code',
-        header: 'Code',
-        cell: ({ row }) => h('p', { class: 'font-mono text-(--ui-text-muted)' }, row.original.code || 'N/A')
-    },
-    {
-        accessorKey: 'nom',
-        header: 'Nom',
-        cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.nom)
-    },
-    {
-        accessorKey: 'status',
-        header: 'Statut',
-        cell: ({ row }) => {
-            const statusStr = row.original.status || 'actif'
-            const statusColors: Record<string, 'success' | 'error' | 'warning' | 'neutral'> = {
-                actif: 'success',
-                unsubscribed: 'error',
-                bounced: 'warning'
-            }
-            const color = statusColors[statusStr] || 'neutral'
-            return h(UBadge, { variant: 'subtle', color, class: 'capitalize' }, () => statusStr)
+    const items = [
+        {
+            label: 'Approbateurs',
+            icon: 'i-lucide-user',
+            slot: 'users'
         }
-    },
-    {
-        id: 'actions',
-        header: '',
-        cell: ({ row }) => h('div', { class: 'flex justify-end' }, h(UButton, {
-            'color': 'neutral',
-            'variant': 'ghost',
-            'icon': 'i-lucide-arrow-right',
-            'aria-label': 'Aller à',
-            'size': 'xs',
-            'onClick': () => {
-                // If the user wants to navigate to this organization's details
-                // This would require more logic, but for now we could emit something or update props
-                emit('select-matrice', row.original)
-            }
-        }))
-    }
-]
+    ]
 
-const tokenColumns: TableColumn<any>[] = [
-    { accessorKey: 'nom', header: 'Nom' },
-    { accessorKey: 'valeur', header: 'Valeur', cell: () => h('span', '••••••••') },
-    { accessorKey: 'date_debut', header: 'Date début', cell: ({ row }) => h('span', row.original.date_debut || '-') },
-    { accessorKey: 'date_expiration', header: 'Date expiration', cell: ({ row }) => h('span', row.original.date_expiration || '-') }
-]
+    const toast = useToast()
+    const UBadge = resolveComponent('UBadge')
+    const UButton = resolveComponent('UButton')
+
+    const columns: TableColumn<Approbateur>[] = [
+        {
+            accessorKey: 'email',
+            header: 'Email',
+            cell: ({ row }) => h('p', { class: 'font-mono text-(--ui-text-muted)' }, row.original?.email || 'N/A')
+        },
+        {
+            accessorKey: 'nom',
+            header: 'Nom',
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original?.nom)
+        },
+        {
+            accessorKey: 'status',
+            header: 'Statut',
+            cell: ({ row }) => {
+                const statusStr = row.original.status || 'actif'
+                const statusColors: Record<string, 'success' | 'error' | 'warning' | 'neutral'> = {
+                    actif: 'success',
+                    unsubscribed: 'error',
+                    bounced: 'warning'
+                }
+                const color = statusColors[statusStr] || 'neutral'
+                return h(UBadge, { variant: 'subtle', color, class: 'capitalize' }, () => statusStr)
+            }
+        },
+        {
+            id: 'actions',
+            header: '',
+            cell: ({ row }) => h('div', { class: 'flex justify-end' }, h(UButton, {
+                'color': 'neutral',
+                'variant': 'ghost',
+                'icon': 'i-lucide-arrow-right',
+                'aria-label': 'Aller à',
+                'size': 'xs',
+                'onClick': () => {
+                    // If the user wants to navigate to this organization's details
+                    // This would require more logic, but for now we could emit something or update props
+                    emit('select-matrice', row.original)
+                }
+            }))
+        }
+    ]
+
+    const tokenColumns: TableColumn<any>[] = [
+        { accessorKey: 'nom', header: 'Nom' },
+        { accessorKey: 'valeur', header: 'Valeur', cell: () => h('span', '••••••••') },
+        { accessorKey: 'date_debut', header: 'Date début', cell: ({ row }) => h('span', row.original.date_debut || '-') },
+        { accessorKey: 'date_expiration', header: 'Date expiration', cell: ({ row }) => h('span', row.original.date_expiration || '-') }
+    ]
 </script>
 
 <template>
@@ -94,7 +96,7 @@ const tokenColumns: TableColumn<any>[] = [
                         <span class="font-mono bg-elevated px-1.5 py-0.5 rounded">{{ props.matrice?.code
                             || 'N/A' }}</span>
                         <UBadge v-if="props.matrice?.status" :label="props.matrice.status" variant="subtle"
-                                class="capitalize" />
+                            class="capitalize" />
                     </p>
                 </div>
 
@@ -115,19 +117,12 @@ const tokenColumns: TableColumn<any>[] = [
                         <template #users>
                             <div class="pt-4 h-full space-y-4 flex flex-col">
                                 <div class="flex justify-end">
-                                    <MatricesAddApprobateurModal :parent="props.matrice" @approbateur-added="refresh" />
+                                    <MatricesAddApprobateurModal :parent="props.matrice" />
                                 </div>
-                                <UTable :data="services ?? EMPTY_ROWS" :columns="columns" :loading="pending"
-                                        class="border border-default rounded-md overflow-hidden flex-1" :ui="{
-                                            base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
-                                            thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
-                                            tbody: '[&>tr]:last:[&>td]:border-b-0',
-                                            th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r',
-                                            td: 'border-b border-(--ui-border) p-2'
-                                        }">
+                                <UTable :data="approbateurs ?? EMPTY_ROWS" :columns="columns"
+                                    class="border border-default rounded-md overflow-hidden flex-1" :ui="haziTableUiEmbedded">
                                     <template #empty-state>
-                                        <div
-                                            class="flex flex-col items-center justify-center py-6 text-muted text-sm">
+                                        <div class="flex flex-col items-center justify-center py-6 text-muted text-sm">
                                             <p>Aucun service trouvé pour cette matrice.</p>
                                         </div>
                                     </template>

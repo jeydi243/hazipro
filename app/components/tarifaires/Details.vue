@@ -13,13 +13,7 @@
                     v-model:pagination="pagination" empty="Aucune ligne de tarifaire" :pagination-options="{
                         getPaginationRowModel: getPaginationRowModel()
                     }" class="shrink-0 m-2 bg-white dark:bg-(--ui-bg)" :data="tarifairesLines ?? EMPTY_ROWS"
-                    :columns="columnsTarifaireLine" :loading="tarifairesLinesStatus === 'pending'" :ui="{
-                        base: 'table-fixed border-separate border-spacing-0',
-                        thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
-                        tbody: '[&>tr]:last:[&>td]:border-b-0',
-                        th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r',
-                        td: 'border-b border-(--ui-border) p-2'
-                    }" />
+                    :columns="columnsTarifaireLine" :loading="tarifairesLinesStatus === 'pending'" :ui="haziTableUiEmbedded" />
             </div>
             <UModal v-model:open="isStopModalOpen" title="Confirmer l'arrêt de l'tarifaire">
                 <template #body>
@@ -43,6 +37,7 @@
     </USlideover>
 </template>
 <script setup lang="ts">
+import { haziTableUiEmbedded } from '~/utils/table'
 
 // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
 const EMPTY_ROWS: any[] = []

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import { haziTableUiEmbedded } from '~/utils/table'
     import * as z from 'zod'
     import type { FormSubmitEvent, SelectMenuItem, TableColumn } from '@nuxt/ui'
     import type { Role, UserRole } from '~/types'
@@ -152,13 +153,7 @@
 
             <!-- Liste des affectations -->
             <UTable :data="usersRoles ?? EMPTY_ROWS" :columns="columns"
-                class="border border-default rounded-md overflow-hidden" :ui="{
-                    base: 'table-fixed border-separate border-spacing-0',
-                    thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
-                    tbody: '[&>tr]:last:[&>td]:border-b-0',
-                    th: 'py-2 px-3 border-y border-(--ui-border) first:border-l last:border-r',
-                    td: 'py-2 px-3 border-b border-(--ui-border)'
-                }">
+                class="border border-default rounded-md overflow-hidden" :ui="haziTableUiEmbedded">
                 <template #empty-state>
                     <div class="flex flex-col items-center justify-center py-6 text-muted text-sm">
                         <p>Aucun utilisateur n'est affecté à ce rôle.</p>
