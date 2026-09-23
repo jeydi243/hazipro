@@ -75,36 +75,58 @@ export const useParametresStore = defineStore("parametres", () => {
 
     const tasks = [
       { name: "lookups", promise: lookupsStore.fetchAll() },
-      { name: "organisations", promise: owner_id.value
-        ? organisationsStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "articles", promise: owner_id.value
-        ? articlesStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "clients", promise: owner_id.value
-        ? clientsStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "factures", promise: owner_id.value
-        ? facturesStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "profils", promise: owner_id.value
-        ? profilsStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "beneficiaires", promise: owner_id.value
-        ? beneficiairesStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "taux", promise: owner_id.value
-        ? fetchTaux(owner_id.value)
-        : Promise.resolve() },
-      { name: "matrices", promise: owner_id.value
-        ? fetchMatrices(owner_id.value)
-        : Promise.resolve() },
+      {
+        name: "organisations",
+        promise: owner_id.value
+          ? organisationsStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "articles",
+        promise: owner_id.value
+          ? articlesStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "clients",
+        promise: owner_id.value
+          ? clientsStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "factures",
+        promise: owner_id.value
+          ? facturesStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "profils",
+        promise: owner_id.value
+          ? profilsStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "beneficiaires",
+        promise: owner_id.value
+          ? beneficiairesStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "taux",
+        promise: owner_id.value ? fetchTaux(owner_id.value) : Promise.resolve(),
+      },
+      {
+        name: "matrices",
+        promise: owner_id.value
+          ? fetchMatrices(owner_id.value)
+          : Promise.resolve(),
+      },
     ];
     const results = await Promise.allSettled(tasks.map((task) => task.promise));
 
     const errors = results.flatMap((result, index) =>
       result.status === "rejected"
-        ? [{ name: tasks[index].name, reason: result.reason }]
+        ? [{ name: tasks[index]?.name, reason: result.reason }]
         : []
     );
     if (errors.length > 0) console.error("[Store] Erreurs init:", errors);
@@ -136,6 +158,15 @@ export const useParametresStore = defineStore("parametres", () => {
       );
     if (error) throw error;
     if (created) itemsMatrice.value.unshift(created[0] as unknown as Matrice);
+    return created[0];
+  }
+  async function ajouterApprobateur(data: Partial<Approbateur>) {
+    const { data: created, error } = await supabase.from("approbateurs")
+      .insert({ ...data, owner_id: owner_id.value } as never).select();
+    if (error) throw error;
+    if (created) {
+      itemsApprobateurs.value.unshift(created[0] as unknown as Approbateur);
+    }
     return created[0];
   }
   async function createTaux(data: Partial<Taux>) {
@@ -205,8 +236,7 @@ export const useParametresStore = defineStore("parametres", () => {
     }
 
     const matchingTaux = itemsTaux.value.filter((taux) =>
-      taux.from_currency === usdLookup.id
-      && taux.to_currency === destinationCurrencyId
+      taux.from_currency === usdLookup.id && taux.to_currency === destinationCurrencyId
     );
 
     if (!matchingTaux.length) return null;
@@ -252,5 +282,6 @@ export const useParametresStore = defineStore("parametres", () => {
     itemsMatrice,
     itemsApprobateurs,
     getFirstApprobateurID,
+    ajouterApprobateur,
   };
 });

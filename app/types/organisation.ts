@@ -37,6 +37,7 @@ export interface Matrice {
     code: string
     description: string
     type_document_id: string
+    status: string
 }
 
 export interface Organisation {

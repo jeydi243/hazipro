@@ -46,9 +46,14 @@ export interface Approbateur {
     id: string;
     matrice_id: string;
     user_id: string;
+    nom?: string;
+    email?: string;
+    niveau: number;
     org_id: string | Organisation;
-    type_beneficiaire: string | Lookup;
+    date_debut: string | Date;
+    date_fin: string | Date;
     date_taux: string;
+    status: string;
 }
 export interface NF {
     id: string;
@@ -64,27 +69,12 @@ export interface NF {
     date_document: string;
 }
 
-export interface Member {
-    nom: string;
-    username: string;
-    role: "member" | "owner";
-    // avatar: Avatar;
-}
-
 export interface Notification {
     id: number;
     unread?: boolean;
     sender: User;
     body: string;
     date: string;
-}
-
-export interface Sale {
-    id: string;
-    date: string;
-    status: SaleStatus;
-    email: string;
-    amount: number;
 }
 
 export interface Stat {
