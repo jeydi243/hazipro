@@ -125,19 +125,19 @@ async function deleteAffectation(id: number) {
                 <div
                     class="grid grid-cols-2 gap-4 text-sm p-4 bg-elevated rounded-lg border border-default">
                     <div>
-                        <p class="text-(--ui-text-muted) mb-1">Nom</p>
+                        <p class="text-muted mb-1">Nom</p>
                         <p class="font-medium text-highlighted">{{ props.client.nom }}</p>
                     </div>
                     <div>
-                        <p class="text-(--ui-text-muted) mb-1">Code</p>
+                        <p class="text-muted mb-1">Code</p>
                         <p class="font-mono text-highlighted">{{ props.client.code }}</p>
                     </div>
                     <div class="col-span-2">
-                        <p class="text-(--ui-text-muted) mb-1">Description</p>
+                        <p class="text-muted mb-1">Description</p>
                         <p>{{ props.client.description }}</p>
                     </div>
                     <div v-if="props.client.type_id" class="col-span-2">
-                        <p class="text-(--ui-text-muted) mb-1">Type de client</p>
+                        <p class="text-muted mb-1">Type de client</p>
                         <p class="font-medium text-highlighted">
                             {{ (props.client.type_id as any)?.nom }}
                         </p>
@@ -147,7 +147,7 @@ async function deleteAffectation(id: number) {
                 <!-- Affectations -->
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-semibold uppercase tracking-wider text-(--ui-text-muted)">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider text-muted">
                             Organisations Affectées
                         </h3>
                     </div>
