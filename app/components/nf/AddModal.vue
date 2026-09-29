@@ -219,6 +219,7 @@
     const TypeBeneficiaires = useLookupsStore().getTypeBeneficiaires;
     const MatriceNF = parametresStore.getMatriceNF;
     const Devises = useLookupsStore().getDevise;
+    const Beneficiaires = useBeneficiairesStore().getBeneficiaires;
 
     const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
         label: org.nom,

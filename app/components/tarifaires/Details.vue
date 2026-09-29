@@ -217,7 +217,7 @@ function getRowItemsTarifairesLines(row: Row<TarifaireLine>) {
         },
         {
             label: 'Mettre fin',
-            icon: 'i-lucide-stop',
+            icon: 'i-lucide-circle-stop',
             onSelect() {
                 selectedTarrifaireId.value = row.original.id
                 isStopModalOpen.value = true

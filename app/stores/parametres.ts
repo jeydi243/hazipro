@@ -7,7 +7,7 @@ export const useParametresStore = defineStore("parametres", () => {
   const owner_id = ref<string | null>(null);
   const ownerStorageKey = "hazipro-owner-id";
   const supabase = useSupabaseClient();
-  const itemsMatrice = ref<Matrice[]>([]);
+  const itemsMatrices = ref<Matrice[]>([]);
   const itemsTaux = ref<Taux[]>([]);
   const itemsApprobateurs = ref<Approbateur[]>([]);
 
@@ -75,36 +75,64 @@ export const useParametresStore = defineStore("parametres", () => {
 
     const tasks = [
       { name: "lookups", promise: lookupsStore.fetchAll() },
-      { name: "organisations", promise: owner_id.value
-        ? organisationsStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "articles", promise: owner_id.value
-        ? articlesStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "clients", promise: owner_id.value
-        ? clientsStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "factures", promise: owner_id.value
-        ? facturesStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "profils", promise: owner_id.value
-        ? profilsStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "beneficiaires", promise: owner_id.value
-        ? beneficiairesStore.fetchAll(owner_id.value)
-        : Promise.resolve() },
-      { name: "taux", promise: owner_id.value
-        ? fetchTaux(owner_id.value)
-        : Promise.resolve() },
-      { name: "matrices", promise: owner_id.value
-        ? fetchMatrices(owner_id.value)
-        : Promise.resolve() },
+      {
+        name: "organisations",
+        promise: owner_id.value
+          ? organisationsStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "articles",
+        promise: owner_id.value
+          ? articlesStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "clients",
+        promise: owner_id.value
+          ? clientsStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "factures",
+        promise: owner_id.value
+          ? facturesStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "profils",
+        promise: owner_id.value
+          ? profilsStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "beneficiaires",
+        promise: owner_id.value
+          ? beneficiairesStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "taux",
+        promise: owner_id.value ? fetchTaux(owner_id.value) : Promise.resolve(),
+      },
+      {
+        name: "matrices",
+        promise: owner_id.value
+          ? fetchMatrices(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "approbateurs",
+        promise: owner_id.value
+          ? fetchApprobateurs(owner_id.value)
+          : Promise.resolve(),
+      },
     ];
     const results = await Promise.allSettled(tasks.map((task) => task.promise));
 
     const errors = results.flatMap((result, index) =>
       result.status === "rejected"
-        ? [{ name: tasks[index].name, reason: result.reason }]
+        ? [{ name: tasks[index]?.name, reason: result.reason }]
         : []
     );
     if (errors.length > 0) console.error("[Store] Erreurs init:", errors);
@@ -127,7 +155,16 @@ export const useParametresStore = defineStore("parametres", () => {
     if (ownerId) query = query.eq("owner_id", ownerId);
     const { data, error } = await query;
     if (error) throw error;
-    if (data) itemsMatrice.value = data as unknown as Matrice[];
+    if (data) itemsMatrices.value = data as unknown as Matrice[];
+  }
+  async function fetchApprobateurs(ownerId?: string | null) {
+    let query = supabase.from("approbateurs").select(
+      "*",
+    );
+    if (ownerId) query = query.eq("owner_id", ownerId);
+    const { data, error } = await query;
+    if (error) throw error;
+    if (data) itemsApprobateurs.value = data as unknown as Approbateur[];
   }
   async function createMatrice(data: Partial<Matrice>) {
     const { data: created, error } = await supabase.from("matrices")
@@ -135,7 +172,16 @@ export const useParametresStore = defineStore("parametres", () => {
         "id, nom, code, description, status, owner_id, type_document_id",
       );
     if (error) throw error;
-    if (created) itemsMatrice.value.unshift(created[0] as unknown as Matrice);
+    if (created) itemsMatrices.value.unshift(created[0] as unknown as Matrice);
+    return created[0];
+  }
+  async function createApprobateur(data: Partial<Approbateur>) {
+    const { data: created, error } = await supabase.from("approbateurs")
+      .insert({ ...data, owner_id: owner_id.value } as never).select("*");
+    if (error) throw error;
+    if (created) {
+      itemsApprobateurs.value.unshift(created[0] as unknown as Approbateur);
+    }
     return created[0];
   }
   async function createTaux(data: Partial<Taux>) {
@@ -169,7 +215,7 @@ export const useParametresStore = defineStore("parametres", () => {
     classes.value.map((c) => ({ label: c.nom, id: c.id }))
   );
   const getMatriceNF = computed(() =>
-    itemsMatrice.value.map((c) => ({ nom: c.nom, id: c.id }))
+    itemsMatrices.value.map((c) => ({ nom: c.nom, id: c.id }))
   );
   const getTaux = computed(() =>
     itemsTaux.value.map((c) => {
@@ -205,8 +251,8 @@ export const useParametresStore = defineStore("parametres", () => {
     }
 
     const matchingTaux = itemsTaux.value.filter((taux) =>
-      taux.from_currency === usdLookup.id
-      && taux.to_currency === destinationCurrencyId
+      taux.from_currency === usdLookup.id &&
+      taux.to_currency === destinationCurrencyId
     );
 
     if (!matchingTaux.length) return null;
@@ -241,6 +287,7 @@ export const useParametresStore = defineStore("parametres", () => {
     setOwnerID,
     clearOwnerID,
     createMatrice,
+    createApprobateur,
     getClasseById,
     getLookupsById,
     getClasseItems,
@@ -249,7 +296,7 @@ export const useParametresStore = defineStore("parametres", () => {
     getTauxForDevise,
     createTaux,
     itemsTaux,
-    itemsMatrice,
+    itemsMatrices,
     itemsApprobateurs,
     getFirstApprobateurID,
   };

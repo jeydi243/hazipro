@@ -15,7 +15,8 @@
         <template #body>
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination"
-                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="nfs ?? EMPTY_ROWS" :columns="columns" :ui="{
+                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="nfs ?? EMPTY_ROWS"
+                :columns="columns" :ui="{
                     base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
                     tbody: '[&>tr]:last:[&>td]:border-b-0',
@@ -46,19 +47,19 @@
         </template>
     </UDrawer>
 
-    <ClassesUpdateModal v-model:open="openClasseUpdateModal" :classe="selectedNf ?? undefined"
+    <!-- <ClassesUpdateModal v-model:open="openClasseUpdateModal" :classe="selectedNf ?? undefined"
         @classe_updated="refreshClasses" />
 
-    <ClassesListeLookups v-model:open="openSlideOver" :item="selectedNf" />
+    <ClassesListeLookups v-model:open="openSlideOver" :item="selectedNf" /> -->
 </template>
 
 <script setup lang="ts">
-
-// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-const EMPTY_ROWS: any[] = []
     import type { TableColumn } from '@nuxt/ui'
     import type { Row } from '@tanstack/table-core'
     import type { NF } from '~/types/organisation'
+
+    // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+    const EMPTY_ROWS: any[] = []
 
     useHead({
         title: 'Note de frais',
@@ -120,11 +121,11 @@ const EMPTY_ROWS: any[] = []
             header: () => h('div', { class: 'text-center' }, 'Edit'),
             cell: ({ row }) => h('div', { class: 'text-center' }, [
                 h(UButton, {
-                    color: 'neutral',
-                    variant: 'ghost',
-                    icon: 'i-lucide-edit',
+                    "color": 'neutral',
+                    "variant": 'ghost',
+                    "icon": 'i-lucide-edit',
                     'aria-label': 'Modifier',
-                    onClick: () => {
+                    "onClick": () => {
                         selectedNf.value = row.original;
                         openClasseUpdateModal.value = true;
                     }
@@ -135,14 +136,14 @@ const EMPTY_ROWS: any[] = []
             accessorKey: 'code',
             header: 'Code',
             cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.code)
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.numero_document)
             ])
         },
         {
             accessorKey: 'nom',
             header: 'Nom',
             cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.nom)
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.description)
             ])
         },
         {
@@ -167,11 +168,11 @@ const EMPTY_ROWS: any[] = []
             header: () => h('div', { class: 'text-center' }, 'Lookups'),
             cell: ({ row }) => h('div', { class: 'text-center' }, [
                 h(UButton, {
-                    color: 'neutral',
-                    variant: 'solid',
-                    icon: 'i-lucide-eye',
+                    "color": 'neutral',
+                    "variant": 'solid',
+                    "icon": 'i-lucide-eye',
                     'aria-label': 'Voir les détails',
-                    onClick: () => {
+                    "onClick": () => {
                         selectedNf.value = row.original;
                         openSlideOver.value = true;
                     }
@@ -182,8 +183,8 @@ const EMPTY_ROWS: any[] = []
             header: () => h('div', { class: 'text-center' }, 'Actions'),
             id: 'actions',
             cell: ({ row }) => h('div', { class: 'text-center' },
-                h(UDropdownMenu, { content: { align: 'end' }, items: getRowItemsClasse(row) },
-                    () => h(UButton, { icon: 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", color: 'neutral', variant: 'ghost', class: 'ml-auto' })
+                h(UDropdownMenu, { content: { align: 'end' }, children: getRowItemsClasse(row) },
+                    () => h(UButton, { "icon": 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", "color": 'neutral', "variant": 'ghost', "class": 'ml-auto' })
                 )
             )
         }

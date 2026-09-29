@@ -34,7 +34,7 @@ export const useProfilsStore = defineStore('profils', () => {
   }
 
   async function updateAvatar(userId: string, avatarUrl: string) {
-    const { error } = await supabase.from('profils').update({ avatar: avatarUrl } as any).eq('user_id', userId)
+    const { error } = await supabase.from('profils').update({ avatar: avatarUrl } as never).eq('user_id', userId)
     if (error) throw error
     if (currentProfil.value && currentProfil.value.user_id === userId) {
       (currentProfil.value as any).avatar = avatarUrl

@@ -4,9 +4,9 @@ import type { Beneficiaire } from "~/types";
 export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     const items = ref<Beneficiaire[]>([]);
     const loading = ref(false);
+    const supabase = useSupabaseClient();
 
     async function fetchAll(_ownerId?: string | null) {
-        const supabase = useSupabaseClient();
         loading.value = true;
         const { data, error } = await supabase.from("beneficiaires").select(
             "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur, owner_id",
@@ -85,6 +85,7 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
             supabase.removeChannel(channel);
         };
     }
+    const getBeneficiaires = computed(() => items);
 
     return {
         items,
@@ -95,5 +96,6 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
         fetchLines,
         removeLine,
         subscribeToRealtime,
+        getBeneficiaires
     };
 });

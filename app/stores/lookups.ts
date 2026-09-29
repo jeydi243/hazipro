@@ -5,9 +5,9 @@ export const useLookupsStore = defineStore("lookups", () => {
   const lookups = ref<Lookup[]>([]);
   const classes = ref<Classe[]>([]);
   const loading = ref(false);
+  const supabase = useSupabaseClient();
 
   async function fetchAll() {
-    const supabase = useSupabaseClient();
     loading.value = true;
     const [lookupsRes, classesRes] = await Promise.allSettled([
       supabase.from("lookups").select(

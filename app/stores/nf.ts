@@ -4,9 +4,9 @@ import type { NF } from "~/types";
 export const useNFStore = defineStore("nf", () => {
     const items = ref<NF[]>([]);
     const loading = ref(false);
+    const supabase = useSupabaseClient();
 
     async function fetchAll(_ownerId?: string | null) {
-        const supabase = useSupabaseClient();
         loading.value = true;
         const { data, error } = await supabase.from("nf").select(
             "id, code, nom, description, organisation_id, client:owner_id(id, nom, code)",

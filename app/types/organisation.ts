@@ -14,6 +14,7 @@ export interface NF {
     id: string
     organisation_id: string
     description: string
+    numero_document: string
     nature_nf: string
     devise: string
     beneficiaire_id: string
@@ -36,7 +37,9 @@ export interface Matrice {
     classe: Classe
     code: string
     description: string
-    type_document_id: string
+    type_document_id?: string
+    date_debut: string | Date
+    status: string
 }
 
 export interface Organisation {

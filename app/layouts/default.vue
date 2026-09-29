@@ -52,18 +52,9 @@
                 }
             },
             {
-                label: 'Tiers',
-                to: '/settings/tiers',
+                label: 'Taches attribués',
+                to: '/settings',
                 icon: 'solar:card-transfer-bold-duotone',
-                onSelect: () => {
-                    open.value = false
-                }
-            },
-           
-            {
-                label: 'Fournisseurs',
-                to: '/settings/fournisseurs',
-                icon: 'solar:users-group-two-rounded-line-duotone',
                 onSelect: () => {
                     open.value = false
                 }

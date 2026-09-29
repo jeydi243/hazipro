@@ -186,23 +186,17 @@
         {
             accessorKey: 'type_organisation_id',
             header: "Type d'organisation",
-            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.type?.nom || 'N/A')
+            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.type_organisation_id?.nom || 'N/A')
         },
         {
             accessorKey: 'status',
             header: 'Statut',
-            filterFn: 'equals',
-            cell: ({ row }) => {
-                const statusStr = row.original.status || 'actif'
-                const color = {
-                    "subscribed": 'success' as const,
-                    "actif": 'success' as const,
-                    "unsubscribed": 'error' as const,
-                    "bounced": 'warning' as const
-                }[statusStr] || 'neutral'
-
-                return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => statusStr)
-            }
+            cell: ({ row }) => h('div', { class: 'flex items-center justify-center' }, [
+                h(UBadge, {
+                    color: row.original.status === 'actif' ? 'success' : 'error',
+                    label: row.original.status === 'actif' ? 'Actif' : 'Inactif'
+                })
+            ])
         },
         {
             header: () => h('div', { class: 'text-center' }, 'Actions'),
