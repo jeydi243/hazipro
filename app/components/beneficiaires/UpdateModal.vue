@@ -2,11 +2,22 @@
     import * as z from 'zod'
     import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
     import { generateRandomCode } from '~/utils'
-    import type { Lookup, Organisation } from '~/types/organisation'
-import type { Profil } from '~/types'
+    import type { Beneficiaire } from '~/types'
+    import type { Lookup } from '~/types/organisation'
 
     const parametresStore = useParametresStore()
     const beneficiairesStore = useBeneficiairesStore()
+    const props = defineProps<{
+        open: boolean
+        benef?: Beneficiaire | null
+    }>()
+    const emit = defineEmits<{
+        'update:open': [value: boolean]
+    }>()
+    const isOpen = computed({
+        get: () => props.open,
+        set: (value: boolean) => emit('update:open', value)
+    })
     const schema = z.object({
         nom: z.string().min(6, 'Too short'),
         prenom: z.string().optional(),
@@ -18,8 +29,8 @@ import type { Profil } from '~/types'
         categorie_id: z.string({ message: 'Organisation is required' })
     })
     const MatriceNF = parametresStore.getMatriceNF;
-    const open = ref(false)
     const isLoading = ref(false)
+    const isLoadingUpdate = ref(false)
     const toast = useToast()
     type Schema = z.output<typeof schema>
 
@@ -33,13 +44,43 @@ import type { Profil } from '~/types'
         categorie_id: undefined
     })
 
+    type BeneficiaireAvecMatrice = Beneficiaire & {
+        matrice?: string | { id: string } | null
+        matrice_id?: string | { id: string } | null
+    }
+    function relationId(value: string | { id: string } | null | undefined) {
+        return typeof value === 'string' ? value : value?.id
+    }
+
+    watch(
+        [() => props.benef, () => props.open],
+        ([benef, isOpen]) => {
+            if (!isOpen) return
+
+            const beneficiary = benef as BeneficiaireAvecMatrice | null | undefined
+            Object.assign(state, {
+                nom: beneficiary?.nom,
+                code: beneficiary?.code ?? generateRandomCode(),
+                prenom: beneficiary?.prenom,
+                postnom: beneficiary?.postnom,
+                genre: beneficiary?.genre === 'M' || beneficiary?.genre === 'F'
+                    ? beneficiary.genre
+                    : undefined,
+                matrice_id: relationId(beneficiary?.matrice_id ?? beneficiary?.matrice),
+                approbateur_id: relationId(beneficiary?.approbateur_id),
+                categorie_id: relationId(beneficiary?.categorie_id)
+            })
+        },
+        { immediate: true }
+    )
+
     const TypeBeneficiaires = useLookupsStore().getTypeBeneficiaires;
     const itemsApprobateurs = computed<SelectMenuItem[]>(() =>
         parametresStore.getApprobateurs(state.matrice_id ?? null).flatMap((approbateur) => {
             const user = approbateur.user_id
             if (!user || typeof user === 'string') return []
-            const label = user.nom + ' ' + user.postnom + ' - ' + user.prenom || user.email
-            return label ? [{ label, id: (approbateur.user_id as Profil).id }] : []
+            const label = user.nom || user.email
+            return label ? [{ label, id: approbateur.id }] : []
         })
     )
 
@@ -54,25 +95,28 @@ import type { Profil } from '~/types'
     })) || [])
 
     async function onSubmit(event: FormSubmitEvent<Schema>) {
-        console.log('Submitting form with data:', event.data)
-        isLoading.value = true
+        // const isUpdating = Boolean(props.benef?.id)
+        isLoadingUpdate.value = true;
         try {
-            await beneficiairesStore.create(event.data)
-            toast.add({ title: 'Succès', description: `Nouveau bénéficiaire ajouté`, color: 'success' })
-            open.value = false
+            if (props.benef?.id) {
+                await beneficiairesStore.update(props.benef.id, event.data)
+                toast.add({ title: 'Succès', description: `Bénéficiaire mis à jour`, color: 'success' })
+            } else {
+                await beneficiairesStore.create(event.data)
+                toast.add({ title: 'Succès', description: `Nouveau bénéficiaire ajouté`, color: 'success' })
+            }
+            isOpen.value = false
         } catch (err: any) {
             toast.add({ title: 'Erreur', description: err.message, color: 'error' })
         } finally {
-            isLoading.value = false
+            isLoadingUpdate.value = false;
         }
     }
 </script>
 
 <template>
-    <USlideover v-model:open="open" :ui="{ content: 'min-w-2xl' }" title="Bénéficiaire"
+    <USlideover v-model:open="isOpen" :ui="{ content: 'min-w-2xl' }" title="Bénéficiaire"
         description="Add a new bénéficiaire to the database" :dismissible="false">
-        <UButton label="Nouveau beneficiaire" icon="i-lucide-plus" />
-
         <template #body>
             <UForm id="beneficiaire-form" :schema="schema" :state="state" :validate-on="[]" class="space-y-4"
                 @submit="onSubmit">
@@ -114,8 +158,10 @@ import type { Profil } from '~/types'
         </template>
         <template #footer="{ close }">
             <UButton label="Cancel" color="neutral" variant="outline" @click="close" />
-            <UButton label="Créer le bénéficiaire" class="ml-auto" color="primary" variant="solid" type="submit"
-                form="beneficiaire-form" :loading="isLoading" />
+            <UButton v-if="!benef" label="Créer le bénéficiaire" class="ml-auto" color="primary" variant="solid"
+                type="submit" form="beneficiaire-form" :loading="isLoading" />
+            <UButton v-else label="Mettre à jour le bénéficiaire" class="ml-auto" color="primary" variant="solid"
+                type="submit" form="beneficiaire-form" :loading="isLoadingUpdate" />
         </template>
     </USlideover>
 </template>

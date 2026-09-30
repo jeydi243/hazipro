@@ -20,10 +20,15 @@
 
     const items = [
         {
-            label: 'Approbateurs',
+            label: 'Comptes bancaires',
             icon: 'i-lucide-user',
-            slot: 'users'
-        }
+            slot: 'comptes'
+        },
+        {
+            label: 'Adresses',
+            icon: 'i-lucide-user',
+            slot: 'adresses'
+        },
     ]
     const parametresStore = useParametresStore()
     const { getApprobateurs } = storeToRefs(parametresStore)
@@ -125,7 +130,28 @@
                             </div>
                         </template>
 
-                        <template #users>
+                        <template #comptes>
+                            <div class="pt-4 h-full space-y-4 flex flex-col">
+                                <div class="flex justify-end">
+                                    <MatricesAddApprobateurModal :parent="props.matrice" />
+                                </div>
+                                <UTable :data="approbateurs ?? EMPTY_ROWS" :columns="columns"
+                                    class="border border-default rounded-md overflow-hidden flex-1" :ui="{
+                                        base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-t-lg',
+                                        thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
+                                        tbody: '[&>tr]:last:[&>td]:border-b-0',
+                                        th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r',
+                                        td: 'border-b border-(--ui-border) p-2'
+                                    }">
+                                    <template #empty-state>
+                                        <div class="flex flex-col items-center justify-center py-6 text-muted text-sm">
+                                            <p>Aucun service trouvé pour cette matrice.</p>
+                                        </div>
+                                    </template>
+                                </UTable>
+                            </div>
+                        </template>
+                        <template #adresses>
                             <div class="pt-4 h-full space-y-4 flex flex-col">
                                 <div class="flex justify-end">
                                     <MatricesAddApprobateurModal :parent="props.matrice" />

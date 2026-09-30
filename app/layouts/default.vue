@@ -2,7 +2,7 @@
     const route = useRoute()
     const toast = useToast()
 
-    const open = useLocalStorage('dashboard-sidebar-open', true)
+    const open = useLocalStorage('dashboard-sidebar-open-v2', false)
 
     const links = [
         [{

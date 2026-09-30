@@ -54,7 +54,7 @@ function onFileClick() {
 </script>
 
 <template>
-    <UForm id="settings" :schema="profileSchema" :state="profile" @submit="onSubmit" class="mx-2">
+    <UForm id="settings" :schema="profileSchema" :state="profile" class="mx-2" @submit="onSubmit">
         <UPageCard title="Profile" description="These informations will be displayed publicly." variant="naked"
                    orientation="horizontal" class="mb-4">
             <UButton form="settings" label="Save changes" color="neutral" type="submit" class="w-fit lg:ms-auto" />

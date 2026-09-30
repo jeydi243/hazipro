@@ -9,7 +9,7 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     async function fetchAll(_ownerId?: string | null) {
         loading.value = true;
         const { data, error } = await supabase.from("beneficiaires").select(
-            "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur, owner_id",
+            "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur_id(nom, postnom, email), owner_id",
         );
         if (error) throw error;
         if (data) items.value = data as unknown as Beneficiaire[];
@@ -18,7 +18,6 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     }
 
     async function create(data: Partial<Beneficiaire>) {
-        const supabase = useSupabaseClient();
         const ownerId = useParametresStore().owner_id;
 
         if (!ownerId) {
@@ -38,6 +37,23 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
 
         items.value.unshift(created as Beneficiaire);
         return created;
+    }
+
+    async function update(id: string, data: Partial<Beneficiaire>) {
+        const { data: updated, error } = await supabase
+            .from("beneficiaires")
+            .update(data as never)
+            .eq("id", id)
+            .select(
+                "id, code, nom, postnom, prenom, genre, categorie_id, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur_id(id, nom, postnom, email), owner_id",
+            )
+            .single();
+        if (error) throw error;
+
+        const beneficiary = updated as unknown as Beneficiaire;
+        const index = items.value.findIndex((item) => item.id === id);
+        if (index !== -1) items.value[index] = beneficiary;
+        return beneficiary;
     }
 
     async function remove(id: string) {
@@ -74,11 +90,11 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     function subscribeToRealtime(onChange: () => void): () => void {
         const supabase = useSupabaseClient();
         const channel = supabase
-            .channel("factures_realtime")
+            .channel("beneficiaires_realtime")
             .on("postgres_changes", {
                 event: "*",
                 schema: "public",
-                table: "factures",
+                table: "beneficiaires",
             }, onChange)
             .subscribe();
         return () => {
@@ -92,6 +108,7 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
         loading,
         fetchAll,
         create,
+        update,
         remove,
         fetchLines,
         removeLine,

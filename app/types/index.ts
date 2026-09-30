@@ -1,5 +1,6 @@
 import type { AvatarProps } from "@nuxt/ui";
 import type { Lookup, Organisation } from "./organisation";
+import type { Profil } from "./auth";
 
 export type UserStatus = "subscribed" | "unsubscribed" | "bounced";
 export type SaleStatus = "paid" | "failed" | "refunded";
@@ -33,6 +34,10 @@ export interface Beneficiaire {
     postnom: string;
     prenom: string;
     code: string;
+    genre: string;
+    created: string | Date;
+    updated: string | Date;
+    approbateur_id: string | Profil;
     categorie_id: string | Lookup;
 }
 export interface Taux {
@@ -45,7 +50,11 @@ export interface Taux {
 export interface Approbateur {
     id: string;
     matrice_id: string;
-    user_id: string;
+    user_id: string | Profil;
+    status: string;
+    niveau: number;
+    date_debut: string | Date;
+    date_fin?: string | Date;
     org_id: string | Organisation;
     type_beneficiaire: string | Lookup;
     date_taux: string;

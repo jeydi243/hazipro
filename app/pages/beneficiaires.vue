@@ -1,7 +1,7 @@
 <template>
     <UDashboardPanel id="inbox-70" :ui-pro="{ body: 'p-0' }">
         <template #header>
-            <UDashboardNavbar title="Note de frais" description="Liste des notes de frais"
+            <UDashboardNavbar title="Beneficiaires" description="Liste des notes de frais"
                 :ui-pro="{ body: 'px-4 py-2' }">
                 <template #right>
                     <div class="flex flex-wrap items-center justify-between gap-1.5">
@@ -15,7 +15,7 @@
         <template #body>
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination"
-                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="nfs ?? EMPTY_ROWS"
+                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="beneficiaires ?? EMPTY_ROWS"
                 :columns="columns" :ui="{
                     base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -46,10 +46,8 @@
         </template>
     </UDrawer>
 
-    <ClassesUpdateModal v-model:open="openClasseUpdateModal" :classe="selectedBenef ?? undefined"
-        @classe_updated="refreshClasses" />
-
-    <ClassesListeLookups v-model:open="openSlideOver" :item="selectedBenef" />
+    <BeneficiairesUpdateModal v-model:open="openUpdateModal" :benef="selectedBenef ?? undefined" />
+    <BeneficiairesDetails v-model:open="openDetailsBenef" :benef="selectedBenef ?? undefined" />
 </template>
 
 <script setup lang="ts">
@@ -57,7 +55,7 @@
     // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
     import type { TableColumn } from '@nuxt/ui'
     import type { Row } from '@tanstack/table-core'
-    import type { Beneficiaire } from '~/types'
+    import type { Beneficiaire, Lookup } from '~/types'
 
     const EMPTY_ROWS: any[] = []
 
@@ -68,7 +66,7 @@
         ]
     })
 
-    const supabase = useSupabaseClient()
+    const beneficiaires = useBeneficiairesStore().items
     const toast = useToast()
     const { copy } = useClipboard()
 
@@ -89,8 +87,9 @@
     } = useDataTable({ filterColumnId: 'nom', pageSize: 10 })
 
     // UI State
-    const openClasseUpdateModal = ref(false)
+    const openUpdateModal = ref(false)
     const openDetailsClasse = ref(false)
+    const openDetailsBenef = ref(false)
     const openSlideOver = ref(false)
     const selectedBenef = ref<Beneficiaire | null>(null)
     const searchInput = ref('')
@@ -105,17 +104,6 @@
         debouncedSearch(val)
     })
 
-    // Data loading
-    const { data: nfs, refresh: refreshNfData } = useLazyAsyncData<Beneficiaire[]>('beneficiaires', async () => {
-        const { data, error } = await supabase.from('nf').select('id, code, nom, description, organisation_id')
-        if (error) throw error
-        return data as Beneficiaire[]
-    })
-
-    async function refreshClasses() {
-        await refreshNfData()
-    }
-
     // Columns definition
     const columns: TableColumn<Beneficiaire>[] = [
         {
@@ -129,7 +117,7 @@
                     'aria-label': 'Modifier',
                     "onClick": () => {
                         selectedBenef.value = row.original;
-                        openClasseUpdateModal.value = true;
+                        openUpdateModal.value = true;
                     }
                 })
             ]),
@@ -152,24 +140,42 @@
             accessorKey: 'postnom',
             header: 'Postnom',
             cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.nom)
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.postnom)
             ])
         },
         {
-            id: 'details',
+            accessorKey: 'prenom',
+            header: 'Prenom',
+            cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.prenom)
+            ])
+        },
+        {
+            accessorKey: "genre",
+            header: "Genre",
+            cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.genre)
+            ])
+        },
+        {
+            id: 'categorie_id',
             header: () => h('div', { class: 'text-center' }, 'Categorie Bénéficiaire'),
-            cell: ({ row }) => h('div', { class: 'text-center' }, [
-                h(UButton, {
-                    "color": 'neutral',
-                    "variant": 'solid',
-                    "icon": 'i-lucide-eye',
-                    'aria-label': 'Voir les détails',
-                    "onClick": () => {
-                        selectedBenef.value = row.original;
-                        openSlideOver.value = true;
-                    }
-                })
-            ]),
+            cell: ({ row }) => h('div', { class: 'text-center' }, (row.original.categorie_id as Lookup)?.nom || 'N/A'),
+        },
+        {
+            id: 'created',
+            header: () => h('div', { class: 'text-center' }, 'Date de création'),
+            cell: ({ row }) => h('div', { class: 'text-center' }, row.original.created ? new Date(row.original.created).toLocaleDateString() : 'N/A'),
+        },
+        {
+            id: 'updated',
+            header: () => h('div', { class: 'text-center' }, 'Date de mise à jour'),
+            cell: ({ row }) => h('div', { class: 'text-center' }, row.original.updated ? new Date(row.original.updated).toLocaleDateString() : 'N/A'),
+        },
+        {
+            id: 'status',
+            header: () => h('div', { class: 'text-center' }, 'Status'),
+            cell: ({ row }) => h('div', { class: 'text-center' }, row.original.status === 'actif' ? 'Actif' : 'Inactif'),
         },
         {
             header: () => h('div', { class: 'text-center' }, 'Actions'),

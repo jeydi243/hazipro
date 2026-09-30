@@ -159,7 +159,7 @@ export const useParametresStore = defineStore("parametres", () => {
   }
   async function fetchApprobateurs(ownerId?: string | null) {
     let query = supabase.from("approbateurs").select(
-      "*",
+      "date_debut, date_fin, id, matrice_id, user_id(id, nom, email, postnom, prenom), status, type_beneficiaire, niveau",
     );
     if (ownerId) query = query.eq("owner_id", ownerId);
     const { data, error } = await query;
@@ -217,6 +217,9 @@ export const useParametresStore = defineStore("parametres", () => {
   const getMatriceNF = computed(() =>
     itemsMatrices.value.map((c) => ({ nom: c.nom, id: c.id }))
   );
+  const getApprobateurs = computed(() => (matrice_id: string | null) =>
+    itemsApprobateurs.value.filter((a) => a.matrice_id === matrice_id)
+  );
   const getTaux = computed(() =>
     itemsTaux.value.map((c) => {
       const from = lookups.value.find(
@@ -251,8 +254,8 @@ export const useParametresStore = defineStore("parametres", () => {
     }
 
     const matchingTaux = itemsTaux.value.filter((taux) =>
-      taux.from_currency === usdLookup.id &&
-      taux.to_currency === destinationCurrencyId
+      taux.from_currency === usdLookup.id
+      && taux.to_currency === destinationCurrencyId
     );
 
     if (!matchingTaux.length) return null;
@@ -283,6 +286,7 @@ export const useParametresStore = defineStore("parametres", () => {
     clients,
     invoiceHeaders,
     profils,
+    getApprobateurs,
     init,
     setOwnerID,
     clearOwnerID,
