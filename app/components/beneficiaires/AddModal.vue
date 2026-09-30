@@ -3,7 +3,7 @@
     import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
     import { generateRandomCode } from '~/utils'
     import type { Lookup, Organisation } from '~/types/organisation'
-import type { Profil } from '~/types'
+    import type { Profil } from '~/types'
 
     const parametresStore = useParametresStore()
     const beneficiairesStore = useBeneficiairesStore()

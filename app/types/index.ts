@@ -1,5 +1,5 @@
 import type { AvatarProps } from "@nuxt/ui";
-import type { Lookup, Organisation } from "./organisation";
+import type { Lookup, Matrice, Organisation } from "./organisation";
 import type { Profil } from "./auth";
 
 export type UserStatus = "subscribed" | "unsubscribed" | "bounced";
@@ -35,10 +35,42 @@ export interface Beneficiaire {
     prenom: string;
     code: string;
     genre: string;
+    status: string;
     created: string | Date;
     updated: string | Date;
     approbateur_id: string | Profil;
     categorie_id: string | Lookup;
+}
+export interface Adresse {
+    id: string;
+    beneficiaire_id: string | Beneficiaire;
+    adresse: string;
+    ville: string;
+    pays: string;
+    status: string;
+    created: string | Date;
+    updated: string | Date;
+}
+export interface Banque {
+    id: string;
+    nom: string;
+    code: string;
+}
+export interface CompteBancaire {
+    id: string;
+    beneficiaire_id: string | Beneficiaire;
+    numero_compte: string;
+    intitule_compte: string;
+    banque_id: string | Banque;
+    agence?: string;
+    rib?: string;
+    type_compte?: string;
+    
+    status: string;
+    created: string | Date;
+    updated: string | Date;
+    matrice_id: string | Matrice;
+    approbateur_id: string | Profil;
 }
 export interface Taux {
     id: string;

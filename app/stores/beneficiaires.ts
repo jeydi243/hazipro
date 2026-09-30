@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Beneficiaire } from "~/types";
+import type { Adresse, Beneficiaire, CompteBancaire } from "~/types";
 
 export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     const items = ref<Beneficiaire[]>([]);
@@ -26,6 +26,48 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
 
         const { data: created, error } = await supabase
             .from("beneficiaires")
+            .insert({
+                ...data,
+                owner_id: ownerId,
+            } as never)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        items.value.unshift(created as Beneficiaire);
+        return created;
+    }
+    async function createCompteBancaire(data: Partial<CompteBancaire>) {
+        const ownerId = useParametresStore().owner_id;
+
+        if (!ownerId) {
+            throw new Error("ownerId introuvable");
+        }
+
+        const { data: created, error } = await supabase
+            .from("comptes_bancaires")
+            .insert({
+                ...data,
+                owner_id: ownerId,
+            } as never)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        items.value.unshift(created as Beneficiaire);
+        return created;
+    }
+    async function createAdresse(data: Partial<Adresse>) {
+        const ownerId = useParametresStore().owner_id;
+
+        if (!ownerId) {
+            throw new Error("ownerId introuvable");
+        }
+
+        const { data: created, error } = await supabase
+            .from("adresses")
             .insert({
                 ...data,
                 owner_id: ownerId,
@@ -111,6 +153,8 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
         update,
         remove,
         fetchLines,
+        createCompteBancaire,
+        createAdresse,
         removeLine,
         subscribeToRealtime,
         getBeneficiaires

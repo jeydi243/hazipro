@@ -180,23 +180,39 @@
         {
             header: () => h('div', { class: 'text-center' }, 'Actions'),
             id: 'actions',
-            cell: ({ row }) => h('div', { class: 'text-center' },
-                h(UDropdownMenu, { content: { align: 'end' }, children: getRowItemsClasse(row) },
-                    () => h(UButton, { "icon": 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", "color": 'neutral', "variant": 'ghost', "class": 'ml-auto' })
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-center' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: { align: 'end' },
+                            children: getRowItems(row)
+                        },
+                        () =>
+                            h(UButton, {
+                                'icon': 'i-lucide-ellipsis-vertical',
+                                'aria-label': "Plus d'actions",
+                                'color': 'neutral',
+                                'variant': 'ghost',
+                                'class': 'ml-auto'
+                            })
+                    )
                 )
-            )
+            }
         }
     ]
 
-    function getRowItemsClasse(row: Row<Beneficiaire>) {
+    function getRowItems(row: Row<Beneficiaire>) {
         return [[
             { type: 'label', label: 'Actions' },
             {
-                label: 'Copy classe ID',
+                label: 'Copy bénéficiaire ID',
                 icon: 'i-lucide-copy',
                 onSelect() {
                     copy(row.original.id.toString())
-                    toast.add({ title: 'Copied', description: 'Classe ID copied to clipboard' })
+                    toast.add({ title: 'Copied', description: 'Bénéficiaire ID copied to clipboard' })
                 }
             },
             { type: 'separator' },
@@ -205,12 +221,12 @@
                 icon: 'material-symbols:open-in-full-rounded',
                 onSelect() {
                     selectedBenef.value = row.original
-                    openDetailsClasse.value = true
+                    openDetailsBenef.value = true
                 }
             },
             { type: 'separator' },
             {
-                label: 'Delete classe',
+                label: 'Delete bénéficiaire',
                 icon: 'i-lucide-trash',
                 color: 'error' as const,
                 onSelect() {
