@@ -1,6 +1,6 @@
 import { items } from "happy-dom/lib/PropertySymbol.js";
 import { defineStore } from "pinia";
-import type { Approbateur, Taux } from "~/types";
+import type { Approbateur, Banque, Taux } from "~/types";
 import type { Matrice } from "~/types/organisation";
 
 export const useParametresStore = defineStore("parametres", () => {
@@ -10,6 +10,7 @@ export const useParametresStore = defineStore("parametres", () => {
   const itemsMatrices = ref<Matrice[]>([]);
   const itemsTaux = ref<Taux[]>([]);
   const itemsApprobateurs = ref<Approbateur[]>([]);
+  const itemsBanques = ref<Banque[]>([]);
 
   const lookupsStore = useLookupsStore();
   const clientsStore = useClientsStore();
@@ -106,6 +107,12 @@ export const useParametresStore = defineStore("parametres", () => {
           : Promise.resolve(),
       },
       {
+        name: "banques",
+        promise: owner_id.value
+          ? fetchAllBanques(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
         name: "beneficiaires",
         promise: owner_id.value
           ? beneficiairesStore.fetchAll(owner_id.value)
@@ -166,6 +173,15 @@ export const useParametresStore = defineStore("parametres", () => {
     if (error) throw error;
     if (data) itemsApprobateurs.value = data as unknown as Approbateur[];
   }
+  async function fetchAllBanques(ownerId?: string | null) {
+    let query = supabase.from("banques").select(
+      "id, nom, code, description, status, owner_id",
+    );
+    if (ownerId) query = query.eq("owner_id", ownerId);
+    const { data, error } = await query;
+    if (error) throw error;
+    if (data) itemsBanques.value = data as unknown as Banque[];
+  }
   async function createMatrice(data: Partial<Matrice>) {
     const { data: created, error } = await supabase.from("matrices")
       .insert({ ...data, owner_id: owner_id.value } as never).select(
@@ -184,6 +200,16 @@ export const useParametresStore = defineStore("parametres", () => {
     }
     return created[0];
   }
+  async function createBanque(data: Partial<Banque>) {
+    const { data: created, error } = await supabase.from("banques")
+      .insert({ ...data, owner_id: owner_id.value } as never).select(
+        "id, nom, code, description, status, owner_id",
+      );
+    if (error) throw error;
+    if (created) itemsBanques.value.unshift(created[0] as unknown as Banque);
+    return created[0];
+  }
+
   async function createTaux(data: Partial<Taux>) {
     const today = new Date().toISOString().slice(0, 10);
     if (data.date_taux && data.date_taux > today) {
@@ -254,8 +280,8 @@ export const useParametresStore = defineStore("parametres", () => {
     }
 
     const matchingTaux = itemsTaux.value.filter((taux) =>
-      taux.from_currency === usdLookup.id
-      && taux.to_currency === destinationCurrencyId
+      taux.from_currency === usdLookup.id &&
+      taux.to_currency === destinationCurrencyId
     );
 
     if (!matchingTaux.length) return null;
@@ -292,6 +318,7 @@ export const useParametresStore = defineStore("parametres", () => {
     clearOwnerID,
     createMatrice,
     createApprobateur,
+    createBanque,
     getClasseById,
     getLookupsById,
     getClasseItems,
@@ -302,6 +329,7 @@ export const useParametresStore = defineStore("parametres", () => {
     itemsTaux,
     itemsMatrices,
     itemsApprobateurs,
+    itemsBanques,
     getFirstApprobateurID,
   };
 });

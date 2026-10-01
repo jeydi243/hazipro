@@ -8,15 +8,45 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     const itemsAdresses = ref<Adresse[]>([]);
     const loading = ref(false);
 
-    async function fetchAll(_ownerId?: string | null) {
+    // async function fetchAll(_ownerId?: string | null) {
+    //     loading.value = true;
+    //     const { data, error } = await supabase.from("beneficiaires").select(
+    //         "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur_id(nom, postnom, email), owner_id",
+    //     );
+    //     if (error) throw error;
+    //     if (data) items.value = data as unknown as Beneficiaire[];
+    //     loading.value = false;
+    //     return items.value;
+    // }
+    async function fetchAll(ownerId?: string | null) {
         loading.value = true;
-        const { data, error } = await supabase.from("beneficiaires").select(
-            "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur_id(nom, postnom, email), owner_id",
-        );
-        if (error) throw error;
-        if (data) items.value = data as unknown as Beneficiaire[];
+    //     if (ownerId) query = query.eq("owner_id", ownerId);
+    // const { data, error } = await query;
+        const [benefRes, classesRes, adressesRes] = await Promise.allSettled([
+            supabase.from("beneficiaires").select(
+                "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur_id(nom, postnom, email), owner_id",
+            ).eq("owner_id", ownerId),
+            supabase.from("comptes_bancaires").select(
+                "numero_compte, intitule_compte, banque_id(id, nom), type_compte_id(id, nom), beneficiaire_id(id, nom, postnom, prenom), id",
+            ).eq("owner_id", ownerId),
+            supabase.from("adresses").select(
+                "adresse,ville,pays, beneficiaire_id(id, nom, postnom, prenom), id",
+            ).eq("owner_id", ownerId),
+        ]);
+
+        if (benefRes.status === "fulfilled" && benefRes.value.data) {
+            items.value = benefRes.value
+                .data as unknown as Beneficiaire[];
+        }
+        if (classesRes.status === "fulfilled" && classesRes.value.data) {
+            itemsComptesBancaires.value = classesRes.value
+                .data as unknown as CompteBancaire[];
+        }
+        if (adressesRes.status === "fulfilled" && adressesRes.value.data) {
+            itemsAdresses.value = adressesRes.value
+                .data as unknown as Adresse[];
+        }
         loading.value = false;
-        return items.value;
     }
 
     async function create(data: Partial<Beneficiaire>) {
@@ -151,7 +181,7 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
         () => (beneficiaire_id: string | null) =>
             itemsComptesBancaires.value.filter((c) =>
                 c.beneficiaire_id === beneficiaire_id
-            )
+            ),
     );
     const getAdresses = computed(() => (beneficiaire_id: string | null) =>
         itemsAdresses.value.filter((a) => a.beneficiaire_id === beneficiaire_id)

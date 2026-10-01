@@ -130,6 +130,14 @@
                 }
             },
             {
+                label: 'Banques',
+                to: '/settings/banques',
+                icon: 'solar:user-id-bold-duotone',
+                onSelect: () => {
+                    open.value = false
+                }
+            },
+            {
                 label: 'Articles',
                 to: '/settings/articles',
                 icon: 'solar:layers-minimalistic-bold-duotone',

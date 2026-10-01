@@ -1,66 +1,71 @@
 <script setup lang="ts">
-useHead({
-    title: 'Settings - Wazi',
-    meta: [
-        { name: 'description', content: 'Manage your settings.' }
-    ]
-})
-const links = [{
-    label: 'Parametres',
-    icon: 'i-lucide-user',
-    to: '/settings',
-    exact: true
-}, {
-    label: 'Lookups',
-    icon: 'i-lucide-users',
-    to: '/settings/lookups'
-}, {
-    label: 'Organisations',
-    icon: 'octicon:organization-16',
-    to: '/settings/organisations'
-},
-{
-    label: 'Matrices',
-    icon: 'octicon:organization-16',
-    to: '/settings/matrices'
-},
-{
-    label: 'Articles',
-    icon: 'icon-park-outline:ad-product',
-    to: '/settings/articles'
-},
-{
-    label: 'Taux',
-    icon: 'icon-park-outline:ad-product',
-    to: '/settings/taux'
-},
+    useHead({
+        title: 'Settings - Wazi',
+        meta: [
+            { name: 'description', content: 'Manage your settings.' }
+        ]
+    })
+    const links = [{
+        label: 'Parametres',
+        icon: 'i-lucide-user',
+        to: '/settings',
+        exact: true
+    }, {
+        label: 'Lookups',
+        icon: 'i-lucide-users',
+        to: '/settings/lookups'
+    }, {
+        label: 'Organisations',
+        icon: 'octicon:organization-16',
+        to: '/settings/organisations'
+    },
+    {
+        label: 'Matrices',
+        icon: 'octicon:organization-16',
+        to: '/settings/matrices'
+    },
+    {
+        label: 'Articles',
+        icon: 'icon-park-outline:ad-product',
+        to: '/settings/articles'
+    },
+    {
+        label: 'Taux',
+        icon: 'icon-park-outline:ad-product',
+        to: '/settings/taux'
+    },
 
-{
-    label: 'Grille Tarifaire',
-    icon: 'i-lucide-shield',
-    to: '/settings/tarifaire'
-},
-{
-    label: 'Utilisateurs',
-    icon: 'i-lucide-shield',
-    to: '/settings/users'
-},
-{
-    label: 'Rôles',
-    icon: 'i-lucide-shield',
-    to: '/settings/roles'
-},
+    {
+        label: 'Grille Tarifaire',
+        icon: 'i-lucide-shield',
+        to: '/settings/tarifaire'
+    },
+    {
+        label: 'Utilisateurs',
+        icon: 'i-lucide-shield',
+        to: '/settings/users'
+    },
+    {
+        label: 'Rôles',
+        icon: 'i-lucide-shield',
+        to: '/settings/roles'
+    },
+    {
+        label: 'Banques',
+        icon: 'i-lucide-shield',
+        to: '/settings/banques'
+    },
 
-{
-    label: 'Clients',
-    icon: 'icon-park-outline:ad-product',
-    to: '/settings/clients'
-},
-{
-    label: 'Security',
-    icon: 'i-lucide-shield',
-    to: '/settings/security'
-}]
+    {
+        label: 'Clients',
+        icon: 'icon-park-outline:ad-product',
+        to: '/settings/clients'
+    },
+    {
+        label: 'Security',
+        icon: 'i-lucide-shield',
+        to: '/settings/security'
+    }]
 </script>
 
 <template>

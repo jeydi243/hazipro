@@ -63,6 +63,16 @@
         }
     })
 
+    function formatNumeroCompte(value: string) {
+        const digits = value.replace(/\D/g, '').slice(0, 23)
+        state.numero_compte = [
+            digits.slice(0, 5),
+            digits.slice(5, 10),
+            digits.slice(10, 21),
+            digits.slice(21, 23)
+        ].filter(Boolean).join('-')
+    }
+
     const profilItems = computed<SelectMenuItem[]>(() => (Profils || []).map((p: Profil) => ({
         label: `${p.email}`,
         id: p.id
@@ -116,7 +126,9 @@
 
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormField label="Numéro de compte" name="numero_compte">
-                    <UInput v-model="state.numero_compte" class="w-full" placeholder="Entrez le numéro de compte" />
+                    <UInput :model-value="state.numero_compte" class="w-full"
+                        placeholder="12345-12345-12345678901-12" inputmode="numeric" maxlength="26"
+                        @update:model-value="formatNumeroCompte" />
                 </UFormField>
                 <UFormField label="Intitulé de compte" name="intitule_compte">
                     <UInput v-model="state.intitule_compte" class="w-full" placeholder="Entrez l'intitulé du compte" />
