@@ -42,20 +42,20 @@ defineShortcuts({
 </script>
 
 <template>
-    <div class="overflow-y-auto divide-y divide-(--ui-border) h-full pb-2">
+    <div class="overflow-y-auto divide-y divide-default h-full pb-2">
         <div v-for="(user, index) in users" :key="index" :ref="el => { (usersRefs as any)[user.id] = el as Element }">
             <div class="p-4 sm:px-6 text-sm cursor-pointer border-l-2 transition-colors" :class="[
-                selectedUser && selectedUser.id === user.id ? 'border-(--ui-primary) bg-(--ui-primary)/10' : 'border-transparent hover:border-(--ui-primary) hover:bg-(--ui-primary)/5'
+                selectedUser && selectedUser.id === user.id ? 'border-primary bg-(--ui-primary)/10' : 'border-transparent hover:border-primary hover:bg-(--ui-primary)/5'
             ]" @click="selectedUser = user">
                 <div class="flex items-center gap-3">
                     <UAvatar :alt="`${user.prenom} ${user.nom}`" size="sm" />
                     <div class="min-w- flex-1">
                         <div class="flex items-center justify-between">
-                            <span class="font-semibold text-(--ui-text-highlighted) truncate">
+                            <span class="font-semibold text-highlighted truncate">
                                 {{ user.prenom }} {{ user.nom }}
                             </span>
                         </div>
-                        <p class="text-(--ui-text-dimmed) text-xs truncate">
+                        <p class="text-dimmed text-xs truncate">
                             @{{ user.user_name }}
                         </p>
                     </div>

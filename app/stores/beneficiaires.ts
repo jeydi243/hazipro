@@ -2,9 +2,11 @@ import { defineStore } from "pinia";
 import type { Adresse, Beneficiaire, CompteBancaire } from "~/types";
 
 export const useBeneficiairesStore = defineStore("beneficiaires", () => {
-    const items = ref<Beneficiaire[]>([]);
-    const loading = ref(false);
     const supabase = useSupabaseClient();
+    const items = ref<Beneficiaire[]>([]);
+    const itemsComptesBancaires = ref<CompteBancaire[]>([]);
+    const itemsAdresses = ref<Adresse[]>([]);
+    const loading = ref(false);
 
     async function fetchAll(_ownerId?: string | null) {
         loading.value = true;
@@ -145,6 +147,16 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     }
     const getBeneficiaires = computed(() => items);
 
+    const getComptesBancaires = computed(
+        () => (beneficiaire_id: string | null) =>
+            itemsComptesBancaires.value.filter((c) =>
+                c.beneficiaire_id === beneficiaire_id
+            )
+    );
+    const getAdresses = computed(() => (beneficiaire_id: string | null) =>
+        itemsAdresses.value.filter((a) => a.beneficiaire_id === beneficiaire_id)
+    );
+
     return {
         items,
         loading,
@@ -154,9 +166,11 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
         remove,
         fetchLines,
         createCompteBancaire,
+        getAdresses,
+        getComptesBancaires,
         createAdresse,
         removeLine,
         subscribeToRealtime,
-        getBeneficiaires
+        getBeneficiaires,
     };
 });

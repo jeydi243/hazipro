@@ -86,9 +86,9 @@
 </script>
 
 <template>
-    <UModal v-model:open="open" title="Attacher un utilisateur"
-        description="Attacher un utilisateur à cette organisation">
-        <UButton label="Attacher un utilisateur" icon="i-lucide-plus" size="sm" variant="subtle" />
+    <UModal v-model:open="open" title="Ajouter une adresse"
+        description="Ajouter une adresse à ce bénéficiaire">
+        <UButton label="Ajouter une adresse" icon="i-lucide-plus" size="sm" variant="subtle" />
 
         <template #body>
             <div v-if="props.parent" class="mb-4 p-3 bg-elevated rounded-lg border border-default text-sm">

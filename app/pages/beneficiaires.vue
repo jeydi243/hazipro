@@ -47,13 +47,13 @@
     </UDrawer>
 
     <BeneficiairesUpdateModal v-model:open="openUpdateModal" :benef="selectedBenef ?? undefined" />
-    <BeneficiairesDetails v-model:open="openDetailsBenef" :benef="selectedBenef ?? undefined" />
+    <BeneficiairesDetails v-model:open="openDetailsBenef" :benef="selectedBenef ?? null" />
 </template>
 
 <script setup lang="ts">
 
     // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-    import type { TableColumn } from '@nuxt/ui'
+    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
     import type { Row } from '@tanstack/table-core'
     import type { Beneficiaire, Lookup } from '~/types'
 
@@ -188,7 +188,7 @@
                         UDropdownMenu,
                         {
                             content: { align: 'end' },
-                            children: getRowItems(row)
+                            items: getRowItems(row)
                         },
                         () =>
                             h(UButton, {
@@ -204,7 +204,7 @@
         }
     ]
 
-    function getRowItems(row: Row<Beneficiaire>) {
+    function getRowItems(row: Row<Beneficiaire>): DropdownMenuItem[][] {
         return [[
             { type: 'label', label: 'Actions' },
             {

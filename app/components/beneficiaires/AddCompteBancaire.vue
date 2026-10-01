@@ -3,35 +3,40 @@
     import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
     import { CalendarDate, getLocalTimeZone } from '@internationalized/date'
     import type { Beneficiaire, Profil } from '~/types'
-    import type { Matrice } from '~/types/organisation';
+    import type { Lookup, Matrice } from '~/types/organisation';
 
     const props = defineProps<{
         parent: Beneficiaire | null
     }>()
     const Profils = useProfilsStore().items;
+    const TypeComptes = useLookupsStore().lookups;
     const emit = defineEmits(['compte-added'])
 
     const schema = z.object({
-        user_id: z.string().min(1, 'Utilisateur requis'),
+        beneficiaire_id: z.string().min(1, 'Bénéficiaire requis'),
+        numero_compte: z.string().min(1, 'Numéro de compte requis'),
+        intitule_compte: z.string().min(1, 'Intitulé de compte requis'),
+        banque_id: z.string().min(1, 'Banque requise'),
+        type_compte_id: z.string().min(1, 'Type de compte requis'),
         date_debut: z.date({ message: 'Date de début requise' }),
         date_fin: z.date().optional(),
-        type_beneficiaire: z.string().optional(),
-        niveau: z.number().min(1, 'Niveau requis').max(5, 'Niveau maximum 5')
+
     })
 
     const open = ref(false)
     const toast = useToast()
-    const supabase = useSupabaseClient()
     const beneficiairesStore = useBeneficiairesStore()
 
     type Schema = z.output<typeof schema>
 
     const state = reactive<Partial<Schema>>({
-        user_id: undefined,
+        beneficiaire_id: props.parent?.id,
+        numero_compte: undefined,
+        intitule_compte: undefined,
+        banque_id: undefined,
+        type_compte_id: undefined,
         date_debut: new Date(),
-        date_fin: undefined,
-        type_beneficiaire: undefined,
-        niveau: 1
+        date_fin: undefined
     })
 
     const maxDate = new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
@@ -62,6 +67,10 @@
         label: `${p.email}`,
         id: p.id
     })))
+    const typeCompteItems = computed<SelectMenuItem[]>(() => (TypeComptes || []).map((t: Lookup) => ({
+        label: `${t.nom}`,
+        id: t.id
+    })))
 
     async function onSubmit(event: FormSubmitEvent<Schema>) {
         if (!props.parent?.id) return
@@ -76,7 +85,10 @@
             emit('compte-added')
             open.value = false
             // Reset state
-            state.user_id = undefined
+            state.beneficiaire_id = undefined
+            state.numero_compte = undefined
+            state.intitule_compte = undefined
+            state.banque_id = undefined
             state.date_debut = new Date()
             state.date_fin = undefined
         } catch (err: any) {
@@ -86,9 +98,9 @@
 </script>
 
 <template>
-    <UModal v-model:open="open" title="Attacher un utilisateur"
-        description="Attacher un utilisateur à cette organisation">
-        <UButton label="Attacher un utilisateur" icon="i-lucide-plus" size="sm" variant="subtle" />
+    <UModal v-model:open="open" title="Ajouter un compte bancaire"
+        description="Ajouter un compte bancaire à ce bénéficiaire">
+        <UButton label="Ajouter un compte bancaire" icon="i-lucide-plus" size="sm" variant="subtle" />
 
         <template #body>
             <div v-if="props.parent" class="mb-4 p-3 bg-elevated rounded-lg border border-default text-sm">
@@ -97,24 +109,24 @@
                     Organisation Parente
                 </p> -->
                 <p class="font-medium text-highlighted">
-                    {{ props.parent.nom }}
+                    {{ props.parent.nom }} {{ props.parent.postnom }} {{ props.parent.prenom }}
                     <span class="text-xs font-mono opacity-60 ml-1">({{ props.parent.code || 'N/A' }})</span>
                 </p>
             </div>
 
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Utilisateur" name="user_id">
-                    <USelectMenu v-model="state.user_id" class="w-full" value-key="id" :items="profilItems"
-                        placeholder="Choisir un utilisateur" />
+                <UFormField label="Numéro de compte" name="numero_compte">
+                    <UInput v-model="state.numero_compte" class="w-full" placeholder="Entrez le numéro de compte" />
                 </UFormField>
-                <UFormField label="Niveau" name="niveau">
-                    <USelectMenu v-model="state.niveau" class="w-full" value-key="id" :items="[
-                        { label: '1', id: 1 },
-                        { label: '2', id: 2 },
-                        { label: '3', id: 3 },
-                        { label: '4', id: 4 },
-                        { label: '5', id: 5 }
-                    ]" placeholder="Choisir un niveau" />
+                <UFormField label="Intitulé de compte" name="intitule_compte">
+                    <UInput v-model="state.intitule_compte" class="w-full" placeholder="Entrez l'intitulé du compte" />
+                </UFormField>
+                <UFormField label="Banque" name="banque_id">
+                    <USelectMenu v-model="state.banque_id" class="w-full" value-key="id" :items="profilItems"
+                        placeholder="Choisir une banque" />
+                </UFormField>
+                <UFormField label="Type de compte" name="type_compte_id">
+                    <USelectMenu v-model="state.type_compte_id" class="w-full" value-key="id" :items="typeCompteItems" placeholder="Choisir un type de compte" />
                 </UFormField>
                 <UFormField label="Date debut" name="date_debut">
                     <UInputDate v-model="dateDebutModel" class="w-full" :max-date="maxDate">

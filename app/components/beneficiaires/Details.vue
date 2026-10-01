@@ -29,16 +29,15 @@
             slot: 'adresses'
         },
     ]
-    const parametresStore = useParametresStore()
-    const { getApprobateurs } = storeToRefs(parametresStore)
+    const beneficiairesStore = useBeneficiairesStore()
+    const { getComptesBancaires, getAdresses } = storeToRefs(beneficiairesStore)
 
-    const approbateurs = computed(() => getApprobateurs.value(props.benef?.id || null))
-    const comptesBancaires = computed(() => getApprobateurs.value(props.benef?.id || null))
-    const adresses = computed(() => getApprobateurs.value(props.benef?.id || null))
+    const comptesBancaires = computed<CompteBancaire[]>(() => (getComptesBancaires.value(props.benef?.id || null) ?? []) as CompteBancaire[])
+    const adresses = computed<Adresse[]>(() => (getAdresses.value(props.benef?.id || null) ?? []) as Adresse[])
     const UBadge = resolveComponent('UBadge')
     const UButton = resolveComponent('UButton')
 
-    const columnsCompte: TableColumn<CompteBancaire>[] = [
+    const columnsCompte: TableColumn<any>[] = [
         {
             accessorKey: 'intitule',
             header: 'Intitule',
@@ -94,23 +93,19 @@
         {
             accessorKey: 'nom',
             header: 'Nom',
-            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, (row.original.user_id as Profil).nom || 'N/A')
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, (row.original.adresse || 'N/A'))
         },
         {
             accessorKey: 'niveau',
             header: 'Niveau',
-            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.niveau || 'N/A')
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.ville || 'N/A')
         },
         {
             accessorKey: 'date_debut',
             header: 'Date début',
-            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.date_debut as string || 'N/A')
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.pays as string || 'N/A')
         },
-        {
-            accessorKey: 'date_fin',
-            header: 'Date fin',
-            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original?.date_fin as string || ' - ')
-        },
+
         {
             accessorKey: 'status',
             header: 'Statut',
@@ -169,7 +164,7 @@
                                 <div>
                                     <p class="text-sm font-medium text-muted mb-1">Description</p>
                                     <p class="text-sm text-highlighted">
-                                        {{ props.benef.description ||
+                                        {{ props.benef.nom ||
                                             'Aucune description.' }}
                                     </p>
                                 </div>
