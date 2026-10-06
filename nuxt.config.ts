@@ -5,8 +5,10 @@ export default defineNuxtConfig({
         "@nuxt/ui",
         "@vueuse/nuxt",
         "@nuxtjs/supabase",
-        "@pinia/nuxt",
     ],
+    imports: {
+        dirs: ["stores"],
+    },
     app: {
         rootAttrs: {
             "data-vaul-drawer-wrapper": "",
