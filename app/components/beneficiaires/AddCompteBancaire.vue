@@ -2,14 +2,21 @@
     import * as z from 'zod'
     import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui'
     import { CalendarDate, getLocalTimeZone } from '@internationalized/date'
-    import type { Beneficiaire, Profil } from '~/types'
+    import type { Banque, Beneficiaire, Profil } from '~/types'
     import type { Lookup, Matrice } from '~/types/organisation';
 
     const props = defineProps<{
         parent: Beneficiaire | null
     }>()
+    const paramStore = useParametresStore()
     const Profils = useProfilsStore().items;
     const TypeComptes = useLookupsStore().lookups;
+    const Banques = paramStore.itemsBanques;
+    const devises: Lookup[] = useLookupsStore().getDevise
+    const itemsDevises = computed<SelectMenuItem[]>(() => devises?.map((lookup: any) => ({
+        label: lookup.nom,
+        id: lookup.id
+    })) || [])
     const emit = defineEmits(['compte-added'])
 
     const schema = z.object({
@@ -17,13 +24,14 @@
         numero_compte: z.string().min(1, 'Numéro de compte requis'),
         intitule_compte: z.string().min(1, 'Intitulé de compte requis'),
         banque_id: z.string().min(1, 'Banque requise'),
-        type_compte_id: z.string().min(1, 'Type de compte requis'),
         date_debut: z.date({ message: 'Date de début requise' }),
         date_fin: z.date().optional(),
+        devise: z.string().min(3, 'Devise requise')
 
     })
 
     const open = ref(false)
+    const isLoading = ref(false)
     const toast = useToast()
     const beneficiairesStore = useBeneficiairesStore()
 
@@ -34,9 +42,10 @@
         numero_compte: undefined,
         intitule_compte: undefined,
         banque_id: undefined,
-        type_compte_id: undefined,
+
         date_debut: new Date(),
-        date_fin: undefined
+        date_fin: undefined,
+        devise: 'USD'
     })
 
     const maxDate = new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())
@@ -73,21 +82,18 @@
         ].filter(Boolean).join('-')
     }
 
-    const profilItems = computed<SelectMenuItem[]>(() => (Profils || []).map((p: Profil) => ({
-        label: `${p.email}`,
-        id: p.id
-    })))
-    const typeCompteItems = computed<SelectMenuItem[]>(() => (TypeComptes || []).map((t: Lookup) => ({
-        label: `${t.nom}`,
-        id: t.id
+    const banqueItems = computed<SelectMenuItem[]>(() => (Banques || []).map((b: Banque) => ({
+        label: `${b.nom}`,
+        id: b.id
     })))
 
     async function onSubmit(event: FormSubmitEvent<Schema>) {
+        isLoading.value = true
         if (!props.parent?.id) return
-
         try {
             await beneficiairesStore.createCompteBancaire({
                 ...event.data,
+                numero_compte: event.data.numero_compte.replace(/-/g, ''),
                 beneficiaire_id: props.parent.id
             })
 
@@ -103,6 +109,8 @@
             state.date_fin = undefined
         } catch (err: any) {
             toast.add({ title: 'Erreur', description: err.message, color: 'error' })
+        } finally {
+            isLoading.value = false
         }
     }
 </script>
@@ -126,19 +134,19 @@
 
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormField label="Numéro de compte" name="numero_compte">
-                    <UInput :model-value="state.numero_compte" class="w-full"
-                        placeholder="12345-12345-12345678901-12" inputmode="numeric" maxlength="26"
-                        @update:model-value="formatNumeroCompte" />
+                    <UInput :model-value="state.numero_compte" class="w-full" placeholder="AAAAA-XXXXX-12345678901-XX"
+                        inputmode="numeric" maxlength="26" @update:model-value="formatNumeroCompte" />
                 </UFormField>
                 <UFormField label="Intitulé de compte" name="intitule_compte">
                     <UInput v-model="state.intitule_compte" class="w-full" placeholder="Entrez l'intitulé du compte" />
                 </UFormField>
                 <UFormField label="Banque" name="banque_id">
-                    <USelectMenu v-model="state.banque_id" class="w-full" value-key="id" :items="profilItems"
+                    <USelectMenu v-model="state.banque_id" class="w-full" value-key="id" :items="banqueItems"
                         placeholder="Choisir une banque" />
                 </UFormField>
-                <UFormField label="Type de compte" name="type_compte_id">
-                    <USelectMenu v-model="state.type_compte_id" class="w-full" value-key="id" :items="typeCompteItems" placeholder="Choisir un type de compte" />
+                <UFormField label="Devise du compte" name="devise">
+                    <USelectMenu v-model="state.devise" class="w-full" value-key="id" :items="itemsDevises"
+                        placeholder="Choisir une devise" />
                 </UFormField>
                 <UFormField label="Date debut" name="date_debut">
                     <UInputDate v-model="dateDebutModel" class="w-full" :max-date="maxDate">
@@ -171,7 +179,7 @@
 
                 <div class="flex justify-end gap-2">
                     <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
-                    <UButton label="Attacher" color="primary" variant="solid" type="submit" />
+                    <UButton label="Attacher" color="primary" variant="solid" type="submit" :loading="isLoading" />
                 </div>
             </UForm>
         </template>

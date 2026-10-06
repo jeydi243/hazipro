@@ -209,6 +209,19 @@ export const useParametresStore = defineStore("parametres", () => {
     if (created) itemsBanques.value.unshift(created[0] as unknown as Banque);
     return created[0];
   }
+  async function updateBanque(id: string, data: Partial<Banque>) {
+    const supabase = useSupabaseClient();
+    const { data: updated, error } = await supabase.from("banques").update(
+      data as never,
+    )
+      .eq("id", id).select("id, nom, code, description, status, owner_id");
+    if (error) throw error;
+    if (updated) {
+      const idx = itemsBanques.value.findIndex((b) => b.id === id);
+      if (idx !== -1) itemsBanques.value[idx] = updated[0] as unknown as Banque;
+    }
+    return updated;
+  }
 
   async function createTaux(data: Partial<Taux>) {
     const today = new Date().toISOString().slice(0, 10);
@@ -325,6 +338,7 @@ export const useParametresStore = defineStore("parametres", () => {
     getMatriceNF,
     getTaux,
     getTauxForDevise,
+    updateBanque,
     createTaux,
     itemsTaux,
     itemsMatrices,

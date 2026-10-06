@@ -7,7 +7,6 @@
         nom: z.string().min(3, 'Too short'),
         description: z.string(),
         code: z.string(),
-        type_document_id: z.string(),
     })
     const open = ref(false)
     const isLoading = ref(false)
@@ -18,18 +17,7 @@
         nom: undefined,
         description: undefined,
         code: undefined,
-        type_document_id: undefined,
     })
-    const { data: lookups } = useAsyncData('org-lookups', async () => {
-        const { data, error } = await supabase.from('lookups').select('id, nom')
-        if (error) throw error
-        return data
-    })
-    const typeDocument: Lookup[] = useLookupsStore().getTypeDocumentBanque
-    const itemsTypeDocument = computed<SelectMenuItem[]>(() => typeDocument?.map((lookup: Lookup) => ({
-        label: lookup.nom,
-        id: lookup.id
-    })) || [])
 
     const emit = defineEmits(['banque-added'])
     const parametresStore = useParametresStore()
@@ -42,7 +30,7 @@
                 description: event.data.description,
                 code: event.data.code,
             } as any)
-            toast.add({ title: 'Succès', description: `Nouvelle banque ${event.data.nom} ajoutée`, color: 'success' })
+            toast.add({ title: 'Succès', description: `Nouvelle banque ${event.data.nom} ajoutée`, color: 'success', })
             emit('banque-added')
             open.value = false
             isLoading.value = false;
@@ -60,9 +48,6 @@
 
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Type document" placeholder="Type document" name="type_document_id">
-                    <USelectMenu v-model="state.type_document_id" value-key="id" :items="itemsTypeDocument" class="w-full" />
-                </UFormField>
                 <UFormField label="Code" placeholder="Code d'banque" name="code">
                     <UInput v-model="state.code" class="w-full" />
                 </UFormField>

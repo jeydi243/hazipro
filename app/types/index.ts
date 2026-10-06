@@ -55,6 +55,10 @@ export interface Banque {
     id: string;
     nom: string;
     code: string;
+    description: string;
+    status: string;
+    created: string | Date;
+    updated: string | Date;
 }
 export interface CompteBancaire {
     id: string;
@@ -64,8 +68,8 @@ export interface CompteBancaire {
     banque_id: string | Banque;
     agence?: string;
     rib?: string;
-    type_compte?: string;
-    
+    devise: string;
+
     status: string;
     created: string | Date;
     updated: string | Date;

@@ -37,16 +37,31 @@
     const UBadge = resolveComponent('UBadge')
     const UButton = resolveComponent('UButton')
 
-    const columnsCompte: TableColumn<any>[] = [
+    function formatNumeroCompte(value: string) {
+        const digits = value.replace(/\D/g, '').slice(0, 23)
+        return [
+            digits.slice(0, 5),
+            digits.slice(5, 10),
+            digits.slice(10, 21),
+            digits.slice(21, 23)
+        ].filter(Boolean).join('-')
+    }
+
+    const columnsCompte: TableColumn<CompteBancaire>[] = [
         {
             accessorKey: 'intitule',
             header: 'Intitule',
             cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.intitule_compte)
         },
         {
-            accessorKey: 'niveau',
-            header: 'Niveau',
-            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.numero_compte || 'N/A')
+            accessorKey: 'numero_compte',
+            header: 'Numéro de compte',
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.numero_compte ? formatNumeroCompte(row.original.numero_compte) : 'N/A')
+        },
+        {
+            accessorKey: 'devise',
+            header: 'Devise',
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.devise || 'N/A')
         },
         {
             accessorKey: 'date_debut',
@@ -141,7 +156,7 @@
 </script>
 
 <template>
-    <USlideover v-model:open="isOpen" title="Détails du bénéficiaire" :ui="{ content: 'max-w-4xl' }">
+    <USlideover v-model:open="isOpen" title="Détails du bénéficiaire" :ui="{ content: 'max-w-5xl' }">
         <template #content>
             <div class="p-4 flex flex-col h-full gap-4">
                 <div>

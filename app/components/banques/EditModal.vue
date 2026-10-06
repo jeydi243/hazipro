@@ -21,10 +21,9 @@
         set: (value) => emit('update:open', value)
     })
 
-    const toast = useToast()
     type Schema = z.output<typeof schema>
+    const toast = useToast()
     const parametresStore = useParametresStore()
-    const lookupsStore = useLookupsStore()
     const state = reactive<Partial<Schema>>({
         nom: undefined,
         description: undefined,
@@ -41,26 +40,19 @@
         }
     }, { immediate: true })
 
-    const getTypeMatrices = computed(() => lookupsStore.getTypeMatrices)
-    const itemsMatrice = computed<SelectMenuItem[]>(() => getTypeMatrices.value?.map((org: any) => ({
-        label: org.nom,
-        id: org.id
-    })) || [])
-
     const loading = ref(false)
 
     async function onSubmit(event: FormSubmitEvent<Schema>) {
         if (!props.matrice?.id) return
         loading.value = true
         try {
-            await matricesStore.update(props.matrice.id, {
+            await parametresStore.updateBanque(props.matrice.id, {
                 nom: event.data.nom,
                 description: event.data.description,
-                code: event.data.code,
-                type_matrice_id: event.data.type_matrice_id
+                code: event.data.code
             })
             loading.value = false
-            toast.add({ title: 'Succès', description: `L'matrice a été modifiée`, color: 'success' })
+            toast.add({ title: 'Succès', description: `La banque a été modifiée`, color: 'success' })
             emit('point-facturation-updated')
             isOpen.value = false
         } catch (err: any) {
@@ -71,12 +63,9 @@
 </script>
 
 <template>
-    <UModal v-model:open="isOpen" title="Modifier" description="Modifier les informations de l'matrice">
+    <UModal v-model:open="isOpen" title="Modifier" description="Modifier les informations de la banque">
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Type d'matrice" name="type_id">
-                    <USelectMenu v-model="state.type_matrice_id" value-key="id" :items="itemsMatrice" class="w-full" />
-                </UFormField>
                 <UFormField label="Code" name="code">
                     <UInput v-model="state.code" class="w-full" />
                 </UFormField>

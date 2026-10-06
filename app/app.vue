@@ -55,7 +55,8 @@
             toast.add({
                 title: 'Erreur de chargement',
                 description: 'Impossible de charger les paramètres.' + initError?.message,
-                color: 'error'
+                color: 'error',
+                progress: false
             })
         }
     }

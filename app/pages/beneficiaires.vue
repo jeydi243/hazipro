@@ -208,7 +208,7 @@
         return [[
             { type: 'label', label: 'Actions' },
             {
-                label: 'Copy bénéficiaire ID',
+                label: 'Copy ID',
                 icon: 'i-lucide-copy',
                 onSelect() {
                     copy(row.original.id.toString())

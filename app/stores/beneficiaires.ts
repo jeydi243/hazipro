@@ -20,18 +20,18 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
     // }
     async function fetchAll(ownerId?: string | null) {
         loading.value = true;
-    //     if (ownerId) query = query.eq("owner_id", ownerId);
-    // const { data, error } = await query;
+        //     if (ownerId) query = query.eq("owner_id", ownerId);
+        // const { data, error } = await query;
         const [benefRes, classesRes, adressesRes] = await Promise.allSettled([
             supabase.from("beneficiaires").select(
-                "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur_id(nom, postnom, email), owner_id",
-            ).eq("owner_id", ownerId),
+                "id, code, nom, postnom, prenom, genre, owner:owner_id(id, nom), matrice:matrice_id(id, nom), approbateur_id, owner_id",
+            ).eq("owner_id", ownerId || ""),
             supabase.from("comptes_bancaires").select(
-                "numero_compte, intitule_compte, banque_id(id, nom), type_compte_id(id, nom), beneficiaire_id(id, nom, postnom, prenom), id",
-            ).eq("owner_id", ownerId),
+                "numero_compte, id, intitule_compte, banque_id(id, nom), devise, beneficiaire_id",
+            ).eq("owner_id", ownerId || ""),
             supabase.from("adresses").select(
-                "adresse,ville,pays, beneficiaire_id(id, nom, postnom, prenom), id",
-            ).eq("owner_id", ownerId),
+                "adresse, id, ville, pays, beneficiaire_id",
+            ).eq("owner_id", ownerId || ""),
         ]);
 
         if (benefRes.status === "fulfilled" && benefRes.value.data) {
@@ -88,7 +88,7 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
 
         if (error) throw error;
 
-        items.value.unshift(created as Beneficiaire);
+        itemsComptesBancaires.value.unshift(created as CompteBancaire);
         return created;
     }
     async function createAdresse(data: Partial<Adresse>) {
@@ -109,7 +109,7 @@ export const useBeneficiairesStore = defineStore("beneficiaires", () => {
 
         if (error) throw error;
 
-        items.value.unshift(created as Beneficiaire);
+        itemsAdresses.value.unshift(created as Adresse);
         return created;
     }
 
