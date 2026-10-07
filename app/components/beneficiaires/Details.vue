@@ -1,17 +1,21 @@
 <script setup lang="ts">
-    import type { TableColumn } from '@nuxt/ui'
+    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
     import type { Adresse, Approbateur, Banque, Beneficiaire, CompteBancaire, Profil } from '~/types';
+    import type { Row } from '@tanstack/table-core'
 
-    // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
     const EMPTY_ROWS: any[] = []
     const open = defineModel<boolean>('open', { default: false })
+    const UBadge = resolveComponent('UBadge')
+    const UButton = resolveComponent('UButton')
+    const UDropdownMenu = resolveComponent('UDropdownMenu')
 
     const props = defineProps<{
         benef: Beneficiaire | null
     }>()
-
+    let openDetailsCompte = ref(false)
+    let selectedCompte = ref<CompteBancaire | null>(null)
     const emit = defineEmits(['update:open', 'select-matrice'])
-
+    const { copy } = useClipboard()
     const isOpen = computed({
         get: () => open.value,
         set: (value) => emit('update:open', value)
@@ -34,11 +38,9 @@
 
     const comptesBancaires = computed<CompteBancaire[]>(() => (getComptesBancaires.value(props.benef?.id || null) ?? []) as CompteBancaire[])
     const adresses = computed<Adresse[]>(() => (getAdresses.value(props.benef?.id || null) ?? []) as Adresse[])
-    const UBadge = resolveComponent('UBadge')
-    const UButton = resolveComponent('UButton')
-
-    function formatNumeroCompte(value: string) {
-        const digits = value.replace(/\D/g, '').slice(0, 23)
+    const toast = useToast()
+    function formatNumeroCompte(value: string | number) {
+        const digits = String(value).replace(/\D/g, '').slice(0, 23)
         return [
             digits.slice(0, 5),
             digits.slice(5, 10),
@@ -90,18 +92,27 @@
         {
             id: 'actions',
             header: '',
-            cell: ({ row }) => h('div', { class: 'flex justify-end' }, h(UButton, {
-                'color': 'neutral',
-                'variant': 'ghost',
-                'icon': 'i-lucide-arrow-right',
-                'aria-label': 'Aller à',
-                'size': 'xs',
-                'onClick': () => {
-                    // If the user wants to navigate to this organization's details
-                    // This would require more logic, but for now we could emit something or update props
-                    emit('select-matrice', row.original)
-                }
-            }))
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-center' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: { align: 'end' },
+                            items: getRowItemsComptes(row)
+                        },
+                        () =>
+                            h(UButton, {
+                                'icon': 'i-lucide-ellipsis-vertical',
+                                'aria-label': "Plus d'actions",
+                                'color': 'neutral',
+                                'variant': 'ghost',
+                                'class': 'ml-auto'
+                            })
+                    )
+                )
+            }
         }
     ]
     const columnsAdresse: TableColumn<Adresse>[] = [
@@ -152,6 +163,38 @@
             }))
         }
     ]
+
+    function getRowItemsComptes(row: Row<CompteBancaire>): DropdownMenuItem[][] {
+        return [[
+            { type: 'label', label: 'Actions' },
+            {
+                label: 'Copy ID',
+                icon: 'i-lucide-copy',
+                onSelect() {
+                    copy(row.original.id.toString())
+                    toast.add({ title: 'Copied', description: 'Bénéficiaire ID copied to clipboard' })
+                }
+            },
+            { type: 'separator' },
+            {
+                label: 'Details',
+                icon: 'material-symbols:open-in-full-rounded',
+                onSelect() {
+                    selectedCompte.value = row.original
+                    openDetailsCompte.value = true
+                }
+            },
+            { type: 'separator' },
+            {
+                label: 'Désactiver le compte',
+                icon: 'i-lucide-trash',
+                color: 'error' as const,
+                onSelect() {
+                    toast.add({ title: 'Delete', description: 'Action non implémentée.' })
+                }
+            }
+        ]]
+    }
 
 </script>
 

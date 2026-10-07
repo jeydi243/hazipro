@@ -63,7 +63,7 @@ export interface Banque {
 export interface CompteBancaire {
     id: string;
     beneficiaire_id: string | Beneficiaire;
-    numero_compte: string;
+    numero_compte: string | number;
     intitule_compte: string;
     banque_id: string | Banque;
     agence?: string;

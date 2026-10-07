@@ -65,8 +65,9 @@
             { name: 'description', content: 'Manage Bénéficiaires' }
         ]
     })
+    const benefStore = useBeneficiairesStore()
 
-    const beneficiaires = useBeneficiairesStore().items
+    const { items: beneficiaires } = storeToRefs(benefStore)
     const toast = useToast()
     const { copy } = useClipboard()
 
@@ -90,7 +91,6 @@
     const openUpdateModal = ref(false)
     const openDetailsClasse = ref(false)
     const openDetailsBenef = ref(false)
-    const openSlideOver = ref(false)
     const selectedBenef = ref<Beneficiaire | null>(null)
     const searchInput = ref('')
 
