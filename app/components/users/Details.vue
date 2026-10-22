@@ -1,6 +1,10 @@
 <template>
     <USlideover v-model:open="isOpenSlideOver" inset :title="`${props.user?.prenom} ${props.user?.nom}`"
-        description="Description de l'utilisateur" :ui="{ content: 'max-w-3xl' }">
+        description="Description de l'utilisateur" :ui="{ content: 'max-w-3xl' }" :dismissible="false" :close="{
+      color: 'primary',
+      variant: 'outline',
+      class: 'rounded-full'
+    }">
         <template #body>
             <!-- Design Information Utilisateur -->
             <div
@@ -110,12 +114,12 @@
 </template>
 <script setup lang="ts">
 
-// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-const EMPTY_ROWS: any[] = []
 import type { PropType } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
 import type { Affectation, Profil, Role, UserRole } from '~/types'
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
@@ -311,11 +315,11 @@ const columnsAffectations: TableColumn<Affectation>[] = [
                     },
                     () =>
                         h(UButton, {
-                            icon: 'i-lucide-ellipsis-vertical',
+                            "icon": 'i-lucide-ellipsis-vertical',
                             'aria-label': "Plus d'actions",
-                            color: 'neutral',
-                            variant: 'ghost',
-                            class: 'ml-auto'
+                            "color": 'neutral',
+                            "variant": 'ghost',
+                            "class": 'ml-auto'
                         })
                 )
             )
@@ -389,11 +393,11 @@ const columnsRoles: TableColumn<UserRole>[] = [
                     },
                     () =>
                         h(UButton, {
-                            icon: 'i-lucide-ellipsis-vertical',
+                            "icon": 'i-lucide-ellipsis-vertical',
                             'aria-label': "Plus d'actions",
-                            color: 'neutral',
-                            variant: 'ghost',
-                            class: 'ml-auto'
+                            "color": 'neutral',
+                            "variant": 'ghost',
+                            "class": 'ml-auto'
                         })
                 )
             )

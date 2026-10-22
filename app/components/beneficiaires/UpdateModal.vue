@@ -116,7 +116,11 @@
 
 <template>
     <USlideover v-model:open="isOpen" :ui="{ content: 'min-w-2xl' }" title="Bénéficiaire"
-        description="Add a new bénéficiaire to the database" :dismissible="false">
+        description="Add a new bénéficiaire to the database" :dismissible="false" :close="{
+            color: 'primary',
+            variant: 'ghost',
+            class: 'rounded-full'
+        }">
         <template #body>
             <UForm id="beneficiaire-form" :schema="schema" :state="state" :validate-on="[]" class="space-y-4"
                 @submit="onSubmit">

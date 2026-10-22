@@ -55,7 +55,6 @@
             </div>
         </template>
     </UDashboardPanel>
-
 </template>
 
 <script setup lang="ts">
@@ -76,7 +75,7 @@
     const emptyRows: Taux[] = []
     const toast = useToast()
     const parametresStore = useParametresStore()
-    const { lookups, getTaux : taux} = storeToRefs(parametresStore)
+    const { lookups, getTaux: taux } = storeToRefs(parametresStore)
 
     // Utilisation du composable centralisé
     const {

@@ -2,6 +2,7 @@
     import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
     import type { Adresse, Approbateur, Banque, Beneficiaire, CompteBancaire, Profil } from '~/types';
     import type { Row } from '@tanstack/table-core'
+    import { storeToRefs } from 'pinia'
 
     const EMPTY_ROWS: any[] = []
     const open = defineModel<boolean>('open', { default: false })
@@ -199,20 +200,33 @@
 </script>
 
 <template>
-    <USlideover v-model:open="isOpen" title="Détails du bénéficiaire" :ui="{ content: 'max-w-5xl' }">
+    <USlideover v-model:open="isOpen" title="Détails du bénéficiaire" :ui="{ content: 'max-w-5xl' }"
+        :dismissible="false" close-on-esc inset :close="{
+            color: 'primary',
+            variant: 'ghost',
+            class: 'rounded-full'
+        }">
         <template #content>
             <div class="p-4 flex flex-col h-full gap-4">
-                <div>
-                    <p v-if="props.benef" class="text-xl font-semibold text-highlighted">
-                        {{
-                            props.benef.nom }}
-                    </p>
-                    <p class="text-sm text-muted flex items-center gap-2 mt-1">
-                        <span class="font-mono bg-elevated px-1.5 py-0.5 rounded">{{ props.benef?.code
-                            || 'N/A' }}</span>
-                        <UBadge v-if="props.benef?.status" :label="props.benef.status" variant="subtle"
-                            class="capitalize" />
-                    </p>
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p v-if="props.benef" class="text-xl font-semibold text-highlighted">
+                            {{ props.benef.nom }} {{ props.benef.postnom }} {{ props.benef.prenom }}
+                        </p>
+                        <p class="text-sm text-muted flex items-center gap-2 mt-1">
+                            <span class="font-mono bg-elevated px-1.5 py-0.5 rounded">{{ props.benef?.nom || 'N/A' }}</span>
+                            <UBadge v-if="props.benef?.status" :label="props.benef.status" variant="subtle"
+                                class="capitalize" />
+                        </p>
+                    </div>
+                    <UButton
+                        icon="i-lucide-x"
+                        color="primary"
+                        variant="ghost"
+                        class="rounded-full"
+                        aria-label="Fermer"
+                        @click="isOpen = false"
+                    />
                 </div>
 
                 <div v-if="props.benef" class="flex-1 overflow-hidden">

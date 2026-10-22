@@ -13,6 +13,7 @@ export default withNuxt({
         'vue/html-indent': 'off',
         'vue/script-indent': 'off',
         '@stylistic/member-delimiter-style': 'off',
+        '@stylistic/operator-linebreak': 'off',
         '@stylistic/quotes': 'off',
         '@stylistic/semi': 'off',
         '@typescript-eslint/no-unused-vars': 'off',

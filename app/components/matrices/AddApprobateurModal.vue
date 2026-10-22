@@ -15,6 +15,7 @@
         user_id: z.string().min(1, 'Utilisateur requis'),
         date_debut: z.date({ message: 'Date de début requise' }),
         date_fin: z.date().optional(),
+        organisation_id: z.string().optional(),
         type_beneficiaire: z.string().optional(),
         niveau: z.number().min(1, 'Niveau requis').max(5, 'Niveau maximum 5')
     })
@@ -30,6 +31,7 @@
         user_id: undefined,
         date_debut: new Date(),
         date_fin: undefined,
+        organisation_id: undefined,
         type_beneficiaire: undefined,
         niveau: 1
     })
@@ -79,6 +81,7 @@
             state.user_id = undefined
             state.date_debut = new Date()
             state.date_fin = undefined
+            state.organisation_id = undefined
         } catch (err: any) {
             toast.add({ title: 'Erreur', description: err.message, color: 'error' })
         }

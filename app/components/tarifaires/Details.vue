@@ -1,10 +1,14 @@
 <template>
     <USlideover v-model:open="isOpenSlideOver" description="Details du tarifaire" inset
-        :title="`${props.tarifaire?.code}`" :ui="{ content: 'max-w-3xl' }">
+        :title="`${props.tarifaire?.code}`" :ui="{ content: 'max-w-3xl' }" :dismissible="false" :close="{
+            color: 'primary',
+            variant: 'ghost',
+            class: 'rounded-full'
+        }">
         <template #body>
             <div class="flex flex-row justify-between">
-                <UButton icon="iconoir:refresh-double" color="primary" variant="ghost"
-                    aria-label="Actualiser" @click="refreshTarifairesLines" />
+                <UButton icon="iconoir:refresh-double" color="primary" variant="ghost" aria-label="Actualiser"
+                    @click="refreshTarifairesLines" />
                 <TarifairesAddArticle :tarifaire_id="props.tarifaire?.id" @tarifaire-added="refreshTarifairesLines" />
             </div>
             <div>
@@ -43,204 +47,202 @@
     </USlideover>
 </template>
 <script setup lang="ts">
-
-// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-const EMPTY_ROWS: any[] = []
-import type { PropType } from 'vue'
-import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
-import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import type { Tarifaire, TarifaireLine } from '~/types'
-
-const props = defineProps({
-    tarifaire: {
-        type: Object as PropType<Tarifaire | null>,
-        required: true
-    },
-    open: {
-        type: Boolean,
-        required: true
-    }
-})
-
-const emit = defineEmits(['update:open'])
-const supabase = useSupabaseClient()
-const tarifairesStore = useTarifairesStore()
-const toast = useToast()
-
-const { data: tarifairesLines, refresh: refreshTarifairesLines, status: tarifairesLinesStatus } = useAsyncData(
-    `tarifaires-${props.tarifaire?.id}`,
-    async () => {
-        if (!props.tarifaire?.id) return []
-        const { data, error } = await supabase.from('tarifaires_lines').select("id, prix, article:articles!inner(nom, description)").eq('tarifaire_id', props.tarifaire.id)
-        if (error) {
-            toast.add({
-                title: 'Error',
-                description: error.message,
-                color: 'error'
-            })
-            throw error
+    import type { PropType } from 'vue'
+    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
+    import { getPaginationRowModel, type Row } from '@tanstack/table-core'
+    import type { Tarifaire, TarifaireLine } from '~/types'
+    // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+    const EMPTY_ROWS: any[] = []
+    const props = defineProps({
+        tarifaire: {
+            type: Object as PropType<Tarifaire | null>,
+            required: true
+        },
+        open: {
+            type: Boolean,
+            required: true
         }
-        return data as TarifaireLine[]
-    },
-    {
-        watch: [() => props.tarifaire],
-        immediate: true // Ensure it runs on mount if tarifaire is present
-    }
-)
+    })
 
-const columnFilters = ref([{
-    id: 'id',
-    value: ''
-}])
+    const emit = defineEmits(['update:open'])
+    const supabase = useSupabaseClient()
+    const tarifairesStore = useTarifairesStore()
+    const toast = useToast()
 
-const isOpenSlideOver = computed({
-    get: () => props.open,
-    set: (value) => emit('update:open', value)
-})
-
-const rowSelection = ref({})
-const pagination = ref({
-    pageIndex: 0,
-    pageSize: 10,
-})
-const columnVisibility = ref()
-const isStopModalOpen = ref(false)
-const selectedTarrifaireId = ref<string | null>(null)
-
-async function stopTarrifaireLine() {
-    if (!selectedTarrifaireId.value) return
-
-    try {
-        await tarifairesStore.update(selectedTarrifaireId.value, { end_date: new Date().toISOString() } as any)
-        toast.add({
-            title: 'Succès',
-            description: 'Le tarifaire a été arrêtée avec succès.',
-            color: 'success'
-        })
-        refreshTarifairesLines()
-        isStopModalOpen.value = false
-    } catch (err: any) {
-        toast.add({
-            title: 'Error',
-            description: err.message,
-            color: 'error'
-        })
-    }
-}
-
-const UButton = resolveComponent('UButton')
-const UDropdownMenu = resolveComponent('UDropdownMenu')
-const table_tarifaires_lines = useTemplateRef('table_tarifaires_lines')
-
-const columnsTarifaireLine: TableColumn<TarifaireLine>[] = [
-    {
-        accessorKey: 'article_id',
-        header: 'Article',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.article?.nom || ''),
-                ])
-            ])
-        }
-    },
-    {
-        accessorKey: 'prix',
-        header: 'Prix',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.prix),
-                ])
-            ])
-        }
-    },
-    {
-        accessorKey: 'date_debut',
-        header: 'Date début',
-        cell: ({ row }) => {
-            return h('div', { class: 'flex items-center gap-3' }, [
-
-                h('div', undefined, [
-                    h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.date_debut),
-                ])
-            ])
-        }
-    },
-    {
-        header: () => h('div', { class: 'text-center' }, 'Actions'),
-        id: 'actions',
-        cell: ({ row }) => {
-            return h(
-                'div',
-                { class: 'text-center' },
-                h(
-                    UDropdownMenu,
-                    {
-                        content: {
-                            align: 'end'
-                        },
-                        items: getRowItemsTarifairesLines(row)
-                    },
-                    () =>
-                        h(UButton, {
-                            icon: 'i-lucide-ellipsis-vertical',
-                            'aria-label': "Plus d'actions",
-                            color: 'neutral',
-                            variant: 'ghost',
-                            class: 'ml-auto'
-                        })
-                )
-            )
-        }
-    }
-]
-
-function getRowItemsTarifairesLines(row: Row<TarifaireLine>) {
-    const items: DropdownMenuItem[] | DropdownMenuItem[][] = [
-        {
-            type: 'label',
-            label: 'Actions'
+    const { data: tarifairesLines, refresh: refreshTarifairesLines, status: tarifairesLinesStatus } = useAsyncData(
+        `tarifaires-${props.tarifaire?.id}`,
+        async () => {
+            if (!props.tarifaire?.id) return []
+            const { data, error } = await supabase.from('tarifaires_lines').select("id, prix, article:articles!inner(nom, description)").eq('tarifaire_id', props.tarifaire.id)
+            if (error) {
+                toast.add({
+                    title: 'Error',
+                    description: error.message,
+                    color: 'error'
+                })
+                throw error
+            }
+            return data as TarifaireLine[]
         },
         {
-            label: 'Copie ID',
-            icon: 'i-lucide-copy',
-            onSelect() {
-                navigator.clipboard.writeText(row.original.id.toString())
-                toast.add({
-                    title: 'Copied to clipboard',
-                    description: 'Article ID copied to clipboard'
-                })
+            watch: [() => props.tarifaire],
+            immediate: true // Ensure it runs on mount if tarifaire is present
+        }
+    )
+
+    const columnFilters = ref([{
+        id: 'id',
+        value: ''
+    }])
+
+    const isOpenSlideOver = computed({
+        get: () => props.open,
+        set: (value) => emit('update:open', value)
+    })
+
+    const rowSelection = ref({})
+    const pagination = ref({
+        pageIndex: 0,
+        pageSize: 10,
+    })
+    const columnVisibility = ref()
+    const isStopModalOpen = ref(false)
+    const selectedTarrifaireId = ref<string | null>(null)
+
+    async function stopTarrifaireLine() {
+        if (!selectedTarrifaireId.value) return
+
+        try {
+            await tarifairesStore.update(selectedTarrifaireId.value, { end_date: new Date().toISOString() } as any)
+            toast.add({
+                title: 'Succès',
+                description: 'Le tarifaire a été arrêtée avec succès.',
+                color: 'success'
+            })
+            refreshTarifairesLines()
+            isStopModalOpen.value = false
+        } catch (err: any) {
+            toast.add({
+                title: 'Error',
+                description: err.message,
+                color: 'error'
+            })
+        }
+    }
+
+    const UButton = resolveComponent('UButton')
+    const UDropdownMenu = resolveComponent('UDropdownMenu')
+    const table_tarifaires_lines = useTemplateRef('table_tarifaires_lines')
+
+    const columnsTarifaireLine: TableColumn<TarifaireLine>[] = [
+        {
+            accessorKey: 'article_id',
+            header: 'Article',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+
+                    h('div', undefined, [
+                        h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.article?.nom || ''),
+                    ])
+                ])
             }
         },
         {
-            label: 'Mettre fin',
-            icon: 'i-lucide-circle-stop',
-            onSelect() {
-                selectedTarrifaireId.value = row.original.id
-                isStopModalOpen.value = true
+            accessorKey: 'prix',
+            header: 'Prix',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+
+                    h('div', undefined, [
+                        h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.prix),
+                    ])
+                ])
+            }
+        },
+        {
+            accessorKey: 'date_debut',
+            header: 'Date début',
+            cell: ({ row }) => {
+                return h('div', { class: 'flex items-center gap-3' }, [
+
+                    h('div', undefined, [
+                        h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.date_debut),
+                    ])
+                ])
+            }
+        },
+        {
+            header: () => h('div', { class: 'text-center' }, 'Actions'),
+            id: 'actions',
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-center' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: {
+                                align: 'end'
+                            },
+                            items: getRowItemsTarifairesLines(row)
+                        },
+                        () =>
+                            h(UButton, {
+                                "icon": 'i-lucide-ellipsis-vertical',
+                                'aria-label': "Plus d'actions",
+                                "color": 'neutral',
+                                "variant": 'ghost',
+                                "class": 'ml-auto'
+                            })
+                    )
+                )
             }
         }
     ]
 
-    if (!row.original) {
-        items.push({
-            type: 'separator'
-        });
-
-        items.push({
-            label: "Supprimer l'article",
-            icon: 'i-lucide-trash',
-            color: 'error',
-            onSelect() {
-                selectedTarrifaireId.value = row.original.id
-                isStopModalOpen.value = true
+    function getRowItemsTarifairesLines(row: Row<TarifaireLine>) {
+        const items: DropdownMenuItem[] | DropdownMenuItem[][] = [
+            {
+                type: 'label',
+                label: 'Actions'
+            },
+            {
+                label: 'Copie ID',
+                icon: 'i-lucide-copy',
+                onSelect() {
+                    navigator.clipboard.writeText(row.original.id.toString())
+                    toast.add({
+                        title: 'Copied to clipboard',
+                        description: 'Article ID copied to clipboard'
+                    })
+                }
+            },
+            {
+                label: 'Mettre fin',
+                icon: 'i-lucide-circle-stop',
+                onSelect() {
+                    selectedTarrifaireId.value = row.original.id
+                    isStopModalOpen.value = true
+                }
             }
-        })
-    }
+        ]
 
-    return items
-}
+        if (!row.original) {
+            items.push({
+                type: 'separator'
+            });
+
+            items.push({
+                label: "Supprimer l'article",
+                icon: 'i-lucide-trash',
+                color: 'error',
+                onSelect() {
+                    selectedTarrifaireId.value = row.original.id
+                    isStopModalOpen.value = true
+                }
+            })
+        }
+
+        return items
+    }
 </script>

@@ -90,9 +90,9 @@ export interface Approbateur {
     status: string;
     niveau: number;
     date_debut: string | Date;
-    date_fin?: string | Date;
-    org_id: string | Organisation;
-    type_beneficiaire: string | Lookup;
+    date_fin?: string | Date | null;
+    organisation_id: string | Organisation;
+    type_beneficiaire?: string | Lookup;
     date_taux: string;
 }
 export interface NF {

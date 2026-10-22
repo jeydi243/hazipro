@@ -70,7 +70,11 @@
 
 <template>
     <USlideover v-model:open="open" :ui="{ content: 'min-w-2xl' }" title="Bénéficiaire"
-        description="Add a new bénéficiaire to the database" :dismissible="false">
+        description="Add a new bénéficiaire to the database" :dismissible="false" :close="{
+            color: 'primary',
+            variant: 'ghost',
+            class: 'rounded-full'
+        }">
         <UButton label="Nouveau beneficiaire" icon="i-lucide-plus" />
 
         <template #body>

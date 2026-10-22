@@ -166,7 +166,7 @@ export const useParametresStore = defineStore("parametres", () => {
   }
   async function fetchApprobateurs(ownerId?: string | null) {
     let query = supabase.from("approbateurs").select(
-      "date_debut, date_fin, id, matrice_id, user_id(id, nom, email, postnom, prenom), status, type_beneficiaire, niveau",
+      "date_debut, date_fin, id, matrice_id, organisation_id, user_id(id, nom, email, postnom, prenom), status, type_beneficiaire, niveau",
     );
     if (ownerId) query = query.eq("owner_id", ownerId);
     const { data, error } = await query;
@@ -199,6 +199,26 @@ export const useParametresStore = defineStore("parametres", () => {
       itemsApprobateurs.value.unshift(created[0] as unknown as Approbateur);
     }
     return created[0];
+  }
+  async function updateApprobateur(data: Partial<Approbateur>) {
+    const { data: updated, error } = await supabase
+      .from("approbateurs")
+      .update(data as never)
+      .eq("id", data?.id || "")
+      .select(
+        "date_debut, date_fin, id, matrice_id, organisation_id(nom,code, description), user_id(id, nom, email, postnom, prenom), status, type_beneficiaire, niveau",
+      )
+      .maybeSingle();
+    if (error) throw error;
+    if (!updated) {
+      throw new Error("Aucun approbateur n'a été mis à jour." + JSON.stringify(data));
+    }
+
+    const approbateur = updated as unknown as Approbateur;
+    const index = itemsApprobateurs.value.findIndex((item) => item.id === data.id);
+    if (index !== -1) itemsApprobateurs.value[index] = approbateur;
+
+    return approbateur;
   }
   async function createBanque(data: Partial<Banque>) {
     const { data: created, error } = await supabase.from("banques")
@@ -242,10 +262,18 @@ export const useParametresStore = defineStore("parametres", () => {
     classes.value.find((c) => c.id === id)?.nom
   );
   const getFirstApprobateurID = computed(
-    () => (matrice_id: string, org_id: string) =>
-      itemsApprobateurs.value.find((a) =>
-        a.matrice_id === matrice_id && a.org_id === org_id
-      )?.user_id,
+    () => (matrice_id: string, org_id: string) => {
+      const approbateur = itemsApprobateurs.value.find((approbateur) => {
+        const organisationId = typeof approbateur.organisation_id === "string"
+          ? approbateur.organisation_id
+          : approbateur.organisation_id?.id;
+        return approbateur.matrice_id === matrice_id &&
+          organisationId === org_id &&
+          approbateur.niveau === 1;
+      });
+      const user = approbateur?.user_id;
+      return typeof user === "string" ? user : user?.id;
+    },
   );
   const getLookupsById = computed(() => (id: string) =>
     lookups.value.find((l) => l.id == id)?.nom
@@ -256,8 +284,20 @@ export const useParametresStore = defineStore("parametres", () => {
   const getMatriceNF = computed(() =>
     itemsMatrices.value.map((c) => ({ nom: c.nom, id: c.id }))
   );
-  const getApprobateurs = computed(() => (matrice_id: string | null) =>
-    itemsApprobateurs.value.filter((a) => a.matrice_id === matrice_id)
+  const getApprobateurs = computed(() =>
+  (
+    matrice_id: string | null,
+    org_id?: string | null,
+    niveau?: number,
+  ) =>
+    itemsApprobateurs.value.filter((approbateur) => {
+      const organisationId = typeof approbateur.organisation_id === "string"
+        ? approbateur.organisation_id
+        : approbateur.organisation_id?.id;
+      return approbateur.matrice_id === matrice_id &&
+        (org_id == null || organisationId === org_id) &&
+        (niveau == null || approbateur.niveau === niveau);
+    })
   );
   const getTaux = computed(() =>
     itemsTaux.value.map((c) => {
@@ -331,6 +371,7 @@ export const useParametresStore = defineStore("parametres", () => {
     clearOwnerID,
     createMatrice,
     createApprobateur,
+    updateApprobateur,
     createBanque,
     getClasseById,
     getLookupsById,

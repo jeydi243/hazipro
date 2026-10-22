@@ -1,8 +1,10 @@
 <script setup lang="ts">
-    import type { TableColumn } from '@nuxt/ui'
+    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
     import type { Approbateur, Profil } from '~/types';
     import type { Matrice } from '~/types/organisation';
+    import type { Row } from '@tanstack/table-core'
 
+    const { copy } = useClipboard()
     // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
     const EMPTY_ROWS: any[] = []
     const open = defineModel<boolean>('open', { default: false })
@@ -10,7 +12,8 @@
     const props = defineProps<{
         matrice: Matrice | null
     }>()
-
+    const selectedApprobateur = ref<Approbateur | null>(null)
+    const openDetailsApprobateur = ref(false)
     const emit = defineEmits(['update:open', 'select-matrice'])
 
     const isOpen = computed({
@@ -32,17 +35,23 @@
     const toast = useToast()
     const UBadge = resolveComponent('UBadge')
     const UButton = resolveComponent('UButton')
+    const UDropdownMenu = resolveComponent('UDropdownMenu')
 
     const columns: TableColumn<Approbateur>[] = [
         {
             accessorKey: 'nom',
             header: 'Nom',
-            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, (row.original.user_id as Profil).nom || 'N/A')
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, (row.original.user_id as Profil).nom + ' ' + (row.original.user_id as Profil).postnom || 'N/A')
         },
         {
             accessorKey: 'niveau',
             header: 'Niveau',
             cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.niveau || 'N/A')
+        },
+        {
+            accessorKey: 'Organisation',
+            header: 'Organisation',
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.organisation_id?.nom || 'N/A')
         },
         {
             accessorKey: 'date_debut',
@@ -70,22 +79,61 @@
         },
         {
             id: 'actions',
-            header: '',
-            cell: ({ row }) => h('div', { class: 'flex justify-end' }, h(UButton, {
-                'color': 'neutral',
-                'variant': 'ghost',
-                'icon': 'i-lucide-arrow-right',
-                'aria-label': 'Aller à',
-                'size': 'xs',
-                'onClick': () => {
-                    // If the user wants to navigate to this organization's details
-                    // This would require more logic, but for now we could emit something or update props
-                    emit('select-matrice', row.original)
-                }
-            }))
+            header: 'Actions',
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-center' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: { align: 'end' },
+                            items: getRowItemsApprobateur(row)
+                        },
+                        () =>
+                            h(UButton, {
+                                'icon': 'i-lucide-ellipsis-vertical',
+                                'aria-label': "Plus d'actions",
+                                'color': 'neutral',
+                                'variant': 'ghost',
+                                'class': 'ml-auto'
+                            })
+                    )
+                )
+            }
         }
     ]
-
+    function getRowItemsApprobateur(row: Row<Approbateur>): DropdownMenuItem[][] {
+        return [[
+            { type: 'label', label: 'Actions' },
+            {
+                label: 'Copy ID',
+                icon: 'i-lucide-copy',
+                onSelect() {
+                    copy(row.original.id.toString())
+                    toast.add({ title: 'Copied', description: 'Approbateur ID copied to clipboard' })
+                }
+            },
+            { type: 'separator' },
+            {
+                label: 'Details',
+                icon: 'material-symbols:open-in-full-rounded',
+                onSelect() {
+                    selectedApprobateur.value = row.original
+                    openDetailsApprobateur.value = true
+                }
+            },
+            { type: 'separator' },
+            {
+                label: 'Désactiver le compte',
+                icon: 'i-lucide-trash',
+                color: 'error' as const,
+                onSelect() {
+                    toast.add({ title: 'Delete', description: 'Action non implémentée.' })
+                }
+            }
+        ]]
+    }
     const tokenColumns: TableColumn<any>[] = [
         { accessorKey: 'nom', header: 'Nom' },
         { accessorKey: 'valeur', header: 'Valeur', cell: () => h('span', '••••••••') },
@@ -95,20 +143,28 @@
 </script>
 
 <template>
-    <USlideover v-model:open="isOpen" title="Détails de la matrice" :ui="{ content: 'max-w-4xl' }">
+    <USlideover v-model:open="isOpen" title="Détails de la matrice" :ui="{ content: 'max-w-4xl' }" :dismissible="false"
+        :close="{
+            color: 'primary',
+            variant: 'outline',
+            class: 'rounded-full'
+        }">
         <template #content>
             <div class="p-4 flex flex-col h-full gap-4">
-                <div>
-                    <p v-if="props.matrice" class="text-xl font-semibold text-highlighted">
-                        {{
-                            props.matrice.nom }}
-                    </p>
-                    <p class="text-sm text-muted flex items-center gap-2 mt-1">
-                        <span class="font-mono bg-elevated px-1.5 py-0.5 rounded">{{ props.matrice?.code
-                            || 'N/A' }}</span>
-                        <UBadge v-if="props.matrice?.status" :label="props.matrice.status" variant="subtle"
-                            class="capitalize" />
-                    </p>
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p v-if="props.matrice" class="text-xl font-semibold text-highlighted">
+                            {{ props.matrice.nom }}
+                        </p>
+                        <p class="text-sm text-muted flex items-center gap-2 mt-1">
+                            <span class="font-mono bg-elevated px-1.5 py-0.5 rounded">{{ props.matrice?.code || 'N/A'
+                            }}</span>
+                            <UBadge v-if="props.matrice?.status" :label="props.matrice.status" variant="subtle"
+                                class="capitalize" />
+                        </p>
+                    </div>
+                    <UButton icon="i-lucide-x" color="primary" variant="outline" class="rounded-full"
+                        aria-label="Fermer" @click="isOpen = false" />
                 </div>
 
                 <div v-if="props.matrice" class="flex-1 overflow-hidden">
@@ -140,7 +196,7 @@
                                     }">
                                     <template #empty-state>
                                         <div class="flex flex-col items-center justify-center py-6 text-muted text-sm">
-                                            <p>Aucun service trouvé pour cette matrice.</p>
+                                            <p>Aucun approbateur trouvé pour cette matrice.</p>
                                         </div>
                                     </template>
                                 </UTable>
@@ -151,4 +207,6 @@
             </div>
         </template>
     </USlideover>
+    <MatricesUpdateApprobateur v-model:open="openDetailsApprobateur" :matrice="props.matrice"
+        :approbateur="selectedApprobateur" />
 </template>
