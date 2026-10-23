@@ -114,6 +114,9 @@ export const useLookupsStore = defineStore("lookups", () => {
   const getDevise = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "devises")
   );
+  const getNatures = computed(() =>
+    lookups.value.filter((l) => l.classe?.table_name === "nature_nf")
+  );
   const getTypeClient = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "type_clients")
   );
@@ -151,6 +154,7 @@ export const useLookupsStore = defineStore("lookups", () => {
     getTypeClient,
     getTypeArticles,
     getTypeOrganisations,
+    getNatures,
     getGroupeTaxation,
     getTypeBeneficiaires
   };

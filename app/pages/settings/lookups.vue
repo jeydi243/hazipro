@@ -53,12 +53,12 @@
 </template>
 
 <script setup lang="ts">
-
-// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-const EMPTY_ROWS: any[] = []
 import type { TableColumn } from '@nuxt/ui'
 import type { Row } from '@tanstack/table-core'
 import type { Classe } from '~/types'
+
+// Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
+const EMPTY_ROWS: any[] = []
 
 useHead({
     title: 'Lookups',
@@ -120,11 +120,11 @@ const columns: TableColumn<Classe>[] = [
         header: () => h('div', { class: 'text-center' }, 'Edit'),
         cell: ({ row }) => h('div', { class: 'text-center' }, [
             h(UButton, {
-                color: 'neutral',
-                variant: 'ghost',
-                icon: 'i-lucide-edit',
+                "color": 'neutral',
+                "variant": 'ghost',
+                "icon": 'i-lucide-edit',
                 'aria-label': 'Modifier',
-                onClick: () => {
+                "onClick": () => {
                     selectedClasse.value = row.original;
                     openClasseUpdateModal.value = true;
                 }
@@ -171,11 +171,11 @@ const columns: TableColumn<Classe>[] = [
         header: () => h('div', { class: 'text-center' }, 'Lookups'),
         cell: ({ row }) => h('div', { class: 'text-center' }, [
             h(UButton, {
-                color: 'neutral',
-                variant: 'solid',
-                icon: 'i-lucide-eye',
+                "color": 'neutral',
+                "variant": 'solid',
+                "icon": 'i-lucide-eye',
                 'aria-label': 'Voir les détails',
-                onClick: () => {
+                "onClick": () => {
                     selectedClasse.value = row.original;
                     openSlideOver.value = true;
                 }
@@ -186,8 +186,8 @@ const columns: TableColumn<Classe>[] = [
         header: () => h('div', { class: 'text-center' }, 'Actions'),
         id: 'actions',
         cell: ({ row }) => h('div', { class: 'text-center' },
-            h(UDropdownMenu, { content: { align: 'end' }, items: getRowItemsClasse(row) },
-                () => h(UButton, { icon: 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", color: 'neutral', variant: 'ghost', class: 'ml-auto' })
+            h(UDropdownMenu, { content: { align: 'end' }, "items": getRowItemsClasse(row) },
+                () => h(UButton, { "icon": 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", "color": 'neutral', "variant": 'ghost', "class": 'ml-auto' })
             )
         )
     }

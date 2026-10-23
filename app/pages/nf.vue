@@ -15,7 +15,7 @@
         <template #body>
             <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
                 v-model:row-selection="rowSelection" v-model:pagination="pagination"
-                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="nfs ?? EMPTY_ROWS"
+                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="note_frais ?? EMPTY_ROWS"
                 :columns="columns" :ui="{
                     base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
                     thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -102,17 +102,7 @@
     watch(searchInput, (val) => {
         debouncedSearch(val)
     })
-
-    // Data loading
-    const { data: nfs, refresh: refreshNfData } = useLazyAsyncData<NF[]>('nfs', async () => {
-        const { data, error } = await supabase.from('nf').select('id, code, nom, description, organisation_id')
-        if (error) throw error
-        return data as NF[]
-    })
-
-    async function refreshClasses() {
-        await refreshNfData()
-    }
+    const note_frais = useNFStore().items;
 
     // Columns definition
     const columns: TableColumn<NF>[] = [
@@ -133,19 +123,20 @@
             ]),
         },
         {
-            accessorKey: 'code',
-            header: 'Code',
+            accessorKey: 'numero_document',
+            header: 'Numero document',
             cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
                 h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.numero_document)
             ])
         },
         {
             accessorKey: 'nom',
-            header: 'Nom',
+            header: 'Bénéficiaire',
             cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.description)
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.beneficiaire_id?.nom || 'N/A')
             ])
         },
+
         {
             accessorKey: 'description',
             header: ({ column }) => {
@@ -161,29 +152,73 @@
                     onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
                 })
             }
+        }, {
+            accessorKey: 'montant_total',
+            header: 'Montant',
+            cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.montant_total)
+            ])
+        },
+        {
+            accessorKey: 'devise',
+            header: ({ column }) => {
+                const isSorted = column.getIsSorted()
+                return h(UButton, {
+                    color: 'neutral',
+                    variant: 'ghost',
+                    label: 'Devise',
+                    icon: isSorted
+                        ? (isSorted === 'asc' ? 'i-lucide-arrow-up-narrow-wide' : 'i-lucide-arrow-down-wide-narrow')
+                        : 'i-lucide-arrow-up-down',
+                    class: '-mx-2.5',
+                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+                })
+            },
+            cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.devise_id?.nom || 'N/A')
+            ])
+        },
+        {
+            accessorKey: 'statut_document',
+            header: ({ column }) => {
+                const isSorted = column.getIsSorted()
+                return h(UButton, {
+                    color: 'neutral',
+                    variant: 'ghost',
+                    label: 'Statut du document',
+                    icon: isSorted
+                        ? (isSorted === 'asc' ? 'i-lucide-arrow-up-narrow-wide' : 'i-lucide-arrow-down-wide-narrow')
+                        : 'i-lucide-arrow-up-down',
+                    class: '-mx-2.5',
+                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+                })
+            },
+            cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.statut_document)
+            ])
         },
 
-        {
-            id: 'details',
-            header: () => h('div', { class: 'text-center' }, 'Lookups'),
-            cell: ({ row }) => h('div', { class: 'text-center' }, [
-                h(UButton, {
-                    "color": 'neutral',
-                    "variant": 'solid',
-                    "icon": 'i-lucide-eye',
-                    'aria-label': 'Voir les détails',
-                    "onClick": () => {
-                        selectedNf.value = row.original;
-                        openSlideOver.value = true;
-                    }
-                })
-            ]),
-        },
+        // {
+        //     id: 'details',
+        //     header: () => h('div', { class: 'text-center' }, 'Lookups'),
+        //     cell: ({ row }) => h('div', { class: 'text-center' }, [
+        //         h(UButton, {
+        //             "color": 'neutral',
+        //             "variant": 'solid',
+        //             "icon": 'i-lucide-eye',
+        //             'aria-label': 'Voir les détails',
+        //             "onClick": () => {
+        //                 selectedNf.value = row.original;
+        //                 openSlideOver.value = true;
+        //             }
+        //         })
+        //     ]),
+        // },
         {
             header: () => h('div', { class: 'text-center' }, 'Actions'),
             id: 'actions',
             cell: ({ row }) => h('div', { class: 'text-center' },
-                h(UDropdownMenu, { content: { align: 'end' }, children: getRowItemsClasse(row) },
+                h(UDropdownMenu, { content: { align: 'end' }, "items": getRowItemsClasse(row) },
                     () => h(UButton, { "icon": 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", "color": 'neutral', "variant": 'ghost', "class": 'ml-auto' })
                 )
             )
@@ -193,6 +228,22 @@
     function getRowItemsClasse(row: Row<NF>) {
         return [[
             { type: 'label', label: 'Actions' },
+            {
+                label: "Historique d'approbation",
+                icon: 'i-lucide-copy',
+                onSelect() {
+                    copy(row.original.id.toString())
+                    toast.add({ title: 'Copied', description: 'Classe ID copied to clipboard' })
+                }
+            },
+            {
+                label: "Pieces jointes",
+                icon: 'i-lucide-file-text',
+                onSelect() {
+                    copy(row.original.id.toString())
+                    toast.add({ title: 'Copied', description: 'Classe ID copied to clipboard' })
+                }
+            },
             {
                 label: 'Copy classe ID',
                 icon: 'i-lucide-copy',
@@ -212,7 +263,7 @@
             },
             { type: 'separator' },
             {
-                label: 'Delete classe',
+                label: 'Annuler la note de frais',
                 icon: 'i-lucide-trash',
                 color: 'error' as const,
                 onSelect() {

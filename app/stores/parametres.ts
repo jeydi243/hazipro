@@ -17,6 +17,7 @@ export const useParametresStore = defineStore("parametres", () => {
   const profilsStore = useProfilsStore();
   const articlesStore = useArticlesStore();
   const facturesStore = useFacturesStore();
+  const nfsStore = useNFStore();
   const organisationsStore = useOrganisationsStore();
   const beneficiairesStore = useBeneficiairesStore();
 
@@ -98,6 +99,12 @@ export const useParametresStore = defineStore("parametres", () => {
         name: "factures",
         promise: owner_id.value
           ? facturesStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "nf",
+        promise: owner_id.value
+          ? nfsStore.fetchAll(owner_id.value)
           : Promise.resolve(),
       },
       {

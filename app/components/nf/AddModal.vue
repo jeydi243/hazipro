@@ -35,8 +35,8 @@
                     <!-- <UFormField label="Code" name="code">
                         <UInput v-model="state.code" class="w-full" placeholder="" />
                     </UFormField> -->
-                    <UFormField label="Type budget" placeholder="" name="type_budget">
-                        <USelectMenu v-model="state.type_budget" value-key="id" :items="itemsBudget" class="w-full" />
+                    <UFormField label="Type budget" placeholder="" name="type_budget_id">
+                        <USelectMenu v-model="state.type_budget_id" value-key="id" :items="itemsBudget" class="w-full" />
                     </UFormField>
                     <UFormField label="Matrice" placeholder="" name="matrice_id">
                         <USelectMenu v-model="state.matrice_id" value-key="id" :items="itemsMatriceNF" class="w-full" />
@@ -141,11 +141,11 @@
         organisation_id: z.string({ message: 'La direction est obligatoire' }).min(1, 'La direction est obligatoire'),
         taux: z.number().optional(),
         type_nf: z.string().min(1, 'Le type de note de frais est obligatoire'),
-        type_budget: z.string().min(1, 'Le type de budget est obligatoire'),
+        type_budget_id: z.string().min(1, 'Le type de budget est obligatoire'),
         groupe_paiement_id: z.string().optional(),
         nature_id: z.string().min(1, 'La nature de la note est obligatoire'),
         beneficiaire_id: z.string().min(1, 'Le bénéficiaire est obligatoire'),
-        devise_id: z.string().min(1, 'La devise est obligatoire'),
+        devise_id: z.string().min(3, 'La devise est obligatoire'),
         numero_document: z.string().optional(),
         statut_document: z.string(),
         statut_approbation: z.string(),
@@ -169,7 +169,7 @@
         approbateur_id: undefined,
         organisation_id: undefined,
         type_nf: undefined,
-        type_budget: undefined,
+        type_budget_id: undefined,
         nature_id: undefined,
         beneficiaire_id: undefined,
         groupe_paiement_id: undefined,
@@ -233,6 +233,7 @@
     const TypeBeneficiaires = useLookupsStore().getTypeBeneficiaires;
     const MatriceNF = parametresStore.getMatriceNF;
     const Devises = useLookupsStore().getDevise;
+    const Natures = useLookupsStore().getNatures;
     const Beneficiaires = useBeneficiairesStore().getBeneficiaires;
 
     const itemsOrganisations = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
@@ -245,7 +246,7 @@
         id: beneficiaire.id
     })) || [])
 
-    const itemsNaturesOrganisation = computed<SelectMenuItem[]>(() => Organisations?.map((org: Organisation) => ({
+    const itemsNaturesOrganisation = computed<SelectMenuItem[]>(() => Natures?.map((org: Lookup) => ({
         label: org.nom,
         id: org.id
     })) || [])
@@ -298,6 +299,7 @@
         },
         immediate: false
     })
+
     function onOpen() {
         if (!beneficiaires.value?.length) {
             execute()

@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
     import type { Approbateur, Profil } from '~/types';
-    import type { Matrice } from '~/types/organisation';
+    import type { Matrice, Organisation } from '~/types/organisation';
     import type { Row } from '@tanstack/table-core'
 
     const { copy } = useClipboard()
@@ -51,7 +51,7 @@
         {
             accessorKey: 'Organisation',
             header: 'Organisation',
-            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.organisation_id?.nom || 'N/A')
+            cell: ({ row }) => h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, (row.original.organisation_id as Organisation)?.nom || 'N/A')
         },
         {
             accessorKey: 'date_debut',
