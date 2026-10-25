@@ -100,13 +100,20 @@ export interface NF {
     organisation_id: string | Organisation;
     devise: string;
     description: string;
-    nature_nf: string | Lookup;
+    nature_id: string | Lookup;
     beneficiaire_id: string | Beneficiaire;
     created_at: string;
     updated_at: string;
     groupe_paiement_id: string;
     type_nf: string;
     date_document: string;
+    statut_approbation: string;
+    statut_paiement: string;
+    type_budget_id: string | Lookup;
+    devise_id: string;
+    montant_total: number;
+    matrice_id: string | Matrice;
+    approbateur_id: string | Profil;
 }
 
 export interface Member {

@@ -5,6 +5,7 @@ export const useNFStore = defineStore("nf", () => {
     const items = ref<NF[]>([]);
     const loading = ref(false);
     const supabase = useSupabaseClient();
+    const benefStore = useBeneficiairesStore();
 
     async function fetchAll(_ownerId?: string | null) {
         loading.value = true;
@@ -69,6 +70,14 @@ export const useNFStore = defineStore("nf", () => {
             supabase.removeChannel(channel);
         };
     }
+    const getNF = computed(() => {
+        return items.value.filter((l) => {
+            const benef = benefStore.getBeneficiaires.value.find((b) =>
+                b.id === l.beneficiaire_id
+            );
+            return { ...l, beneficiaire: benef };
+        });
+    });
 
     return {
         items,
@@ -78,6 +87,7 @@ export const useNFStore = defineStore("nf", () => {
         remove,
         fetchLines,
         removeLine,
+        getNF,
         subscribeToRealtime,
     };
 });

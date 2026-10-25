@@ -37,7 +37,7 @@
         </template>
     </UDashboardPanel>
 
-    <UDrawer v-model:open="openDetailsClasse" title="Détails" description="Détails de la classe sélectionnée">
+    <!-- <UModal v-model:open="openHistoriqueApprobation" title="Détails" description="Détails de la classe sélectionnée" :ui="{ content: 'min-w-3xl' }">
         <template #body>
             <div class="p-4 text-center">
                 <p v-if="selectedNf" class="font-medium">{{ selectedNf.organisation_id }}</p>
@@ -45,21 +45,21 @@
                 <p v-else>Sélectionnez une note de frais pour voir les détails.</p>
             </div>
         </template>
-    </UDrawer>
+    </UModal> -->
 
     <!-- <ClassesUpdateModal v-model:open="openClasseUpdateModal" :classe="selectedNf ?? undefined"
-        @classe_updated="refreshClasses" />
+        @classe_updated="refreshClasses" /> -->
 
-    <ClassesListeLookups v-model:open="openSlideOver" :item="selectedNf" /> -->
+    <NfHistoriqueApprobation v-model:open="openHistoriqueApprobation" :item="selectedNf" />
+    <NfDetails v-model:open="openDetailsNF" :current-nf="selectedNf" />
 </template>
 
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
     import type { Row } from '@tanstack/table-core'
+import type { Beneficiaire } from '~/types'
     import type { NF } from '~/types/organisation'
 
-    // Tableau vide STABLE pour UTable : évite la boucle de réactivité du watch data
-    const EMPTY_ROWS: any[] = []
 
     useHead({
         title: 'Note de frais',
@@ -67,10 +67,6 @@
             { name: 'description', content: 'Manage note de frais' }
         ]
     })
-
-    const supabase = useSupabaseClient()
-    const toast = useToast()
-    const { copy } = useClipboard()
 
     const {
         table: tableNfs,
@@ -87,13 +83,14 @@
         currentPageSize,
         setPage
     } = useDataTable({ filterColumnId: 'nom', pageSize: 10 })
-
-    // UI State
-    const openClasseUpdateModal = ref(false)
-    const openDetailsClasse = ref(false)
-    const openSlideOver = ref(false)
+    const EMPTY_ROWS: any[] = []
+    const supabase = useSupabaseClient()
+    const toast = useToast()
+    const openDetailsNF = ref(false)
+    const openHistoriqueApprobation = ref(false)
     const selectedNf = ref<NF | null>(null)
     const searchInput = ref('')
+    const { copy } = useClipboard()
 
     const debouncedSearch = useDebounceFn((val: string) => {
         tableNfs.value?.tableApi?.getColumn('nom')?.setFilterValue(val)
@@ -102,7 +99,7 @@
     watch(searchInput, (val) => {
         debouncedSearch(val)
     })
-    const note_frais = useNFStore().items;
+    const note_frais = useNFStore().getNF;
 
     // Columns definition
     const columns: TableColumn<NF>[] = [
@@ -117,7 +114,7 @@
                     'aria-label': 'Modifier',
                     "onClick": () => {
                         selectedNf.value = row.original;
-                        openClasseUpdateModal.value = true;
+                        openDetailsNF.value = true;
                     }
                 })
             ]),
@@ -133,7 +130,7 @@
             accessorKey: 'nom',
             header: 'Bénéficiaire',
             cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
-                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.beneficiaire_id?.nom || 'N/A')
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, (row.original.beneficiaire_id as Beneficiaire)?.nom || 'N/A')
             ])
         },
 
@@ -197,6 +194,25 @@
                 h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.statut_document)
             ])
         },
+        {
+            accessorKey: 'statut_paiement',
+            header: ({ column }) => {
+                const isSorted = column.getIsSorted()
+                return h(UButton, {
+                    color: 'neutral',
+                    variant: 'ghost',
+                    label: 'Statut de paiement',
+                    icon: isSorted
+                        ? (isSorted === 'asc' ? 'i-lucide-arrow-up-narrow-wide' : 'i-lucide-arrow-down-wide-narrow')
+                        : 'i-lucide-arrow-up-down',
+                    class: '-mx-2.5',
+                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+                })
+            },
+            cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
+                h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.statut_paiement)
+            ])
+        },
 
         // {
         //     id: 'details',
@@ -232,8 +248,8 @@
                 label: "Historique d'approbation",
                 icon: 'i-lucide-copy',
                 onSelect() {
-                    copy(row.original.id.toString())
-                    toast.add({ title: 'Copied', description: 'Classe ID copied to clipboard' })
+                    openHistoriqueApprobation.value = true
+                    selectedNf.value = row.original
                 }
             },
             {
