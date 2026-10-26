@@ -146,6 +146,14 @@
                 }
             },
             {
+                label: 'Frais',
+                to: '/settings/frais',
+                icon: 'solar:layers-minimalistic-bold-duotone',
+                onSelect: () => {
+                    open.value = false
+                }
+            },
+            {
                 label: 'Clients',
                 to: '/settings/clients',
                 icon: 'solar:users-group-two-rounded-bold-duotone',

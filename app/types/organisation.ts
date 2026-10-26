@@ -38,6 +38,14 @@ export interface NF {
     statut_paiement: string;
     statut_document: string;
 }
+export interface LigneNF {
+    id: string;
+    frais_id: string;
+    montant_total: number;
+    devise_id: string | Lookup;
+    description: string;
+    nf_id: string | NF;
+}
 
 export interface Lookup {
     id: string;

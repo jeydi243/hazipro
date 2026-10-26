@@ -11,6 +11,7 @@ export const useParametresStore = defineStore("parametres", () => {
   const itemsTaux = ref<Taux[]>([]);
   const itemsApprobateurs = ref<Approbateur[]>([]);
   const itemsBanques = ref<Banque[]>([]);
+  const itemsFrais = ref<Frais[]>([]);
 
   const lookupsStore = useLookupsStore();
   const clientsStore = useClientsStore();
@@ -141,6 +142,12 @@ export const useParametresStore = defineStore("parametres", () => {
           ? fetchApprobateurs(owner_id.value)
           : Promise.resolve(),
       },
+      {
+        name: "frais",
+        promise: owner_id.value
+          ? fetchFrais(owner_id.value)
+          : Promise.resolve(),
+      },
     ];
     const results = await Promise.allSettled(tasks.map((task) => task.promise));
 
@@ -170,6 +177,13 @@ export const useParametresStore = defineStore("parametres", () => {
     const { data, error } = await query;
     if (error) throw error;
     if (data) itemsMatrices.value = data as unknown as Matrice[];
+  }
+  async function fetchFrais(ownerId?: string | null) {
+    let query = supabase.from("frais").select("*");
+    if (ownerId) query = query.eq("owner_id", ownerId);
+    const { data, error } = await query;
+    if (error) throw error;
+    if (data) itemsFrais.value = data as unknown as Frais[];
   }
   async function fetchApprobateurs(ownerId?: string | null) {
     let query = supabase.from("approbateurs").select(
@@ -392,6 +406,7 @@ export const useParametresStore = defineStore("parametres", () => {
     itemsMatrices,
     itemsApprobateurs,
     itemsBanques,
+    itemsFrais,
     getFirstApprobateurID,
   };
 });

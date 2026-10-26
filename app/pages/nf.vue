@@ -37,18 +37,7 @@
         </template>
     </UDashboardPanel>
 
-    <!-- <UModal v-model:open="openHistoriqueApprobation" title="Détails" description="Détails de la classe sélectionnée" :ui="{ content: 'min-w-3xl' }">
-        <template #body>
-            <div class="p-4 text-center">
-                <p v-if="selectedNf" class="font-medium">{{ selectedNf.organisation_id }}</p>
-                <p v-if="selectedNf" class="text-sm text-muted">{{ selectedNf.description }}</p>
-                <p v-else>Sélectionnez une note de frais pour voir les détails.</p>
-            </div>
-        </template>
-    </UModal> -->
 
-    <!-- <ClassesUpdateModal v-model:open="openClasseUpdateModal" :classe="selectedNf ?? undefined"
-        @classe_updated="refreshClasses" /> -->
 
     <NfHistoriqueApprobation v-model:open="openHistoriqueApprobation" :item="selectedNf" />
     <NfDetails v-model:open="openDetailsNF" :current-nf="selectedNf" />
@@ -57,7 +46,7 @@
 <script setup lang="ts">
     import type { TableColumn } from '@nuxt/ui'
     import type { Row } from '@tanstack/table-core'
-import type { Beneficiaire } from '~/types'
+    import type { Beneficiaire } from '~/types'
     import type { NF } from '~/types/organisation'
 
 
@@ -88,7 +77,7 @@ import type { Beneficiaire } from '~/types'
     const toast = useToast()
     const openDetailsNF = ref(false)
     const openHistoriqueApprobation = ref(false)
-    const selectedNf = ref<NF | null>(null)
+    const selectedNf = shallowRef<NF | null>(null)
     const searchInput = ref('')
     const { copy } = useClipboard()
 
@@ -113,7 +102,7 @@ import type { Beneficiaire } from '~/types'
                     "icon": 'i-lucide-edit',
                     'aria-label': 'Modifier',
                     "onClick": () => {
-                        selectedNf.value = row.original;
+                        selectedNf.value = row.original as unknown as NF;
                         openDetailsNF.value = true;
                     }
                 })
@@ -234,7 +223,7 @@ import type { Beneficiaire } from '~/types'
             header: () => h('div', { class: 'text-center' }, 'Actions'),
             id: 'actions',
             cell: ({ row }) => h('div', { class: 'text-center' },
-                h(UDropdownMenu, { content: { align: 'end' }, "items": getRowItemsClasse(row) },
+                h(UDropdownMenu, { content: { align: 'end' }, items: getRowItemsClasse(row) },
                     () => h(UButton, { "icon": 'i-lucide-ellipsis-vertical', 'aria-label': "Plus d'actions", "color": 'neutral', "variant": 'ghost', "class": 'ml-auto' })
                 )
             )
@@ -249,7 +238,7 @@ import type { Beneficiaire } from '~/types'
                 icon: 'i-lucide-copy',
                 onSelect() {
                     openHistoriqueApprobation.value = true
-                    selectedNf.value = row.original
+                    selectedNf.value = row.original as unknown as NF
                 }
             },
             {
@@ -273,8 +262,8 @@ import type { Beneficiaire } from '~/types'
                 label: 'Details',
                 icon: 'material-symbols:open-in-full-rounded',
                 onSelect() {
-                    selectedNf.value = row.original
-                    openDetailsClasse.value = true
+                    selectedNf.value = row.original as unknown as NF
+                    // openDetailsClasse.value = true
                 }
             },
             { type: 'separator' },

@@ -1,23 +1,24 @@
 <template>
     <USlideover v-model:open="open" :ui="{ content: 'min-w-5xl' }" :dismissible="false" title="Note de frais"
-        description="Add a new note de frais to the database" :close="{
+        :description="`Add a new note de frais to the database : ${nextStep}`" :close="{
             color: 'primary',
             variant: 'outline',
             class: 'rounded-full'
         }">
         <template #body>
-            <div v-if="nextStep === 'header'" class="header">
-                <UForm id="nf-create-form" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit"
-                    @error="onValidationError">
-                    <div v-if="validationErrors.length" role="alert" aria-live="assertive"
-                        class="rounded-md border border-error/50 bg-error/5 p-3 text-sm text-error">
-                        <p class="font-medium">Veuillez corriger les erreurs suivantes :</p>
-                        <ul class="mt-1 list-inside list-disc">
-                            <li v-for="(error, index) in validationErrors" :key="`${error.id}-${index}`">
-                                {{ error.message }}
-                            </li>
-                        </ul>
-                    </div>
+            <Transition name="nf-step" mode="out-in">
+                <div v-if="nextStep === 'header'" class="header">
+                    <UForm id="nf-create-form" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit"
+                        @error="onValidationError">
+                        <div v-if="validationErrors.length" role="alert" aria-live="assertive"
+                            class="rounded-md border border-error/50 bg-error/5 p-3 text-sm text-error">
+                            <p class="font-medium">Veuillez corriger les erreurs suivantes :</p>
+                            <ul class="mt-1 list-inside list-disc">
+                                <li v-for="(error, index) in validationErrors" :key="`${error.id}-${index}`">
+                                    {{ error.message }}
+                                </li>
+                            </ul>
+                        </div>
                     <div class="grid grid-cols-4 gap-4">
                         <UFormField label="Direction" name="organisation_id">
                             <USelectMenu v-model="state.organisation_id" value-key="id" :items="itemsOrganisations"
@@ -116,15 +117,16 @@
                     <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
                     <UButton label="Créer" form="" color="primary" variant="solid" type="submit" />
                 </div> -->
-                </UForm>
-            </div>
-            <div v-else-if="nextStep === 'lignes'">
-                <NFDetailsLignes :current-nf="state" />
-            </div>
+                    </UForm>
+                </div>
+                <div v-else-if="nextStep === 'lignes'">
+                    <NfDetailsLignes :current-nf="state as Partial<NF>" />
+                </div>
+            </Transition>
         </template>
         <template #footer="{ close }">
-            <UButton v-if="nextStep === 'header'" label="Fermer" color="neutral" variant="outline" @click="close" />
-            <UButton v-else label="Precedent" color="info" variant="ghost" @click="setPrevious('header')" />
+            <UButton v-if="nextStep === 'header'" label="Fermer" color="neutral" variant="ghost" @click="close" />
+            <UButton v-else label="Precedent" color="info" variant="ghost" icon="material-symbols:arrow-left-alt" @click="setPrevious('header')" />
 
             <UButton label="Documents" color="info" variant="ghost" />
             <UButton v-if="!state.id" label="Créer la note de frais" class="ml-auto" color="primary" variant="solid"
@@ -132,7 +134,7 @@
             <span v-else-if="state.id" class="flex flex-row gap-2 ml-auto">
                 <UButton label="Mettre à jour" class="ml-auto" color="primary" variant="solid" type="submit"
                     form="nf-create-form" :loading="isLoading" />
-                <UButton v-if="state.id" label="Suivant" class="ml-auto" color="primary" variant="ghost"
+                <UButton label="Suivant" trailing-icon="material-symbols:keyboard-arrow-right" class="ml-auto" color="primary" variant="ghost"
                     :loading="isLoading" @click="setNext('lignes')" />
             </span>
         </template>
@@ -155,7 +157,7 @@
         description: z.string().min(1, 'La description est obligatoire'),
         matrice_id: z.string().min(1, 'La matrice est obligatoire'),
         approbateur_id: z.string().min(1, 'Aucun approbateur trouvé pour cette matrice et cette direction'),
-        organisation_id: z.string({ message: 'La direction est obligatoire' }).min(1, 'La direction est obligatoire'),
+        organisation_id: z.string({ message: 'La direction est obligatoire' }),
         taux: z.number().optional(),
         type_nf: z.string().min(1, 'Le type de note de frais est obligatoire'),
         type_budget_id: z.string().min(1, 'Le type de budget est obligatoire'),
@@ -183,6 +185,7 @@
         type_nf: undefined,
         type_budget_id: undefined,
         nature_id: undefined,
+        numero_document: undefined,
         beneficiaire_id: undefined,
         groupe_paiement_id: undefined,
         taux: undefined,
@@ -368,3 +371,44 @@
         }
     }
 </script>
+
+<style scoped>
+.nf-step-enter-active {
+    animation: nf-fast-slide-in 180ms ease-out both;
+}
+
+.nf-step-leave-active {
+    animation: nf-fade-slide-out 140ms ease-in both;
+}
+
+@keyframes nf-fast-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(0.75rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes nf-fade-slide-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-0.5rem);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nf-step-enter-active,
+    .nf-step-leave-active {
+        animation: none;
+    }
+}
+</style>

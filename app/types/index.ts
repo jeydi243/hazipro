@@ -51,6 +51,14 @@ export interface Adresse {
     created: string | Date;
     updated: string | Date;
 }
+export interface Frais {
+    id: string;
+    nom: string;
+    description: string;
+    status: string;
+    created: string | Date;
+    updated: string | Date;
+}   
 export interface Banque {
     id: string;
     nom: string;
@@ -108,6 +116,8 @@ export interface NF {
     type_nf: string;
     date_document: string;
     statut_approbation: string;
+    statut_document: string;
+    numero_document: string;
     statut_paiement: string;
     type_budget_id: string | Lookup;
     devise_id: string;

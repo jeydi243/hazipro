@@ -1,8 +1,10 @@
 import { defineStore } from "pinia";
 import type { NF } from "~/types";
+import type { LigneNF } from "~/types/organisation";
 
 export const useNFStore = defineStore("nf", () => {
     const items = ref<NF[]>([]);
+    const itemsLignes = ref<LigneNF[]>([]);
     const loading = ref(false);
     const supabase = useSupabaseClient();
     const benefStore = useBeneficiairesStore();
@@ -25,6 +27,15 @@ export const useNFStore = defineStore("nf", () => {
         ).select("*");
         if (error) throw error;
         if (created) items.value.unshift(created[0] as unknown as NF);
+        return created[0];
+    }
+
+    async function createLigne(data: Partial<LigneNF>) {
+        const { data: created, error } = await supabase.from("nf_lines").insert(
+            data as never,
+        ).select("*");
+        if (error) throw error;
+        if (created) itemsLignes.value.unshift(created[0] as unknown as LigneNF);
         return created[0];
     }
 
@@ -78,6 +89,9 @@ export const useNFStore = defineStore("nf", () => {
             return { ...l, beneficiaire: benef };
         });
     });
+    const getLignesNF = computed(() => (nf_id: string) => {
+        return itemsLignes.value.filter((l) => l.nf_id === nf_id);
+    });
 
     return {
         items,
@@ -88,6 +102,8 @@ export const useNFStore = defineStore("nf", () => {
         fetchLines,
         removeLine,
         getNF,
+        getLignesNF,
+        createLigne,
         subscribeToRealtime,
     };
 });
