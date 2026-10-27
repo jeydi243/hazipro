@@ -54,8 +54,11 @@ export interface Adresse {
 export interface Frais {
     id: string;
     nom: string;
+    code: string;
     description: string;
     status: string;
+    type_frais_id: string | Lookup;
+    owner_id: string | Organisation;
     created: string | Date;
     updated: string | Date;
 }   

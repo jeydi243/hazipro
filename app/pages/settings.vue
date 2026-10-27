@@ -30,6 +30,11 @@
         to: '/settings/articles'
     },
     {
+        label: 'Frais',
+        icon: 'icon-park-outline:ad-product',
+        to: '/settings/frais'
+    },
+    {
         label: 'Taux',
         icon: 'icon-park-outline:ad-product',
         to: '/settings/taux'

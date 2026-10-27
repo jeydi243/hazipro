@@ -212,6 +212,15 @@ export const useParametresStore = defineStore("parametres", () => {
     if (created) itemsMatrices.value.unshift(created[0] as unknown as Matrice);
     return created[0];
   }
+  async function createFrais(data: Partial<Frais>) {
+    const { data: created, error } = await supabase.from("frais")
+      .insert({ ...data, owner_id: owner_id.value } as never).select(
+        "*",
+      );
+    if (error) throw error;
+    if (created) itemsFrais.value.unshift(created[0] as unknown as Frais);
+    return created[0];
+  }
   async function createApprobateur(data: Partial<Approbateur>) {
     const { data: created, error } = await supabase.from("approbateurs")
       .insert({ ...data, owner_id: owner_id.value } as never).select("*");
@@ -232,11 +241,15 @@ export const useParametresStore = defineStore("parametres", () => {
       .maybeSingle();
     if (error) throw error;
     if (!updated) {
-      throw new Error("Aucun approbateur n'a été mis à jour." + JSON.stringify(data));
+      throw new Error(
+        "Aucun approbateur n'a été mis à jour." + JSON.stringify(data),
+      );
     }
 
     const approbateur = updated as unknown as Approbateur;
-    const index = itemsApprobateurs.value.findIndex((item) => item.id === data.id);
+    const index = itemsApprobateurs.value.findIndex((item) =>
+      item.id === data.id
+    );
     if (index !== -1) itemsApprobateurs.value[index] = approbateur;
 
     return approbateur;
@@ -263,7 +276,6 @@ export const useParametresStore = defineStore("parametres", () => {
     }
     return updated;
   }
-
   async function createTaux(data: Partial<Taux>) {
     const today = new Date().toISOString().slice(0, 10);
     if (data.date_taux && data.date_taux > today) {
@@ -305,6 +317,9 @@ export const useParametresStore = defineStore("parametres", () => {
   const getMatriceNF = computed(() =>
     itemsMatrices.value.map((c) => ({ nom: c.nom, id: c.id }))
   );
+  const getFrais = computed(() =>
+    itemsFrais.value.map((c) => ({ nom: c.nom, id: c.id }))
+  );
   const getApprobateurs = computed(() =>
   (
     matrice_id: string | null,
@@ -337,7 +352,6 @@ export const useParametresStore = defineStore("parametres", () => {
       };
     })
   );
-
   function getTauxForDevise(
     destinationCurrencyId: string,
     date?: string | null,
@@ -394,14 +408,16 @@ export const useParametresStore = defineStore("parametres", () => {
     createApprobateur,
     updateApprobateur,
     createBanque,
+    createFrais,
+    getTauxForDevise,
+    updateBanque,
+    createTaux,
     getClasseById,
     getLookupsById,
     getClasseItems,
     getMatriceNF,
+    getFrais,
     getTaux,
-    getTauxForDevise,
-    updateBanque,
-    createTaux,
     itemsTaux,
     itemsMatrices,
     itemsApprobateurs,

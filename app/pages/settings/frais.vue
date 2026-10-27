@@ -57,15 +57,15 @@
         </template>
     </UDashboardPanel>
 
-    <FraisDetails v-model:open="openSlideOver" :matrice="selectedMatrice" />
-    <FraisEditModal v-model:open="openEditModal" :matrice="selectedMatriceToEdit" />
+    <FraisDetails v-model:open="openSlideOver" :matrice="selectedFrais" />
+    <FraisEditModal v-model:open="openEditModal" :matrice="selectedFraisToEdit" />
 </template>
 
 <script setup lang="ts">
     import type { Row } from '@tanstack/table-core'
     import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
     import { storeToRefs } from 'pinia'
-    import type { Matrice } from '~/types/organisation'
+    import type { Frais } from '~/types'
 
     useHead({
         title: 'Frais',
@@ -77,7 +77,7 @@
     const supabase = useSupabaseClient()
     // Tableau vide STABLE : évite une nouvelle identité [] à chaque render
     // (boucle infinie du watch data de UTable pendant le chargement)
-    const emptyRows: Matrice[] = []
+    const emptyRows: Frais[] = []
     const toast = useToast()
     const parametresStore = useParametresStore()
     const { lookups, itemsFrais: frais } = storeToRefs(parametresStore)
@@ -108,9 +108,9 @@
     const columnDisplayItems = buildColumnDisplayItems(['select', 'details', 'code', 'nom', 'description', 'type', 'status', 'actions'])
 
     const openSlideOver = ref(false)
-    const selectedMatrice = ref<Matrice | null>(null)
+    const selectedFrais = ref<Frais | null>(null)
     const openEditModal = ref(false)
-    const selectedMatriceToEdit = ref<Matrice | null>(null)
+    const selectedFraisToEdit = ref<Frais | null>(null)
 
     const { copy } = useClipboard()
     const searchInput = ref('')
@@ -123,7 +123,7 @@
         debouncedSearch(val)
     })
 
-    const columns: TableColumn<Matrice>[] = [
+    const columns: TableColumn<Frais>[] = [
         {
             id: 'select',
             header: ({ table }) =>
@@ -150,7 +150,7 @@
                 'aria-label': 'Agrandir',
                 'class': '-mx-2.5',
                 'onClick': () => {
-                    selectedMatrice.value = row.original
+                    selectedFrais.value = row.original
                     openSlideOver.value = true
                 }
             })),
@@ -185,9 +185,9 @@
             }
         },
         {
-            accessorKey: 'type_organisation_id',
-            header: "Type d'organisation",
-            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.type_organisation_id?.nom || 'N/A')
+            accessorKey: 'type_frais_id',
+            header: "Type de frais",
+            cell: ({ row }) => h('p', { class: 'font-medium' }, (row.original.type_frais_id as Lookup)?.nom || 'N/A')
         },
         {
             accessorKey: 'status',
@@ -226,14 +226,14 @@
         }
     ]
 
-    function getRowItems(row: Row<Matrice>): DropdownMenuItem[][] {
+    function getRowItems(row: Row<Frais>): DropdownMenuItem[][] {
         return [[
             {
                 type: 'label' as const,
                 label: 'Actions'
             },
             {
-                label: 'Copie ID Matrice',
+                label: 'Copie ID Frais',
                 icon: 'i-lucide-copy',
                 onSelect() {
                     copy(row.original.id.toString())
@@ -248,7 +248,7 @@
                 label: 'Détails',
                 icon: 'i-lucide-maximize-2',
                 onSelect() {
-                    selectedMatrice.value = row.original
+                    selectedFrais.value = row.original
                     openSlideOver.value = true
                 }
             },
@@ -256,7 +256,7 @@
                 label: 'Modifier',
                 icon: 'i-lucide-pencil',
                 onSelect() {
-                    selectedMatriceToEdit.value = row.original
+                    selectedFraisToEdit.value = row.original
                     openEditModal.value = true
                 }
             },

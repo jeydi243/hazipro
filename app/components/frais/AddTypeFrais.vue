@@ -13,8 +13,9 @@ const schema = z.object({
     id: z.string().optional(),
     nom: z.string().min(3, 'Too short'),
     code: z.string().min(1, 'Too short'),
-    classe_id: z.string().min(3, 'Too short'),
-    description: z.string()
+    type_frais_id: z.string().min(3, 'Too short'),
+    description: z.string(),
+    compte_frais: z.string().optional()
 })
 const open = ref(false)
 const toast = useToast()
@@ -24,7 +25,9 @@ const state = reactive<Partial<Schema>>({
     id: undefined,
     nom: undefined,
     code: undefined,
+    type_frais_id: undefined,
     description: undefined,
+    compte_frais: undefined
 })
 const paramStore = useParametresStore()
 const classes = computed(() => paramStore.getClasseItems)
@@ -53,10 +56,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Classe" placeholder="_" name="classe_id">
-                    <USelectMenu v-model="state.classe_id" disabled value-key="id" :items="classes" class="w-full" />
+                <UFormField label="Type de frais" placeholder="_" name="type_frais_id">
+                    <USelectMenu v-model="state.type_frais_id" value-key="id" :items="classes" class="w-full" />
                 </UFormField>
-                <UFormField label="Nom" placeholder="John Doe" name="nom">
+                <UFormField label="Nom du frais" placeholder="John Doe" name="nom">
                     <UInput v-model="state.nom" class="w-full" />
                 </UFormField>
                 <UFormField label="Code" placeholder="_" name="code">
@@ -64,6 +67,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                 </UFormField>
                 <UFormField label="Description" placeholder="" name="description">
                     <UInput v-model="state.description" class="w-full" />
+                </UFormField>
+                <UFormField label="Compte de frais" placeholder="" name="compte_frais">
+                    <UInput v-model="state.compte_frais" class="w-full" />
                 </UFormField>
                 <div class="flex justify-end gap-2">
                     <UButton label="Cancel" color="neutral" variant="subtle" @click="open = false" />
