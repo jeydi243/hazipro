@@ -36,10 +36,10 @@
         currentPageSize,
         setPage
     } = useDataTable({ filterColumnId: 'nom', pageSize: 10 })
-
-    const EMPTY_ROWS: any[] = []
-    const lignes_note_frais: LigneNF[] = []
     const props = defineProps<{ currentNf: Partial<NF> | null }>();
+    const EMPTY_ROWS: any[] = []
+    const lignes_note_frais = useNFStore().getLignesNF(props.currentNf?.id as string) || EMPTY_ROWS
+
     const toast = useToast()
     const { copy } = useClipboard()
 

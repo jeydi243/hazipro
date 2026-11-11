@@ -49,14 +49,14 @@
                         <UInput v-model="state.approbateur_id" class="w-full" />
                     </UFormField> -->
                     <UFormField label="Date de la note" name="date_document">
-                        <UInputDate ref="inputDate" v-model="dateDocument" :max-value="maxDate">
+                        <UInputDate ref="inputDate" v-model="dateDocument as any" :max-value="maxDate as any">
                             <template #trailing>
                                 <UPopover :reference="inputDate?.inputsRef[3]?.$el">
                                     <UButton color="neutral" variant="link" size="sm" icon="i-lucide-calendar"
                                         aria-label="Select a date" class="px-0" />
 
                                     <template #content>
-                                        <UCalendar v-model="dateDocument" :max-value="maxDate" class="p-2" />
+                                        <UCalendar v-model="dateDocument as any" :max-value="maxDate as any" class="p-2" />
                                     </template>
                                 </UPopover>
                             </template>
