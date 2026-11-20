@@ -16,7 +16,7 @@
     const { idle } = useIdle(5 * 60 * 1000) // 5 minutes
     const { isOnline } = useNetwork()
 
-    const color = computed(() => colorMode.value === 'dark' ? '#020617' : 'white')
+    const color = computed(() => colorMode.value === 'dark' ? '#0A0A0A' : '#FFFFFF')
 
     useHead({
         meta: [

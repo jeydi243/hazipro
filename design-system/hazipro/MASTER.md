@@ -19,15 +19,16 @@ Applied 2026-08-14. Semantic tokens mapped to the project stack:
 
 | Design System Role | Nuxt UI token | Value |
 |--------------------|---------------|-------|
-| Primary | `ui.colors.primary` | `blue` (#2563EB = blue-600) |
-| Accent/CTA | `ui.colors.secondary` | `orange` (#EA580C = orange-600) |
-| Neutral | `ui.colors.neutral` | `slate` |
-| Background | `--ui-bg` | `#F8FAFC` (slate-50) / dark `#020617` |
-| Font | `--font-sans` | `Plus Jakarta Sans Variable` (@fontsource-variable, self-hosted) |
+| Primary | `ui.colors.primary` | `green` (Nuxt green) |
+| Secondary | `ui.colors.secondary` | `blue` (informational accents only) |
+| Neutral | `ui.colors.neutral` | `neutral` |
+| Background | `--ui-bg` | Nuxt UI default / dark `neutral-950` (`#0A0A0A`) |
+| Font | `--font-sans` / `--font-heading` | Inter / Outfit (self-hosted by Nuxt Fonts) |
 
 - Config: `app/app.config.ts` + `app/assets/css/main.css`
-- CTA buttons that must pop use `color="secondary"` (orange); primary actions use `color="primary"` (blue)
-- Custom green scale (`@theme static`) kept for semantic success indicators in admin components
+- Primary actions and active navigation use `color="primary"`; secondary actions use neutral styling
+- Green is reserved for interaction and selected state, not large surfaces
+- Dark mode is the default; the appearance menu keeps light mode available
 
 ---
 
@@ -35,38 +36,24 @@ Applied 2026-08-14. Semantic tokens mapped to the project stack:
 
 ### Color Palette
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#2563EB` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#3B82F6` | `--color-secondary` |
-| On Secondary | `#000000` | `--color-on-secondary` |
-| Accent/CTA | `#EA580C` | `--color-accent` |
-| On Accent/CTA | `#000000` | `--color-on-accent` |
-| Background | `#F8FAFC` | `--color-background` |
-| Foreground | `#1E293B` | `--color-foreground` |
-| Card | `#FFFFFF` | `--color-card` |
-| Card Foreground | `#1E293B` | `--color-card-foreground` |
-| Muted | `#E9EFF8` | `--color-muted` |
-| Muted Foreground | `#475569` | `--color-muted-foreground` |
-| Border | `#E2E8F0` | `--color-border` |
-| Destructive | `#DC2626` | `--color-destructive` |
-| On Destructive | `#FFFFFF` | `--color-on-destructive` |
-| Ring | `#2563EB` | `--color-ring` |
-
-**Color Notes:** Trust blue + orange CTA contrast [Accent adjusted from #F97316]
+| Role | Value | Usage |
+|------|-------|-------|
+| Primary | Nuxt green (`green-400`, `#00DC82`) | Primary actions, links, active navigation |
+| Secondary | Blue | Informational emphasis; not a secondary button fill |
+| Neutral | Nuxt UI `neutral` scale | Text, borders, surfaces, disabled states |
+| Light canvas | Nuxt UI default | Light mode page background |
+| Dark canvas | `neutral-950` (`#0A0A0A`) | Default dark mode page background |
+| Dark elevated | `neutral-900` / `neutral-800` | Cards, popovers, hover and active surfaces |
+| Destructive | Nuxt UI `error` | Destructive actions and errors |
 
 ### Typography
 
-- **Heading Font:** Plus Jakarta Sans
-- **Body Font:** Plus Jakarta Sans
-- **Mood:** friendly, modern, saas, clean, approachable, professional
-- **Google Fonts:** [Plus Jakarta Sans + Plus Jakarta Sans](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap)
+- **Heading Font:** Outfit (`font-heading`)
+- **Body Font:** Inter (`font-sans`)
+- **Mood:** developer-focused, calm, confident, clear
+- Nuxt Fonts self-hosts the families declared in `@theme`.
 
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-```
+Use Outfit for page and section headings; keep controls, labels, and data in Inter.
 
 ### Spacing Variables
 
@@ -97,51 +84,16 @@ Applied 2026-08-14. Semantic tokens mapped to the project stack:
 
 ### Buttons
 
-```css
-/* Primary Button */
-.btn-primary {
-  background: #EA580C;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* Secondary Button */
-.btn-secondary {
-  background: transparent;
-  color: #2563EB;
-  border: 2px solid #2563EB;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-```
+Use Nuxt UI semantic colors: `color="primary"` for the main action and `color="neutral"` for secondary actions. Reserve blue for informational accents.
 
 ### Cards
 
 ```css
 .card {
-  background: #F8FAFC;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
-  cursor: pointer;
-}
-
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  background: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
 }
 ```
 
@@ -150,16 +102,14 @@ Applied 2026-08-14. Semantic tokens mapped to the project stack:
 ```css
 .input {
   padding: 12px 16px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--ui-border);
   border-radius: 8px;
   font-size: 16px;
   transition: border-color 200ms ease;
 }
 
 .input:focus {
-  border-color: #2563EB;
-  outline: none;
-  box-shadow: 0 0 0 3px #2563EB20;
+  border-color: var(--ui-primary);
 }
 ```
 
@@ -172,10 +122,10 @@ Applied 2026-08-14. Semantic tokens mapped to the project stack:
 }
 
 .modal {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow-xl);
+  background: var(--ui-bg-elevated);
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  padding: 24px;
   max-width: 500px;
   width: 90%;
 }
@@ -185,21 +135,21 @@ Applied 2026-08-14. Semantic tokens mapped to the project stack:
 
 ## Style Guidelines
 
-**Style:** Glassmorphism
+**Style:** Neutral, data-first application shell
 
-**Keywords:** Frosted glass, transparent, blurred background, layered, vibrant background, light source, depth, multi-layer
+**Keywords:** True neutral surfaces, Nuxt green accent, clear data hierarchy, restrained depth
 
-**Best For:** Modern SaaS, financial dashboards, high-end corporate, lifestyle apps, modal overlays, navigation
+**Best For:** Financial operations, admin dashboards, forms, and dense tables
 
-**Key Effects:** Backdrop blur (10-20px), subtle border (1px solid rgba white 0.2), light reflection, Z-depth
+**Key Effects:** Distinguish surfaces with neutral background levels and borders; avoid decorative gradients and frosted-glass effects.
 
 ### Page Pattern
 
-**Pattern Name:** Hero + Features + CTA
+**Pattern Name:** Navigation shell + task-focused content
 
-- **Conversion Strategy:** Deep CTA placement. For CTA label text, verify at least 4.5:1 against the button fill; use 7:1 only when the product explicitly targets AAA normal-text contrast. Keep focus and component boundaries independently visible. Disable hero parallax under reduced motion and render its static final state.
-- **CTA Placement:** Hero (sticky) + Bottom
-- **Section Order:** Hero with headline/image > Value prop > Key features (3-5) > CTA section > Footer
+- Keep the dashboard sidebar and page content as the primary structure.
+- Start pages with a clear title and task context; prioritize filters, forms, and data tables over marketing hero sections.
+- Use green for one primary action or selected state at a time.
 
 ---
 
@@ -222,7 +172,8 @@ gsap.from('.grid-item', { opacity: 0, scale: 0.92, y: 16, duration: 0.4, stagger
 ## Anti-Patterns (Do NOT Use)
 
 - ❌ Excessive animation
-- ❌ Dark mode by default
+- ❌ Large green surfaces or multiple competing accent colors
+- ❌ Decorative gradients, frosted glass, or marketing-style hero sections in operational pages
 
 ### Additional Forbidden Patterns
 

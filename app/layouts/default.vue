@@ -41,7 +41,7 @@
             label: 'Workflow & Task',
             to: '/workflow',
             icon: 'hugeicons:workflow-circle-05',
-            defaultOpen: true,
+            defaultOpen: false,
             children: [{
                 label: 'Workflow & Task',
                 icon: 'solar:settings-bold-duotone',
@@ -60,12 +60,60 @@
                 }
             }
             ]
+        }, {
+            label: 'Budget & Reporting',
+            to: '/budget',
+            icon: 'i-lucide-settings',
+            defaultOpen: false,
+            children: [
+                {
+                    label: 'Budget',
+                    icon: 'solar:settings-bold-duotone',
+                    to: '/budget',
+                    exact: true,
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }, 
+                {
+                    label: 'Controle budgétaire',
+                    to: '/budget/controle',
+                    icon: 'solar:card-transfer-bold-duotone',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }, 
+                {
+                    label: 'Réalisation budgétaire',
+                    to: '/budget/realisation',
+                    icon: 'solar:card-transfer-bold-duotone',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                },
+                {
+                    label: 'Table de concordance',
+                    to: '/budget/concordance',
+                    icon: 'solar:card-transfer-bold-duotone',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                },
+                {
+                    label: 'Reporting',
+                    to: '/budget/reporting',
+                    icon: 'solar:card-transfer-bold-duotone',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }
+            ]
         },
         {
             label: 'Parametres',
             to: '/settings',
             icon: 'i-lucide-settings',
-            defaultOpen: true,
+            defaultOpen: false,
             children: [{
                 label: 'Parametres',
                 icon: 'solar:settings-bold-duotone',
@@ -163,6 +211,7 @@
             }
             ]
         },
+
 
         ]
     ]

@@ -26,6 +26,9 @@ export default defineNuxtConfig({
         // pageTransition: { name: "page", mode: "out-in" },
         // layoutTransition: { name: "layout", mode: "out-in" },
     },
+    colorMode: {
+        preference: "dark",
+    },
     runtimeConfig: {
         // Private keys are only available on the server
         SUPABASE_URL: process.env.SUPABASE_URL,

@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+    import AddBudget from './AddBudget.vue'
     import type { TableColumn } from '@nuxt/ui'
     import type { Row } from '@tanstack/table-core'
     import type { LigneNF, NF } from '~/types/organisation'
@@ -91,6 +92,13 @@
             },
             cell: ({ row }) => h('div', { class: 'flex items-center gap-3' }, [
                 h('p', { class: 'font-medium text-(--ui-text-highlighted)' }, row.original.devise_id as string || 'N/A')
+            ])
+        },
+        {
+            header: () => h('div', { class: 'text-center' }, 'Actions'),
+            id: 'budgetiser',
+            cell: ({ row }) => h('div', { class: 'text-center' }, [
+                h(AddBudget, { key: row.original.id, currentNf: props.currentNf, ligneId: row.original.id })
             ])
         },
         {
