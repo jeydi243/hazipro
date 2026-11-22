@@ -13,11 +13,11 @@
     const isLoading = ref(false)
     const toast = useToast()
     const schema = z.object({
-        frais_id: z.string(),
-        montant_total: z.number().positive('Montant total doit être un nombre positif'),
+        ligne_budget_id: z.string(),
+        montant_demande: z.number().positive('Montant demandé doit être un nombre positif'),
+        montant_annuel: z.number().positive('Montant annuel doit être un nombre positif'),
         devise_id: z.string(),
         nf_id: z.string(),
-        numero_piece: z.string().optional(),
         date_piece: z.string().optional(),
     })
     const itemsDevises = computed<SelectMenuItem[]>(() => Devises?.map((org: Lookup) => ({
@@ -26,16 +26,28 @@
     })) || [])
     type Schema = z.output<typeof schema>
     const state = reactive<Partial<Schema>>({
-        frais_id: undefined,
-        montant_total: 0,
+        ligne_budget_id: undefined,
+        montant_demande: 0,
+        montant_annuel: 0,
         nf_id: props.currentNf?.id,
-        numero_piece: undefined,
-        date_piece: undefined,
         devise_id: (props.currentNf?.devise_id as string) || undefined,
     })
 
     const frais = useParametresStore().getFrais
+    const entiteId = computed(() => props.currentNf?.organisation_id as string)
+    const budgetStore = useBudgetsStore()
+    const annee = ref(new Date().getFullYear())
+
+    const lignesBudgetaire = computed(() =>
+        budgetStore.getLignesBudgetaire(entiteId.value, annee.value)
+    )
+
     const itemsFrais = computed<SelectMenuItem[]>(() => frais?.map((f) => ({
+        label: f.nom,
+        id: f.id
+    })) || [])
+
+    const itemsLignesBudgetaire = computed<SelectMenuItem[]>(() => lignesBudgetaire.value?.map((f) => ({
         label: f.nom,
         id: f.id
     })) || [])
@@ -65,38 +77,23 @@
 
         <template #body>
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-                <UFormField label="Frais" placeholder="Type document" name="frais_id">
-                    <USelectMenu v-model="state.frais_id" value-key="id" :items="itemsFrais" class="w-full" />
+                <UFormField label="Ligne budgetaire" placeholder="Ligne budgetaire" name="ligne_budget_id">
+                    <USelectMenu v-model="state.ligne_budget_id" value-key="id" :items="itemsLignesBudgetaire"
+                        class="w-full" />
                 </UFormField>
-                <UFormField label="Montant" placeholder="Montant" name="montant_total">
-                    <UInputNumber v-model="state.montant_total" type="number" class="w-full" />
+                <UFormField label="Montant annuel" placeholder="Montant annuel" name="montant_annuel">
+                    <UInputNumber v-model="state.montant_annuel" type="number" class="w-full" orientation="vertical"
+                        locale="de-DE" :format-options="{ useGrouping: true }" />
+                </UFormField>
+                <UFormField label="Montant demandé" placeholder="Montant demandé" name="montant_demande">
+                    <UInputNumber v-model="state.montant_demande" type="number" class="w-full" orientation="vertical"
+                        locale="de-DE" :format-options="{ useGrouping: true }" />
                 </UFormField>
                 <UFormField label="Devise" placeholder="Code de la ligne" name="devise_id">
                     <USelectMenu v-model="state.devise_id" disabled value-key="id" :items="itemsDevises"
                         class="w-full" />
                 </UFormField>
-                <UFormField label="Numéro de pièce" placeholder="Numéro de pièce" name="numero_piece">
-                    <UInput v-model="state.numero_piece" class="w-full" />
-                </UFormField>
-                <UFormField label="Date de la note" name="date_document">
-                    <UInputDate ref="inputDate" :model-value="datePiece as any" :max-value="maxDate as any" class="w-full">
-                        <template #trailing>
-                            <UPopover :reference="inputDate?.inputsRef[3]?.$el">
-                                <UButton color="neutral" variant="link" size="sm" icon="i-lucide-calendar"
-                                    aria-label="Select a date" class="px-0" />
 
-                                <template #content>
-                                    <UCalendar
-                                        :model-value="datePiece as any"
-                                        :max-value="maxDate as any"
-                                        class="p-2"
-                                        @update:model-value="datePiece = $event as unknown as DateValue"
-                                    />
-                                </template>
-                            </UPopover>
-                        </template>
-                    </UInputDate>
-                </UFormField>
                 <div class="flex justify-end gap-2">
                     <UButton label="Cancel" color="neutral" variant="subtle" @click="open = false" />
                     <UButton label="Ajouter" color="primary" variant="solid" type="submit" :loading="isLoading" />

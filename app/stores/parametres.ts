@@ -18,6 +18,7 @@ export const useParametresStore = defineStore("parametres", () => {
   const profilsStore = useProfilsStore();
   const articlesStore = useArticlesStore();
   const facturesStore = useFacturesStore();
+  const budgetsStore = useBudgetsStore();
   const nfsStore = useNFStore();
   const organisationsStore = useOrganisationsStore();
   const beneficiairesStore = useBeneficiairesStore();
@@ -100,6 +101,12 @@ export const useParametresStore = defineStore("parametres", () => {
         name: "factures",
         promise: owner_id.value
           ? facturesStore.fetchAll(owner_id.value)
+          : Promise.resolve(),
+      },
+      {
+        name: "budget",
+        promise: owner_id.value
+          ? budgetsStore.fetchAll(owner_id.value)
           : Promise.resolve(),
       },
       {

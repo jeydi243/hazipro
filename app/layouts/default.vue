@@ -92,8 +92,8 @@
                     }
                 },
                 {
-                    label: 'Table de concordance',
-                    to: '/budget/concordance',
+                    label: 'Table de correspondance',
+                    to: '/budget/correspondance',
                     icon: 'solar:card-transfer-bold-duotone',
                     onSelect: () => {
                         open.value = false

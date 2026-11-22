@@ -20,9 +20,9 @@
         to: '/budget/realisation'
     },
     {
-        label: 'Table de concordance',
+        label: 'Table de correspondance',
         icon: 'octicon:organization-16',
-        to: '/budget/concordance'
+        to: '/budget/correspondance'
     },
     {
         label: 'Reporting',

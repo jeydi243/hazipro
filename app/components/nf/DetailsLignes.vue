@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
     import AddBudget from './AddBudget.vue'
-    import type { TableColumn } from '@nuxt/ui'
+    import type { DropdownMenuItem, TableColumn } from '@nuxt/ui'
     import type { Row } from '@tanstack/table-core'
     import type { LigneNF, NF } from '~/types/organisation'
 
@@ -115,7 +115,7 @@
         }
     ]
 
-    function getRowItemsClasse(row: Row<LigneNF>) {
+    function getRowItemsClasse(row: Row<LigneNF>): DropdownMenuItem[][] {
         return [[
             { type: 'label', label: 'Actions' },
             {

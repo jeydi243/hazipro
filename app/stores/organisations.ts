@@ -8,7 +8,6 @@ export const useOrganisationsStore = defineStore("organisations", () => {
   const loading = ref(false);
 
   async function fetchAll(ownerId?: string | null) {
-    loading.value = true;
     let query = supabase.from("organisations").select(
       "id, nom, code, description, status, owner_id, organisation_parent_id, type:type_organisation_id(id, code, description, classe:classe_id(id, code, description))",
     );
@@ -16,7 +15,6 @@ export const useOrganisationsStore = defineStore("organisations", () => {
     const { data, error } = await query;
     if (error) throw error;
     if (data) items.value = data as unknown as Organisation[];
-    loading.value = false;
     return items.value;
   }
 
@@ -71,7 +69,6 @@ export const useOrganisationsStore = defineStore("organisations", () => {
     if (created) items.value.unshift(created[0] as unknown as Organisation);
     return created[0];
   }
-  
 
   async function update(id: string, data: Partial<Organisation>) {
     const { data: updated, error } = await supabase.from("organisations")

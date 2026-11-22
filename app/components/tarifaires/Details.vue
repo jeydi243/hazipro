@@ -16,7 +16,7 @@
                     v-model:column-visibility="columnVisibility" v-model:row-selection="rowSelection"
                     v-model:pagination="pagination" empty="Aucune ligne de tarifaire" :pagination-options="{
                         getPaginationRowModel: getPaginationRowModel()
-                    }" class="shrink-0 m-2 bg-white dark:bg-(--ui-bg)" :data="tarifairesLines ?? EMPTY_ROWS"
+                    }" class="shrink-0 m-2 bg-white dark:bg-default" :data="tarifairesLines ?? EMPTY_ROWS"
                     :columns="columnsTarifaireLine" :loading="tarifairesLinesStatus === 'pending'" :ui="{
                         base: 'table-fixed border-separate border-spacing-0',
                         thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
@@ -38,7 +38,7 @@
                     <UButton color="neutral" variant="ghost" @click="close">
                         Annuler
                     </UButton>
-                    <UButton color="secondary" variant="solid" @click="stopTarrifaireLine">
+                    <UButton color="primary" variant="solid" @click="stopTarrifaireLine">
                         Confirmer
                     </UButton>
                 </template>

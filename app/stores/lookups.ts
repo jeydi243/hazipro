@@ -6,7 +6,8 @@ export const useLookupsStore = defineStore("lookups", () => {
   const classes = ref<Classe[]>([]);
   const loading = ref(false);
   const supabase = useSupabaseClient();
-
+  const owner_id = ref<string | null>(null);
+  
   async function fetchAll() {
     loading.value = true;
     const [lookupsRes, classesRes] = await Promise.allSettled([
@@ -120,6 +121,9 @@ export const useLookupsStore = defineStore("lookups", () => {
   const getTypeClient = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "type_clients")
   );
+  const getScenarioBudget = computed(() =>
+    lookups.value.filter((l) => l.classe?.table_name === "scenario_budget")
+  );
   const getTypeArticles = computed(() =>
     lookups.value.filter((l) => l.classe?.table_name === "type_articles")
   );
@@ -158,8 +162,9 @@ export const useLookupsStore = defineStore("lookups", () => {
     getTypeArticles,
     getTypeFrais,
     getTypeOrganisations,
+    getScenarioBudget,
     getNatures,
     getGroupeTaxation,
-    getTypeBeneficiaires
+    getTypeBeneficiaires,
   };
 });

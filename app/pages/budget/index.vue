@@ -1,95 +1,287 @@
+<template>
+    <UDashboardPanel id="organisations" :ui-pro="{ body: 'p-0' }">
+        <template #header>
+            <UDashboardNavbar title="Organisations">
+                <template #leading>
+                    <!-- <UDashboardSidebarCollapse /> -->
+                </template>
+
+                <template #right>
+                    <div class="flex flex-wrap items-center justify-between gap-1.5">
+                        <UInput v-model="searchInput" class="max-w-sm" icon="i-lucide-search"
+                            placeholder="Rechercher une organisation…" />
+
+                        <USelectMenu v-model="currentYear" :items="items" />
+
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <USelect v-model="statusFilter" :items="[
+                                { label: 'Toutes', value: 'all' },
+                                { label: 'Subscribed', value: 'subscribed' },
+                                { label: 'Actif', value: 'actif' },
+                                { label: 'Bounced', value: 'bounced' }
+                            ]" :ui="{ trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200' }"
+                                placeholder="Filtrer par statut" class="min-w-28"
+                                @update:model-value="setStatusFilter('status', $event)" />
+
+                            <UDropdownMenu :items="columnDisplayItems" :content="{ align: 'end' }">
+                                <UButton label="Affichage" color="neutral" variant="outline"
+                                    trailing-icon="i-lucide-settings-2" />
+                            </UDropdownMenu>
+                        </div>
+                    </div>
+                    <BudgetAddModal />
+                </template>
+            </UDashboardNavbar>
+        </template>
+        <template #body>
+            <UTable ref="table" v-model:column-filters="columnFilters" v-model:column-visibility="columnVisibility"
+                v-model:row-selection="rowSelection" v-model:pagination="pagination"
+                :pagination-options="paginationOptions" class="shrink-0 m-2" :data="data ?? emptyRows"
+                :columns="columns" :ui="{
+                    base: 'table-fixed border-separate border-spacing-0 border border-(--ui-border) rounded-lg',
+                    thead: '[&>tr]:bg-(--ui-bg-elevated)/50 [&>tr]:after:content-none',
+                    tbody: '[&>tr]:last:[&>td]:border-b-0',
+                    th: 'py-1 first:rounded-tl-[calc(var(--ui-radius)*2)] last:rounded-tr-[calc(var(--ui-radius)*2)] border-y border-(--ui-border) first:border-l last:border-r pl-2',
+                    td: 'border-b border-(--ui-border) p-2'
+                }" />
+
+            <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
+                <div class="text-sm text-muted">
+                    {{ selectedRowCount }} sur {{ totalFilteredRows }} ligne(s) sélectionnée(s).
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <UPagination :default-page="currentPage" :items-per-page="currentPageSize"
+                        :total="totalFilteredRows" @update:page="setPage" />
+                </div>
+            </div>
+        </template>
+    </UDashboardPanel>
+
+    <PointFacturationDetails v-model:open="openSlideOver" :organisation="selectedOrganisation" />
+    <!-- <PointFacturationEditModal v-model:open="openEditModal" :organisation="selectedOrganisationToEdit"  @point-facturation-updated="refreshOrganisations" /> -->
+</template>
+
 <script setup lang="ts">
-import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
+    import type { Row } from '@tanstack/table-core'
+    import type { TableColumn, DropdownMenuItem } from '@nuxt/ui'
+    import type { Organisation } from '~/types'
+    import { storeToRefs } from 'pinia'
 
-useHead({
-    title: 'General - Settings',
-    meta: [
-        { name: 'description', content: 'General configuration.' }
-    ]
-})
-
-const fileRef = ref<HTMLInputElement>()
-
-const profileSchema = z.object({
-    nom: z.string().min(2, 'Too short'),
-    email: z.string().email('Invalid email'),
-    username: z.string().min(2, 'Too short'),
-    avatar: z.string().optional(),
-    bio: z.string().optional()
-})
-
-type ProfileSchema = z.output<typeof profileSchema>
-
-const profile = reactive<Partial<ProfileSchema>>({
-    nom: 'Benjamin Canac',
-    email: 'ben@nuxtlabs.com',
-    username: 'benjamincanac',
-    avatar: undefined,
-    bio: undefined
-})
-const toast = useToast()
-async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
-    toast.add({
-        title: 'Success',
-        description: 'Your settings have been updated.',
-        icon: 'i-lucide-check',
-        color: 'success'
+    useHead({
+        title: 'Organisations',
+        meta: [
+            { name: 'description', content: 'Gérer les organisations.' }
+        ]
     })
-}
 
-function onFileChange(e: Event) {
-    const input = e.target as HTMLInputElement
+    const supabase = useSupabaseClient()
+    const items = ref([2026, 2027, 2028].map((year) => ({ label: year.toString(), id: year })))
+    const currentYear = ref(items.value.find((item) => item.id === new Date().getFullYear()) ?? items.value[0])
+    const emptyRows: Organisation[] = []
+    const toast = useToast()
+    const parametresStore = useParametresStore()
+    const { lookups } = storeToRefs(parametresStore)
 
-    if (!input.files?.length) {
-        return
+    // Utilisation du composable centralisé
+    const {
+        table,
+        UButton,
+        UBadge,
+        UDropdownMenu,
+        UCheckbox,
+        columnFilters,
+        columnVisibility,
+        rowSelection,
+        pagination,
+        paginationOptions,
+        statusFilter,
+        buildColumnDisplayItems,
+        selectedRowCount,
+        totalFilteredRows,
+        currentPage,
+        currentPageSize,
+        setPage,
+        setStatusFilter
+    } = useDataTable({ filterColumnId: 'description', pageSize: 10 })
+
+    // IDs des colonnes cachables — liste STATIQUE, sans jamais toucher à tableApi
+    const columnDisplayItems = buildColumnDisplayItems(['select', 'details', 'code', 'nom', 'description', 'type', 'status', 'actions'])
+
+    const openSlideOver = ref(false)
+    const selectedOrganisation = ref<BudgetHeader | null>(null)
+    const openEditModal = ref(false)
+    const selectedOrganisationToEdit = ref<BudgetHeader | null>(null)
+
+    const { copy } = useClipboard()
+    const searchInput = ref('')
+
+    const debouncedSearch = useDebounceFn((val: string) => {
+        table.value?.tableApi?.getColumn('description')?.setFilterValue(val)
+    }, 300)
+
+    watch(searchInput, (val) => {
+        debouncedSearch(val)
+    })
+
+    const columns: TableColumn<BudgetHeader>[] = [
+        {
+            id: 'select',
+            header: ({ table }) =>
+                h(UCheckbox as any, {
+                    "modelValue": table.getIsAllPageRowsSelected(),
+                    "indeterminate": table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
+                    'onUpdate:modelValue': (value: any) => table.toggleAllPageRowsSelected(!!value),
+                    'aria-label': 'Tout sélectionner'
+                }),
+            cell: ({ row }) =>
+                h('div', { class: 'flex items-center justify-left' }, h(UCheckbox as any, {
+                    "modelValue": row.getIsSelected(),
+                    'onUpdate:modelValue': (value: any) => row.toggleSelected(!!value),
+                    'aria-label': 'Sélectionner ligne'
+                }))
+        },
+        {
+            id: 'details',
+            header: () => h('div', { class: 'flex items-center justify-center' }, 'Détails'),
+            cell: ({ row }) => h('div', { class: 'flex items-center justify-center' }, h(UButton, {
+                'color': 'neutral',
+                'variant': 'ghost',
+                'icon': 'i-lucide-maximize-2',
+                'aria-label': 'Agrandir',
+                'class': '-mx-2.5',
+                'onClick': () => {
+                    selectedOrganisation.value = row.original
+                    openSlideOver.value = true
+                }
+            })),
+        },
+        {
+            accessorKey: 'annee',
+            header: 'Année',
+            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.annee)
+        },
+        {
+            accessorKey: 'version',
+            header: 'Version',
+            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.version)
+        },
+
+        {
+            accessorKey: 'description',
+            header: ({ column }) => {
+                const isSorted = column.getIsSorted()
+                return h(UButton, {
+                    color: 'neutral',
+                    variant: 'ghost',
+                    label: 'Description',
+                    icon: isSorted
+                        ? isSorted === 'asc'
+                            ? 'i-lucide-arrow-up-narrow-wide'
+                            : 'i-lucide-arrow-down-wide-narrow'
+                        : 'i-lucide-arrow-up-down',
+                    class: '-mx-2.5',
+                    onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+                })
+            }
+        },
+        {
+            accessorKey: 'type_budget_id',
+            header: "Type de budget",
+            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.type_budget_id || 'N/A')
+        },
+        {
+            accessorKey: 'status',
+            header: 'Statut',
+            filterFn: 'equals',
+            cell: ({ row }) => {
+                const statusStr = row.original.status || 'actif'
+                const color = {
+                    subscribed: 'success' as const,
+                    actif: 'success' as const,
+                    unsubscribed: 'error' as const,
+                    bounced: 'warning' as const
+                }[statusStr] || 'neutral'
+
+                return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => statusStr)
+            }
+        },
+        {
+            header: () => h('div', { class: 'text-center' }, 'Actions'),
+            id: 'actions',
+            cell: ({ row }) => {
+                return h(
+                    'div',
+                    { class: 'text-center' },
+                    h(
+                        UDropdownMenu,
+                        {
+                            content: { align: 'end' },
+                            items: getRowItems(row)
+                        },
+                        () =>
+                            h(UButton, {
+                                'icon': 'i-lucide-ellipsis-vertical',
+                                'aria-label': "Plus d'actions",
+                                'color': 'neutral',
+                                'variant': 'ghost',
+                                'class': 'ml-auto'
+                            })
+                    )
+                )
+            }
+        }
+    ]
+
+    function getRowItems(row: Row<BudgetHeader>): DropdownMenuItem[][] {
+        return [[
+            {
+                type: 'label' as const,
+                label: 'Actions'
+            },
+            {
+                label: 'Copie ID Organisation',
+                icon: 'i-lucide-copy',
+                onSelect() {
+                    copy(row.original.id.toString())
+                    toast.add({
+                        title: 'Copié !',
+                        description: 'ID de l\'organisation copié dans le presse-papiers'
+                    })
+                }
+            },
+            { type: 'separator' as const },
+            {
+                label: 'Détails',
+                icon: 'i-lucide-maximize-2',
+                onSelect() {
+                    selectedOrganisation.value = row.original
+                    openSlideOver.value = true
+                }
+            },
+            {
+                label: 'Modifier',
+                icon: 'i-lucide-pencil',
+                onSelect() {
+                    selectedOrganisationToEdit.value = row.original
+                    openEditModal.value = true
+                }
+            },
+            { type: 'separator' as const },
+            {
+                label: 'Supprimer',
+                icon: 'i-lucide-trash',
+                color: 'error' as const,
+                onSelect() {
+                    toast.add({
+                        title: 'Action non disponible',
+                        description: 'La suppression sera implémentée prochainement.'
+                    })
+                }
+            }
+        ]]
     }
 
-    profile.avatar = URL.createObjectURL(input.files[0]!)
-}
+    const data = useBudgetsStore().budgetHeaders;
 
-function onFileClick() {
-    fileRef.value?.click()
-}
 </script>
-
-<template>
-    <UForm id="settings" :schema="profileSchema" :state="profile" class="mx-2" @submit="onSubmit">
-        <UPageCard title="Profile" description="These informations will be displayed publicly." variant="naked"
-                   orientation="horizontal" class="mb-4">
-            <UButton form="settings" label="Save changes" color="neutral" type="submit" class="w-fit lg:ms-auto" />
-        </UPageCard>
-
-        <UPageCard variant="subtle">
-            <UFormField name="nom" label="Nom" description="Will appear on receipts, invoices, and other communication."
-                        required class="flex max-sm:flex-col justify-between items-start gap-4">
-                <UInput v-model="profile.nom" autocomplete="off" />
-            </UFormField>
-            <USeparator />
-            <UFormField name="email" label="Email" description="Used to sign in, for email receipts and product updates."
-                        required class="flex max-sm:flex-col justify-between items-start gap-4">
-                <UInput v-model="profile.email" type="email" autocomplete="off" />
-            </UFormField>
-            <USeparator />
-            <UFormField name="username" label="Username"
-                        description="Your unique username for logging in and your profile URL." required
-                        class="flex max-sm:flex-col justify-between items-start gap-4">
-                <UInput v-model="profile.username" type="username" autocomplete="off" />
-            </UFormField>
-            <USeparator />
-            <UFormField name="avatar" label="Avatar" description="JPG, GIF or PNG. 1MB Max."
-                        class="flex max-sm:flex-col justify-between sm:items-center gap-4">
-                <div class="flex flex-wrap items-center gap-3">
-                    <UAvatar :src="profile.avatar" :alt="profile.nom" size="lg" />
-                    <UButton label="Choose" color="neutral" @click="onFileClick" />
-                    <input ref="fileRef" type="file" class="hidden" accept=".jpg, .jpeg, .png, .gif" @change="onFileChange">
-                </div>
-            </UFormField>
-            <USeparator />
-            <UFormField name="bio" label="Bio" description="Brief description for your profile. URLs are hyperlinked."
-                        class="flex max-sm:flex-col justify-between items-start gap-4" :ui="{ container: 'w-full' }">
-                <UTextarea v-model="profile.bio" :rows="5" autoresize class="w-full" />
-            </UFormField>
-        </UPageCard>
-    </UForm>
-</template>

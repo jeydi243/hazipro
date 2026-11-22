@@ -51,6 +51,47 @@ export interface Adresse {
     created: string | Date;
     updated: string | Date;
 }
+export interface BudgetLine {
+    id: string;
+    budget_code_id: string;
+    entite_id: string;
+    montant: number;
+    status: string;
+    created: string | Date;
+    updated: string | Date;
+}
+export interface BudgetHeader {
+    id: string;
+    budget_code_id: string;
+    type_budget_id: string;
+    entite_id: string;
+    annee: number;
+    version: number;
+    scenario: string;
+    status: string;
+    created: string | Date;
+    updated: string | Date;
+}
+export interface BudgetCorrespondanceLine {
+    id: string;
+    code: string;
+    description: string;
+    budget_code_id: string;
+    compte_budget: string;
+    status: string;
+    date_debut: string | Date;
+    date_fin: string | Date;
+    created: string | Date;
+    updated: string | Date;
+}
+export interface BudgetTransaction {
+    id: string;
+    budget_code_id: string;
+    montant_annuel: string;
+    montant_demande: string;
+    created: string | Date;
+    updated: string | Date;
+}
 export interface Frais {
     id: string;
     nom: string;
@@ -61,7 +102,7 @@ export interface Frais {
     owner_id: string | Organisation;
     created: string | Date;
     updated: string | Date;
-}   
+}
 export interface Banque {
     id: string;
     nom: string;
