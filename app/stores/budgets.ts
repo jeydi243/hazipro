@@ -7,7 +7,6 @@ export const useBudgetsStore = defineStore("budgets", () => {
     const budgetCorrespondanceLine = ref<BudgetCorrespondanceLine[]>([]);
     const budgetTransactions = ref<BudgetTransaction[]>([]);
     const owner_id = ref<string | null>(null);
-    const classes = ref<Classe[]>([]);
     const loading = ref(false);
     const supabase = useSupabaseClient();
 
