@@ -1,13 +1,13 @@
 <template>
     <USlideover v-model:open="open" :ui="{ content: 'min-w-5xl' }" :dismissible="false" title="Note de frais"
-        :description="`Add a new note de frais to the database : ${nextStep}`" :close="{
+        :description="`Add a new note de frais to the database : ${currentStep}`" :close="{
             color: 'primary',
             variant: 'outline',
             class: 'rounded-full'
         }">
         <template #body>
             <Transition name="nf-step" mode="out-in">
-                <div v-if="nextStep === 'header'" class="header">
+                <div v-if="currentStep === 'header'" class="header">
                     <UForm id="nf-create-form" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit"
                         @error="onValidationError">
                         <div v-if="validationErrors.length" role="alert" aria-live="assertive"
@@ -19,123 +19,130 @@
                                 </li>
                             </ul>
                         </div>
-                    <div class="grid grid-cols-4 gap-4">
-                        <UFormField label="Direction" name="organisation_id">
-                            <USelectMenu v-model="state.organisation_id" value-key="id" :items="itemsOrganisations"
-                                class="w-full" />
-                        </UFormField>
-                        <UFormField label="Type NF" placeholder="Employé" name="type_nf">
-                            <USelectMenu v-model="state.type_nf" value-key="id" :items="itemsBeneficiaires"
-                                class="w-full" />
-                        </UFormField>
-                        <UFormField label="Nature de la note" placeholder="" name="nature_id">
-                            <USelectMenu v-model="state.nature_id" value-key="id" :items="itemsNaturesOrganisation"
-                                class="w-full" />
-                        </UFormField>
-                        <!-- <UFormField label="Code" name="code">
+                        <div class="grid grid-cols-4 gap-4">
+                            <UFormField label="Direction" name="organisation_id">
+                                <USelectMenu v-model="state.organisation_id" value-key="id" :items="itemsOrganisations"
+                                    class="w-full" />
+                            </UFormField>
+                            <UFormField label="Type NF" placeholder="Employé" name="type_nf">
+                                <USelectMenu v-model="state.type_nf" value-key="id" :items="itemsBeneficiaires"
+                                    class="w-full" />
+                            </UFormField>
+                            <UFormField label="Nature de la note" placeholder="" name="nature_id">
+                                <USelectMenu v-model="state.nature_id" value-key="id" :items="itemsNaturesOrganisation"
+                                    class="w-full" />
+                            </UFormField>
+                            <!-- <UFormField label="Code" name="code">
                         <UInput v-model="state.code" class="w-full" placeholder="" />
                     </UFormField> -->
-                        <UFormField label="Type budget" placeholder="" name="type_budget_id">
-                            <USelectMenu v-model="state.type_budget_id" value-key="id" :items="itemsBudget"
-                                class="w-full" />
-                        </UFormField>
-                        <UFormField label="Matrice" placeholder="" name="matrice_id">
-                            <USelectMenu v-model="state.matrice_id" value-key="id" :items="itemsMatriceNF"
-                                class="w-full" />
-                        </UFormField>
-                        <UFormField label="1er Approbateur" placeholder="_" name="approbateur_id">
-                            <USelectMenu v-model="state.approbateur_id" value-key="id" :items="itemsApprobateurs"
-                                :disabled="!state.matrice_id || !state.organisation_id" class="w-full" />
-                        </UFormField>
-                        <!-- <UFormField label="Approbateur" placeholder="_" name="aprobateur">
+                            <UFormField label="Type budget" placeholder="" name="type_budget_id">
+                                <USelectMenu v-model="state.type_budget_id" value-key="id" :items="itemsBudget"
+                                    class="w-full" />
+                            </UFormField>
+                            <UFormField label="Matrice" placeholder="" name="matrice_id">
+                                <USelectMenu v-model="state.matrice_id" value-key="id" :items="itemsMatriceNF"
+                                    class="w-full" />
+                            </UFormField>
+                            <UFormField label="1er Approbateur" placeholder="_" name="approbateur_id">
+                                <USelectMenu v-model="state.approbateur_id" value-key="id" :items="itemsApprobateurs"
+                                    :disabled="!state.matrice_id || !state.organisation_id" class="w-full" />
+                            </UFormField>
+                            <!-- <UFormField label="Approbateur" placeholder="_" name="aprobateur">
                         <UInput v-model="state.approbateur_id" class="w-full" />
                     </UFormField> -->
-                        <UFormField label="Date de la note" name="date_document">
-                            <UInputDate ref="inputDate" v-model="dateDocument" :max-value="maxDate">
-                                <template #trailing>
-                                    <UPopover :reference="inputDate?.inputsRef[3]?.$el">
-                                        <UButton color="neutral" variant="link" size="sm" icon="i-lucide-calendar"
-                                            aria-label="Select a date" class="px-0" />
+                            <UFormField label="Date de la note" name="date_document">
+                                <UInputDate ref="inputDate" v-model="dateDocument" :max-value="maxDate">
+                                    <template #trailing>
+                                        <UPopover :reference="inputDate?.inputsRef[3]?.$el">
+                                            <UButton color="neutral" variant="link" size="sm" icon="i-lucide-calendar"
+                                                aria-label="Select a date" class="px-0" />
 
-                                        <template #content>
-                                            <UCalendar v-model="dateDocument" :max-value="maxDate" class="p-2" />
-                                        </template>
-                                    </UPopover>
-                                </template>
-                            </UInputDate>
-                        </UFormField>
-                        <UFormField label="Devise" placeholder="_" name="devise_id">
-                            <USelectMenu v-model="state.devise_id" value-key="id" :items="itemsDevises"
-                                class="w-full" />
-                        </UFormField>
-                        <UFormField label="Taux" placeholder="_" name="taux">
-                            <UInput v-model="state.taux" class="w-full" disabled />
-                        </UFormField>
-                        <!-- <UFormField label="Groupe de paiement" placeholder="_" name="aprobateur">
+                                            <template #content>
+                                                <UCalendar v-model="dateDocument" :max-value="maxDate" class="p-2" />
+                                            </template>
+                                        </UPopover>
+                                    </template>
+                                </UInputDate>
+                            </UFormField>
+                            <UFormField label="Devise" placeholder="_" name="devise_id">
+                                <USelectMenu v-model="state.devise_id" value-key="id" :items="itemsDevises"
+                                    class="w-full" />
+                            </UFormField>
+                            <UFormField label="Taux" placeholder="_" name="taux">
+                                <UInput v-model="state.taux" class="w-full" disabled />
+                            </UFormField>
+                            <!-- <UFormField label="Groupe de paiement" placeholder="_" name="aprobateur">
                         <UInput v-model="state.groupe_paiement_id" class="w-full" />
                     </UFormField> -->
-                    </div>
-                    <div class="mt-auto">
-                        <UFormField label="Bénéficiaire" placeholder="_" name="beneficiaire_id" class="mb-2">
-                            <USelectMenu v-model="state.beneficiaire_id" value-key="id" :items="benef"
-                                icon="i-lucide-user" placeholder="Select user" :ui="{ content: 'min-w-fit' }"
-                                class="w-full" @update:open="onOpen">
-                                <template #item-label="{ item }">
-                                    {{ (item as any)?.label }}
+                        </div>
+                        <div class="mt-auto">
+                            <UFormField label="Bénéficiaire" placeholder="_" name="beneficiaire_id" class="mb-2">
+                                <USelectMenu v-model="state.beneficiaire_id" value-key="id" :items="benef"
+                                    icon="i-lucide-user" placeholder="Select user" :ui="{ content: 'min-w-fit' }"
+                                    class="w-full" @update:open="onOpen">
+                                    <template #item-label="{ item }">
+                                        {{ (item as any)?.label }}
 
-                                    <span class="text-muted">
-                                        {{ (item as any)?.email }}
-                                    </span>
-                                </template>
-                            </USelectMenu>
-                        </UFormField>
-                        <UFormField label="Description" placeholder="_" name="description">
-                            <UTextarea v-model="state.description" class="w-full" />
-                        </UFormField>
-                    </div>
-                    <div class="grid grid-cols-4 gap-4 statuts_nf">
-                        <UFormField label="Statut document" placeholder="_" name="statut_document">
-                            <UInput v-model="state.statut_document" class="w-full" disabled />
-                        </UFormField>
-                        <UFormField label="Statut approbation" placeholder="_" name="statut_approbation">
-                            <UInput v-model="state.statut_approbation" class="w-full" disabled />
-                        </UFormField>
-                        <UFormField label="Statut paiement" placeholder="_" name="statut_paiement">
-                            <UInput v-model="state.statut_paiement" class="w-full" disabled />
-                        </UFormField>
-                        <UFormField label="Statut planification" placeholder="_" name="statut_planification">
-                            <UInput v-model="state.statut_planification" class="w-full" disabled />
-                        </UFormField>
-                        <UFormField label="Statut programmation" placeholder="_" name="statut_programmation">
-                            <UInput v-model="state.statut_programmation" class="w-full" disabled />
-                        </UFormField>
-                        <UFormField label="Numéro de document" placeholder="_" name="numero_document">
-                            <UInput v-model="state.numero_document" class="w-full" disabled />
-                        </UFormField>
-                    </div>
-                    <!-- <div class="flex justify-end gap-2">
+                                        <span class="text-muted">
+                                            {{ (item as any)?.email }}
+                                        </span>
+                                    </template>
+                                </USelectMenu>
+                            </UFormField>
+                            <UFormField label="Description" placeholder="_" name="description">
+                                <UTextarea v-model="state.description" class="w-full" />
+                            </UFormField>
+                        </div>
+                        <div class="grid grid-cols-4 gap-4 statuts_nf">
+                            <UFormField label="Statut document" placeholder="_" name="statut_document">
+                                <UInput v-model="state.statut_document" class="w-full" disabled />
+                            </UFormField>
+                            <UFormField label="Statut approbation" placeholder="_" name="statut_approbation">
+                                <UInput v-model="state.statut_approbation" class="w-full" disabled />
+                            </UFormField>
+                            <UFormField label="Statut paiement" placeholder="_" name="statut_paiement">
+                                <UInput v-model="state.statut_paiement" class="w-full" disabled />
+                            </UFormField>
+                            <UFormField label="Statut planification" placeholder="_" name="statut_planification">
+                                <UInput v-model="state.statut_planification" class="w-full" disabled />
+                            </UFormField>
+                            <UFormField label="Statut programmation" placeholder="_" name="statut_programmation">
+                                <UInput v-model="state.statut_programmation" class="w-full" disabled />
+                            </UFormField>
+                            <UFormField label="Numéro de document" placeholder="_" name="numero_document">
+                                <UInput v-model="state.numero_document" class="w-full" disabled />
+                            </UFormField>
+                        </div>
+                        <!-- <div class="flex justify-end gap-2">
                     <UButton label="Annuler" color="neutral" variant="subtle" @click="open = false" />
                     <UButton label="Créer" form="" color="primary" variant="solid" type="submit" />
                 </div> -->
                     </UForm>
                 </div>
-                <div v-else-if="nextStep === 'lignes'">
+                <div v-else-if="currentStep === 'lignes'">
                     <NfDetailsLignes :current-nf="state as Partial<NF>" />
+                </div>
+                <div v-else-if="currentStep === 'resume'">
+                    <NfResume :current-nf="state as Partial<NF>" />
                 </div>
             </Transition>
         </template>
         <template #footer="{ close }">
-            <UButton v-if="nextStep === 'header'" label="Fermer" color="neutral" variant="ghost" @click="close" />
-            <UButton v-else label="Precedent" color="info" variant="ghost" icon="material-symbols:arrow-left-alt" @click="setPrevious('header')" />
+            <UButton v-if="currentStep === 'header'" label="Fermer" color="warning" variant="solid" @click="close" />
+            <UButton v-else label="Precedent" color="primary" variant="ghost" icon="material-symbols:arrow-left-alt"
+                @click="setPrevious()" />
 
-            <UButton label="Documents" color="info" variant="ghost" />
+            <UButton label="Documents" color="primary" variant="ghost" />
             <UButton v-if="!state.id" label="Créer la note de frais" class="ml-auto" color="primary" variant="solid"
                 type="submit" form="nf-create-form" :loading="isLoading" />
             <span v-else-if="state.id" class="flex flex-row gap-2 ml-auto">
-                <UButton label="Mettre à jour" class="ml-auto" color="primary" variant="solid" type="submit"
-                    form="nf-create-form" :loading="isLoading" />
-                <UButton label="Suivant" trailing-icon="material-symbols:keyboard-arrow-right" class="ml-auto" color="primary" variant="ghost"
-                    :loading="isLoading" @click="setNext('lignes')" />
+                <UButton v-if="currentStep === 'header'" label="Mettre à jour" class="ml-auto" color="primary"
+                    variant="solid" type="submit" form="nf-create-form" :loading="isLoading" />
+                <UButton v-if="currentStep === 'resume'" label="Soumettre à l'approbation" class="ml-auto"
+                    color="primary" variant="solid" :loading="isLoading" @click="submitApproval" />
+                <UButton v-if="currentStepIndex < allSteps.length - 1" label="Suivant"
+                    trailing-icon="material-symbols:keyboard-arrow-right" class="ml-auto" color="primary"
+                    variant="ghost" :loading="isLoading" @click="setNext()" />
             </span>
         </template>
     </USlideover>
@@ -202,7 +209,10 @@
     type Schema = z.output<typeof schema>
     const open = ref(false)
     const isLoading = ref(false)
-    const nextStep = ref<string | null>("header")
+    const allSteps = ['header', 'lignes', 'resume'];
+    let currentStepIndex = ref(0);
+    const currentStep = ref<string | null>(allSteps[currentStepIndex.value] ?? null);
+    // const currentStep = ref<string | null>("header")
     const toast = useToast()
     const nfStore = useNFStore()
     const parametresStore = useParametresStore()
@@ -350,11 +360,13 @@
     function onValidationError(error: FormErrorEvent) {
         validationErrors.value = error.errors
     }
-    function setNext(next: string) {
-        nextStep.value = next
+    function setNext() {
+        currentStep.value = currentStepIndex.value < allSteps.length - 1 ? allSteps[currentStepIndex.value + 1] ?? null : null
+        currentStepIndex.value++
     }
-    function setPrevious(previous: string) {
-        nextStep.value = previous
+    function setPrevious() {
+        currentStep.value = currentStepIndex.value > 0 ? allSteps[currentStepIndex.value - 1] ?? null : null
+        currentStepIndex.value--
     }
 
     async function onSubmit(event: FormSubmitEvent<Schema>) {
@@ -363,6 +375,18 @@
         try {
             await nfStore.create(event.data)
             toast.add({ title: 'Succès', description: `Nouvelle note de frais ajoutée`, color: 'success' })
+            open.value = false
+        } catch (err: any) {
+            toast.add({ title: 'Erreur', description: err.message, color: 'error' })
+        } finally {
+            isLoading.value = false
+        }
+    }
+    async function submitApproval() {
+        isLoading.value = true
+        try {
+            await nfStore.submitForApproval(state.id as string)
+            toast.add({ title: 'Succès', description: `Note de frais soumise à l'approbation`, color: 'success' })
             open.value = false
         } catch (err: any) {
             toast.add({ title: 'Erreur', description: err.message, color: 'error' })
@@ -406,6 +430,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .nf-step-enter-active,
     .nf-step-leave-active {
         animation: none;

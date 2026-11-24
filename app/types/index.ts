@@ -53,8 +53,8 @@ export interface Adresse {
 }
 export interface BudgetLine {
     id: string;
-    budget_code_id: string;
-    entite_id: string;
+    budget_code_id: string | BudgetCorrespondanceLine;
+    entite_id: string | Organisation;
     montant: number;
     status: string;
     created: string | Date;
@@ -63,11 +63,11 @@ export interface BudgetLine {
 export interface BudgetHeader {
     id: string;
     budget_code_id: string;
-    type_budget_id: string;
-    entite_id: string;
+    type_budget_id: string | Lookup;
+    owner_id: string;
     annee: number;
     version: number;
-    scenario: string;
+    scenario: string | Lookup;
     status: string;
     created: string | Date;
     updated: string | Date;
@@ -86,9 +86,10 @@ export interface BudgetCorrespondanceLine {
 }
 export interface BudgetTransaction {
     id: string;
-    budget_code_id: string;
-    montant_annuel: string;
-    montant_demande: string;
+    ligne_budget_id: string | BudgetLine;
+    montant_annuel: number;
+    montant_demande: number;
+    nf_line_id: string | LigneNF;
     created: string | Date;
     updated: string | Date;
 }

@@ -79,19 +79,16 @@
                     <UInput v-model="state.numero_piece" class="w-full" />
                 </UFormField>
                 <UFormField label="Date de la note" name="date_document">
-                    <UInputDate ref="inputDate" :model-value="datePiece as any" :max-value="maxDate as any" class="w-full">
+                    <UInputDate ref="inputDate" :model-value="datePiece as any" :max-value="maxDate as any"
+                        class="w-full">
                         <template #trailing>
                             <UPopover :reference="inputDate?.inputsRef[3]?.$el">
                                 <UButton color="neutral" variant="link" size="sm" icon="i-lucide-calendar"
                                     aria-label="Select a date" class="px-0" />
 
                                 <template #content>
-                                    <UCalendar
-                                        :model-value="datePiece as any"
-                                        :max-value="maxDate as any"
-                                        class="p-2"
-                                        @update:model-value="datePiece = $event as unknown as DateValue"
-                                    />
+                                    <UCalendar :model-value="datePiece as any" :max-value="maxDate as any" class="p-2"
+                                        @update:model-value="datePiece = $event as unknown as DateValue" />
                                 </template>
                             </UPopover>
                         </template>

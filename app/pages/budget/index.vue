@@ -58,8 +58,8 @@
         </template>
     </UDashboardPanel>
 
-    <PointFacturationDetails v-model:open="openSlideOver" :organisation="selectedOrganisation" />
-    <!-- <PointFacturationEditModal v-model:open="openEditModal" :organisation="selectedOrganisationToEdit"  @point-facturation-updated="refreshOrganisations" /> -->
+    <BudgetDetails v-model:open="openSlideOver" :budget="selectedBudgetHeader" />
+    <!-- <PointFacturationEditModal v-model:open="openEditModal" :organisation="selectedBudgetHeaderToEdit"  @point-facturation-updated="refreshOrganisations" /> -->
 </template>
 
 <script setup lang="ts">
@@ -69,9 +69,9 @@
     import { storeToRefs } from 'pinia'
 
     useHead({
-        title: 'Organisations',
+        title: 'Budgets',
         meta: [
-            { name: 'description', content: 'Gérer les organisations.' }
+            { name: 'description', content: 'Gérer les budgets' }
         ]
     })
 
@@ -109,9 +109,9 @@
     const columnDisplayItems = buildColumnDisplayItems(['select', 'details', 'code', 'nom', 'description', 'type', 'status', 'actions'])
 
     const openSlideOver = ref(false)
-    const selectedOrganisation = ref<BudgetHeader | null>(null)
+    const selectedBudgetHeader = ref<BudgetHeader | null>(null)
     const openEditModal = ref(false)
-    const selectedOrganisationToEdit = ref<BudgetHeader | null>(null)
+    const selectedBudgetHeaderToEdit = ref<BudgetHeader | null>(null)
 
     const { copy } = useClipboard()
     const searchInput = ref('')
@@ -126,32 +126,17 @@
 
     const columns: TableColumn<BudgetHeader>[] = [
         {
-            id: 'select',
-            header: ({ table }) =>
-                h(UCheckbox as any, {
-                    "modelValue": table.getIsAllPageRowsSelected(),
-                    "indeterminate": table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
-                    'onUpdate:modelValue': (value: any) => table.toggleAllPageRowsSelected(!!value),
-                    'aria-label': 'Tout sélectionner'
-                }),
-            cell: ({ row }) =>
-                h('div', { class: 'flex items-center justify-left' }, h(UCheckbox as any, {
-                    "modelValue": row.getIsSelected(),
-                    'onUpdate:modelValue': (value: any) => row.toggleSelected(!!value),
-                    'aria-label': 'Sélectionner ligne'
-                }))
-        },
-        {
             id: 'details',
             header: () => h('div', { class: 'flex items-center justify-center' }, 'Détails'),
             cell: ({ row }) => h('div', { class: 'flex items-center justify-center' }, h(UButton, {
-                'color': 'neutral',
+                'color': 'primary',
                 'variant': 'ghost',
-                'icon': 'i-lucide-maximize-2',
+
                 'aria-label': 'Agrandir',
+                'label': 'Détails du budget',
                 'class': '-mx-2.5',
                 'onClick': () => {
-                    selectedOrganisation.value = row.original
+                    selectedBudgetHeader.value = row.original
                     openSlideOver.value = true
                 }
             })),
@@ -168,13 +153,13 @@
         },
 
         {
-            accessorKey: 'description',
+            accessorKey: 'scenario',
             header: ({ column }) => {
                 const isSorted = column.getIsSorted()
                 return h(UButton, {
                     color: 'neutral',
                     variant: 'ghost',
-                    label: 'Description',
+                    label: 'Scenario',
                     icon: isSorted
                         ? isSorted === 'asc'
                             ? 'i-lucide-arrow-up-narrow-wide'
@@ -183,12 +168,13 @@
                     class: '-mx-2.5',
                     onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
                 })
-            }
+            },
+            cell: ({ row }) => h('p', { class: 'font-medium' }, (row.original.scenario as Lookup)?.nom || 'N/A')
         },
         {
             accessorKey: 'type_budget_id',
             header: "Type de budget",
-            cell: ({ row }) => h('p', { class: 'font-medium' }, row.original.type_budget_id || 'N/A')
+            cell: ({ row }) => h('p', { class: 'font-medium' }, (row.original.type_budget_id as Lookup)?.nom || 'N/A')
         },
         {
             accessorKey: 'status',
@@ -255,7 +241,7 @@
                 label: 'Détails',
                 icon: 'i-lucide-maximize-2',
                 onSelect() {
-                    selectedOrganisation.value = row.original
+                    selectedBudgetHeader.value = row.original
                     openSlideOver.value = true
                 }
             },
@@ -263,7 +249,7 @@
                 label: 'Modifier',
                 icon: 'i-lucide-pencil',
                 onSelect() {
-                    selectedOrganisationToEdit.value = row.original
+                    selectedBudgetHeaderToEdit.value = row.original
                     openEditModal.value = true
                 }
             },
@@ -282,6 +268,6 @@
         ]]
     }
 
-    const data = useBudgetsStore().budgetHeaders;
+    const data = computed(() => useBudgetsStore().getBudgetHeaders);
 
 </script>

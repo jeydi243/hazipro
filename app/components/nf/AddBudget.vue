@@ -13,25 +13,34 @@
     const isLoading = ref(false)
     const toast = useToast()
     const schema = z.object({
-        ligne_budget_id: z.string(),
+        ligne_budget_id: z.string('Veuillez sélectionner une ligne budgetaire'),
         montant_demande: z.number().positive('Montant demandé doit être un nombre positif'),
         montant_annuel: z.number().positive('Montant annuel doit être un nombre positif'),
         devise_id: z.string(),
-        nf_id: z.string(),
+        nf_line_id: z.string(),
         date_piece: z.string().optional(),
     })
     const itemsDevises = computed<SelectMenuItem[]>(() => Devises?.map((org: Lookup) => ({
         label: org.nom,
         id: org.id
     })) || [])
+
     type Schema = z.output<typeof schema>
     const state = reactive<Partial<Schema>>({
         ligne_budget_id: undefined,
         montant_demande: 0,
         montant_annuel: 0,
-        nf_id: props.currentNf?.id,
+        nf_line_id: props.ligneId,
         devise_id: (props.currentNf?.devise_id as string) || undefined,
     })
+    watch(() => state.ligne_budget_id, (newValue) => {
+        if (newValue) {
+            const selectedLigne = lignesBudgetaire.value.find((ligne) => ligne.id === newValue);
+            if (selectedLigne) {
+                state.montant_annuel = selectedLigne.montant;
+            }
+        }
+    });
 
     const frais = useParametresStore().getFrais
     const entiteId = computed(() => props.currentNf?.organisation_id as string)
@@ -42,24 +51,18 @@
         budgetStore.getLignesBudgetaire(entiteId.value, annee.value)
     )
 
-    const itemsFrais = computed<SelectMenuItem[]>(() => frais?.map((f) => ({
-        label: f.nom,
-        id: f.id
-    })) || [])
-
     const itemsLignesBudgetaire = computed<SelectMenuItem[]>(() => lignesBudgetaire.value?.map((f) => ({
-        label: f.nom,
+        label: (f.budget_code_id as BudgetCorrespondanceLine).code + ' - ' + (f.budget_code_id as BudgetCorrespondanceLine).description,
         id: f.id
     })) || [])
 
     const emit = defineEmits(['ligne-added'])
-    const nfsStore = useNFStore()
 
     async function onSubmit(event: FormSubmitEvent<Schema>) {
         try {
             isLoading.value = true;
-            await nfsStore.createLigne(event.data)
-            toast.add({ title: 'Succès', description: `Nouveau frais ajoutée`, color: 'success' })
+            await budgetStore.addBudgetTransaction(event.data as any)
+            toast.add({ title: 'Succès', description: `Ligne budgetisée avec succès`, color: 'success' })
             emit('ligne-added')
             open.value = false
             isLoading.value = false;
@@ -76,13 +79,14 @@
         <UButton label="Budgetiser" aria-label="Budgetiser" variant="ghost" class="ml-auto" />
 
         <template #body>
+            {{ state }}
             <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
                 <UFormField label="Ligne budgetaire" placeholder="Ligne budgetaire" name="ligne_budget_id">
                     <USelectMenu v-model="state.ligne_budget_id" value-key="id" :items="itemsLignesBudgetaire"
                         class="w-full" />
                 </UFormField>
                 <UFormField label="Montant annuel" placeholder="Montant annuel" name="montant_annuel">
-                    <UInputNumber v-model="state.montant_annuel" type="number" class="w-full" orientation="vertical"
+                    <UInputNumber v-model="state.montant_annuel" type="number" class="w-full" orientation="vertical" disabled
                         locale="de-DE" :format-options="{ useGrouping: true }" />
                 </UFormField>
                 <UFormField label="Montant demandé" placeholder="Montant demandé" name="montant_demande">

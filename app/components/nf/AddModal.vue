@@ -117,8 +117,8 @@
             </UForm>
         </template>
         <template #footer="{ close }">
-            <UButton label="Cancel" color="neutral" variant="outline" @click="close" />
-            <UButton label="Documents" color="info" variant="outline" />
+            <UButton label="Cancel" color="primary" variant="outline" @click="close" />
+            <UButton label="Documents" color="primary" variant="ghost" />
             <UButton label="Créer la note de frais" class="ml-auto" color="primary" variant="solid" type="submit"
                 form="nf-create-form" :loading="isLoading" />
         </template>

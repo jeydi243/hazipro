@@ -34,10 +34,10 @@
         id: lookup.id
     })) || [])
 
-    
+
 
     async function onSubmit(event: FormSubmitEvent<Schema>) {
-            loading.value = true;
+        loading.value = true;
         try {
             await budgetsStore.addBudgetHeader(event.data as any)
             toast.add({ title: 'Succès', description: `Nouveau budget ${event.data?.scenario} ajouté`, color: 'success' })
@@ -53,7 +53,12 @@
 
 
 <template>
-    <UModal v-model:open="open" title="Budget" description="Ajouter un nouveau budget" :size="'md'" :closeable="true" :overlay="true" :close-on-esc="true" :close-on-click-outside="true">
+    <UModal v-model:open="open" title="Budget" description="Ajouter un nouveau budget" :size="'md'" :closeable="true"
+        :overlay="true" :close-on-esc="true" :close-on-click-outside="true" :close="{
+            color: 'primary',
+            variant: 'ghost',
+            class: 'rounded-full'
+        }">
         <UButton label="Ajouter le budget" icon="i-lucide-plus" />
 
         <template #body>
@@ -68,7 +73,7 @@
                     <UInputNumber v-model="state.version" class="w-full" orientation="vertical" :min="1" />
                 </UFormField>
                 <UFormField label="Exercice fiscale" placeholder="John Doe" name="annee">
-                    <UInputNumber v-model="state.annee" class="w-full" orientation="vertical" :min="2026"/>
+                    <UInputNumber v-model="state.annee" class="w-full" orientation="vertical" :min="2026" />
                 </UFormField>
                 <div class="flex justify-end gap-2">
                     <UButton label="Cancel" color="neutral" variant="subtle" @click="open = false" />

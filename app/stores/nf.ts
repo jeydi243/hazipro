@@ -72,6 +72,18 @@ export const useNFStore = defineStore("nf", () => {
         if (created) items.value.unshift(created[0] as unknown as NF);
         return created[0];
     }
+    async function submitForApproval(nfId: string) {
+        const { data: updated, error } = await supabase.from("nf").update(
+            { status: "En cours" } as never,
+        ).eq("id", nfId).select("*");
+        if (error) throw error;
+        if (updated) {
+            const index = items.value.findIndex((nf) => nf.id === nfId);
+            if (index !== -1) {
+                items.value[index] = updated[0] as unknown as NF;
+            }
+        }
+    }
     async function createLigne(data: Partial<LigneNF>) {
         const { data: created, error } = await supabase.from("nf_lines").insert(
             { ...data, owner_id: owner_id.value } as never,
@@ -107,6 +119,7 @@ export const useNFStore = defineStore("nf", () => {
         );
         if (error) throw error;
     }
+
     function subscribeToRealtime(onChange: () => void): () => void {
         const supabase = useSupabaseClient();
         const channel = supabase
@@ -132,7 +145,9 @@ export const useNFStore = defineStore("nf", () => {
     const getLignesNF = computed(() => (nf_id: string) => {
         return itemsLignes.value.filter((l) => l.nf_id === nf_id).map((l) => {
             const frais = paramStore.getFrais.find((a) => a.id === l.frais_id);
-            const devise = lookupsStore.getDevise.find((d) => d.id === l.devise_id);
+            const devise = lookupsStore.getDevise.find((d) =>
+                d.id === l.devise_id
+            );
             return { ...l, frais_id: frais?.nom, devise_id: devise?.nom };
         });
     });
@@ -144,6 +159,7 @@ export const useNFStore = defineStore("nf", () => {
         create,
         remove,
         fetchLines,
+        submitForApproval,
         removeLine,
         getNF,
         getLignesNF,
